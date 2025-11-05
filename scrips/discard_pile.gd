@@ -3,7 +3,6 @@ class_name DiscardPile
 
 # --- Señales ---
 signal card_played
-signal first_card_placed
 
 # --- Variables ---
 var discarded_cards: Array = []
@@ -35,11 +34,6 @@ func receive_card(new_card: Card, origin: Node2D) -> void:
 
 	# Mover la carta a la posición de descarte
 	await CardManager.move_card_to_position(new_card, discard_position, 0.2, random_rotation)
-
-	# Emitir la señal correspondiente según el origen de la carta
-	if origin is Deck:
-		emit_signal("first_card_placed")
-		return
 	
-	# Si la carta no proviene del mazo, emitir la señal de carta jugada
+	# Emitir la señal de carta jugada
 	emit_signal("card_played")
