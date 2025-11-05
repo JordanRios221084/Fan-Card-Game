@@ -7,12 +7,15 @@ var all_players: Array = []
 var deck: Deck
 var discard_pile: DiscardPile
 
+# --- variables para los jugadores ---
 var prev_winner: Player
 var current_player: Player
 var next_player: Player
 
+# --- Variable que controla el estado actual ---
 var current_state: STATES
 
+# --- Enumerado de estados ---
 enum STATES{
 	IDLE,
 	GAME_STARTED,
