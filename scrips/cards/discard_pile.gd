@@ -2,13 +2,12 @@ extends Node2D
 class_name DiscardPile
 
 # --- Señales ---
-signal card_played
-signal first_card_placed
+signal card_played(last_card: Card)
 
 # --- Variables ---
-var discarded_cards: Array = []
 var top_card: Card
-var discard_position: Vector2 = self.position
+var _discarded_cards: Array = []
+var _discard_position: Vector2 = self.position
 
 # --- Función para recibir una carta en el montón de descarte ---
 func receive_card(new_card: Card, origin: Node2D) -> void:
@@ -16,7 +15,7 @@ func receive_card(new_card: Card, origin: Node2D) -> void:
 	new_card.reparent(self)
 
 	# Añadir la carta a la lista de cartas descartadas
-	discarded_cards.append(new_card)
+	_discarded_cards.append(new_card)
 	new_card.current_parent = self
 
 	# Actualizar la carta superior
@@ -34,12 +33,7 @@ func receive_card(new_card: Card, origin: Node2D) -> void:
 	var random_rotation: float = rad_to_deg(randf_range(-180, 180))
 
 	# Mover la carta a la posición de descarte
-	await CardManager.move_card_to_position(new_card, discard_position, 0.2, random_rotation)
-
-	# Emitir la señal correspondiente según el origen de la carta
-	if origin is Deck:
-		emit_signal("first_card_placed")
-		return
+	await CardManager.move_card_to_position(new_card, _discard_position, 0.2, random_rotation)
 	
-	# Si la carta no proviene del mazo, emitir la señal de carta jugada
-	emit_signal("card_played")
+	# Emitir la señal de carta jugada
+	card_played.emit(new_card)

@@ -3,20 +3,14 @@ extends Node2D
 class_name Deck
 
 # --- Constantes ---
-const CARD_SCENCE_PATH: String = "res://scenes/card.tscn"
+const CARD_SCENCE_PATH: String = "res://scenes/cards/card.tscn"
+
+# --- Nodos ---
+@export var deck_sprite: Sprite2D
+@export var deck_collision_shape: CollisionShape2D
 
 # --- Baraja actual ---
 var current_deck: Array = []
-
-# --- Nodos ---
-var deck_collision_shape: CollisionShape2D
-var deck_sprite: Sprite2D
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	# --- Obtener referencias a nodos ---
-	deck_collision_shape = $Area2D/CollisionShape2D
-	deck_sprite = $DeckSprite
 
 # --- Función para robar una carta de la baraja ---
 func draw_card() -> Card:

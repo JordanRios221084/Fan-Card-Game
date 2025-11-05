@@ -9,13 +9,12 @@ const CENTER_POINT: float = 0.0
 const TARGET_TIME: float = 0.2
 
 # --- Mano actual del jugador ---
-var current_hand: Array = []
+var current_hand: Array[Card] = []
 
 # --- Propiedades del jugador ---
 @export var is_turn: bool = false
 @export var is_human: bool = false
-@export var is_remote_player: bool = false
-@export var auto_sort_cards: bool = false
+@export var _auto_sort_cards: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -35,15 +34,15 @@ func add_card_to_hand(new_card: Card) -> void:
 		new_card.card_animator.play("flip_card")
 	
 	# Si es el turno del jugador, ordenar las cartas
-	if auto_sort_cards:
-		sort_cards()
+	if _auto_sort_cards:
+		_sort_cards()
 	
 	# Posicionar la carta en la mano del jugador
-	calculate_cards_position()
+	_calculate_cards_position()
 	await get_tree().create_timer(TARGET_TIME).timeout
 
 # --- Función para calcular la posición de las cartas en la mano ---
-func calculate_cards_position() -> void:
+func _calculate_cards_position() -> void:
 	var hand_size: int = current_hand.size()
 	var card_selected_index: int = -1
 
@@ -77,7 +76,7 @@ func calculate_cards_position() -> void:
 		CardManager.move_card_to_position(card, final_position, TARGET_TIME, 0.0)
 
 # --- Función para ordenar las cartas en la mano del jugador ---
-func sort_cards() -> void:
+func _sort_cards() -> void:
 	# Diccionarios para asignar un peso numérico a cada tipo.
 	var color_weights: Dictionary = {"red": 0, "green": 1, "yellow": 2, "blue": 3, "wild": 4}
 	# sort_custom usa una función (lambda) para comparar dos elementos (a, b).
@@ -125,5 +124,5 @@ func colapse_hand() -> void:
 	await get_tree().create_timer(TARGET_TIME).timeout
 
 	# Después de colapsar, reordenar las cartas
-	sort_cards()
-	calculate_cards_position()
+	_sort_cards()
+	_calculate_cards_position()
