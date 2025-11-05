@@ -40,6 +40,7 @@ func _ready() -> void:
 	# Comenzar el juego
 	_start_game()
 
+# --- Función para conectar las señales de los nodos necesarios ---
 func _connect_signals() -> void:
 	ai_controller.check_card.connect(_on_ai_controller_check_card)
 	ai_controller.play_card.connect(_on_ai_controller_play_card)
