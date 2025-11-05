@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8qq08rle60vg"]
+
+[ext_resource type="Script" uid="uid://c26wn140yfhc3" path="res://scrips/containers/players_container.gd" id="1_doubq"]
+[ext_resource type="PackedScene" uid="uid://bphyou12mr80w" path="res://scenes/player/player.tscn" id="1_tfo80"]
+
+[node name="PlayersContainer" type="Node"]
+script = ExtResource("1_doubq")
+
+[node name="Player" parent="." instance=ExtResource("1_tfo80")]
+position = Vector2(640, 645)
+is_human = true
+
+[node name="Player2" parent="." instance=ExtResource("1_tfo80")]
+position = Vector2(75, 360)
+rotation = 1.5707964
+
+[node name="Player3" parent="." instance=ExtResource("1_tfo80")]
+position = Vector2(640, 75)
+rotation = 3.1415927
+
+[node name="Player4" parent="." instance=ExtResource("1_tfo80")]
+position = Vector2(1205, 360)
+rotation = 4.712389

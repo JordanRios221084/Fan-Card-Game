@@ -9,7 +9,6 @@ var ai_players: Array = []
 var current_ai_player: Player
 
 var valid_cards: Array = []
-var current_card: Card
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -35,10 +34,10 @@ func process_turn() -> void:
 
 	# Verificamos que cartas de la mano del jugador IA actual son válidas
 	for card: Card in current_ai_player.current_hand:
-		emit_signal("check_card", card)
+		check_card.emit(card)
 
 	# Simulando que la IA está pensando
-	await get_tree().create_timer(random_wait_time + 0.1).timeout
+	await get_tree().create_timer(random_wait_time * 0.1).timeout
 
 	# Si no tiene cartas válidas, terminamos de ejecutar por el momento <-------
 	if valid_cards.is_empty():
@@ -48,8 +47,4 @@ func process_turn() -> void:
 	var ai_found_card: Card = valid_cards.pick_random()
 
 	# Jugar la carta IA encontrada
-	play_found_card(ai_found_card)
-
-# --- Función para jugar la carta encontrada
-func play_found_card(found_card: Card) -> void:
-	emit_signal("play_card", found_card, current_ai_player)
+	play_card.emit(ai_found_card)

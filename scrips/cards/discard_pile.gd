@@ -5,9 +5,9 @@ class_name DiscardPile
 signal card_played(last_card: Card)
 
 # --- Variables ---
-var discarded_cards: Array = []
 var top_card: Card
-var discard_position: Vector2 = self.position
+var _discarded_cards: Array = []
+var _discard_position: Vector2 = self.position
 
 # --- Función para recibir una carta en el montón de descarte ---
 func receive_card(new_card: Card, origin: Node2D) -> void:
@@ -15,7 +15,7 @@ func receive_card(new_card: Card, origin: Node2D) -> void:
 	new_card.reparent(self)
 
 	# Añadir la carta a la lista de cartas descartadas
-	discarded_cards.append(new_card)
+	_discarded_cards.append(new_card)
 	new_card.current_parent = self
 
 	# Actualizar la carta superior
@@ -33,7 +33,7 @@ func receive_card(new_card: Card, origin: Node2D) -> void:
 	var random_rotation: float = rad_to_deg(randf_range(-180, 180))
 
 	# Mover la carta a la posición de descarte
-	await CardManager.move_card_to_position(new_card, discard_position, 0.2, random_rotation)
+	await CardManager.move_card_to_position(new_card, _discard_position, 0.2, random_rotation)
 	
 	# Emitir la señal de carta jugada
-	emit_signal("card_played")
+	card_played.emit(new_card)

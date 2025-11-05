@@ -1,37 +1,27 @@
 [gd_scene load_steps=6 format=3 uid="uid://cr8aig6e11asj"]
 
 [ext_resource type="PackedScene" uid="uid://taslkryubnek" path="res://scenes/game_manager.tscn" id="1_o5qli"]
-[ext_resource type="PackedScene" uid="uid://bphyou12mr80w" path="res://scenes/player.tscn" id="2_0wfyh"]
-[ext_resource type="PackedScene" uid="uid://dt0j27ri56mxn" path="res://scenes/deck.tscn" id="2_sugp2"]
-[ext_resource type="PackedScene" uid="uid://bw8l7m4vdo0o4" path="res://scenes/discard_pile.tscn" id="4_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://dt0j27ri56mxn" path="res://scenes/cards/deck.tscn" id="2_sugp2"]
+[ext_resource type="PackedScene" uid="uid://bw8l7m4vdo0o4" path="res://scenes/cards/discard_pile.tscn" id="4_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://b8qq08rle60vg" path="res://scenes/containers/players_container.tscn" id="4_tbgi4"]
 [ext_resource type="PackedScene" uid="uid://gau28iuxx0g6" path="res://scenes/controllers/ai_controller.tscn" id="5_tbgi4"]
 
 [node name="Main" type="Node2D"]
 
-[node name="GameManager" parent="." instance=ExtResource("1_o5qli")]
+[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "ai_controller", "players_container") instance=ExtResource("1_o5qli")]
+deck = NodePath("Deck")
+discard_pile = NodePath("DiscardPile")
+ai_controller = NodePath("AIController")
+players_container = NodePath("PlayerContainer")
 
 [node name="Deck" parent="GameManager" instance=ExtResource("2_sugp2")]
 position = Vector2(75, 80)
 scale = Vector2(3, 3)
 
-[node name="Player" parent="GameManager" instance=ExtResource("2_0wfyh")]
-position = Vector2(640, 645)
-is_human = true
-
-[node name="Player2" parent="GameManager" instance=ExtResource("2_0wfyh")]
-position = Vector2(75, 360)
-rotation = 1.5707964
-
-[node name="Player3" parent="GameManager" instance=ExtResource("2_0wfyh")]
-position = Vector2(640, 75)
-rotation = 3.1415927
-
-[node name="Player4" parent="GameManager" instance=ExtResource("2_0wfyh")]
-position = Vector2(1205, 360)
-rotation = 4.712389
-
 [node name="DiscardPile" parent="GameManager" instance=ExtResource("4_jyhfs")]
 position = Vector2(640, 360)
+
+[node name="PlayerContainer" parent="GameManager" instance=ExtResource("4_tbgi4")]
 
 [node name="AIController" parent="GameManager" instance=ExtResource("5_tbgi4")]
 
