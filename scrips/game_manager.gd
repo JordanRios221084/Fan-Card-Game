@@ -58,7 +58,7 @@ func start_game() -> void:
 
 	# Repartir 7 cartas a cada jugador
 	for i: int in range(7):
-		# Para cada jugador, dar una carta
+		# Para cada jugador
 		for player: Player in all_players:
 			var card: Card = deck.draw_card() # Tomar una carta del mazo
 			await player.add_card_to_hand(card) # Añadir la carta a la mano del jugador
@@ -107,7 +107,3 @@ func change_state(new_state: STATES) -> void:
 			print("El jugador actual está jugando!!!")
 		STATES.GAME_ENDED:
 			print("El juego a terminado!!!")
-
-# --- Función para manejar la señal de la primera carta colocada ---
-func _on_discard_pile_first_card_placed() -> void:
-	pass
