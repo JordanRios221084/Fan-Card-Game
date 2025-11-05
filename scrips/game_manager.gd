@@ -130,9 +130,24 @@ func is_valid_card(card_to_validate: Card) -> bool:
 	
 	return false # Si ninguna regla se cumple, la carta no es válida
 
-# --- Función para poder validar las cartas por parte de la IA ----
+func attempt_to_play(target_card: Card, target_player: Player) -> void:
+	# Si la carta es válida
+	if is_valid_card(target_card):
+		await discard_pile.receive_card(target_card, target_player) # Llamamos al método para jugarla
+		return
+	
+	# Si no es válida y el jugador es humano
+	if target_player.is_human:
+		target_card.card_animator.play("invalid_card") # Reproducimos la animación de carta inválida
+		return
+
+# --- Función para escuchar la señal de validar cartas de la IA ----
 func _on_ai_controller_check_card(target_card: Card) -> void:
 	# Si la carta es válida
 	if is_valid_card(target_card):
 		ai_controller.valid_cards.append(target_card) # La agregamos a valid_cards de la IA
 
+# --- Función para escuchar la señal de jugar cartas de la IA ----
+func _on_ai_controller_play_card(found_card: Card, origin_player: Player) -> void:
+	# Intentamos jugar la carta
+	attempt_to_play(found_card, origin_player)
