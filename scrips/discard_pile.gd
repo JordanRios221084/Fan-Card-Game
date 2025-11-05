@@ -2,7 +2,7 @@ extends Node2D
 class_name DiscardPile
 
 # --- Señales ---
-signal card_played
+signal card_played(last_card: Card)
 
 # --- Variables ---
 var discarded_cards: Array = []

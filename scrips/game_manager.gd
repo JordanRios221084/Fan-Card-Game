@@ -2,10 +2,11 @@
 extends Node
 class_name GameManager
 
-# --- Variables ---
+# --- Referencis a los nodos hijos ---
 var all_players: Array = []
 var deck: Deck
 var discard_pile: DiscardPile
+var ai_controller: AIController
 
 # --- variables para los jugadores ---
 var prev_winner: Player
@@ -38,7 +39,7 @@ func _ready() -> void:
 
 # --- Función para obtener referencias a nodos importantes ---
 func get_references() -> void:
-	for node: Node2D in self.get_children():
+	for node: Node in self.get_children():
 		if node is Deck:
 			deck = node as Deck
 		
@@ -47,6 +48,9 @@ func get_references() -> void:
 
 		if node is DiscardPile:
 			discard_pile = node as DiscardPile
+		
+		if node is AIController:
+			ai_controller = node as AIController
 
 # --- Función para cargar la base de datos de cartas ---
 func set_database() -> void:
@@ -107,3 +111,28 @@ func change_state(new_state: STATES) -> void:
 			print("El jugador actual está jugando!!!")
 		STATES.GAME_ENDED:
 			print("El juego a terminado!!!")
+
+# --- Función para verificar si la carta es válida ---
+func is_valid_card(card_to_validate: Card) -> bool:
+	var last_card_played: Card = discard_pile.top_card
+
+	# Si la carta tiene el mismo color que la última que se jugó
+	if card_to_validate.card_color == last_card_played.card_color:
+		return true # Devolver true
+
+	# Si la carta tiene el mismo simbolo que la última que se jugó
+	if card_to_validate.card_symbol == last_card_played.card_symbol:
+		return true # Devolver true
+	
+	# Si la carta tiene color negro es un wild card
+	if card_to_validate.card_color == "black":
+		return true # Devolver true
+	
+	return false # Si ninguna regla se cumple, la carta no es válida
+
+# --- Función para poder validar las cartas por parte de la IA ----
+func _on_ai_controller_check_card(target_card: Card) -> void:
+	# Si la carta es válida
+	if is_valid_card(target_card):
+		ai_controller.valid_cards.append(target_card) # La agregamos a valid_cards de la IA
+
