@@ -24,6 +24,3 @@ position = Vector2(640, 360)
 [node name="PlayerContainer" parent="GameManager" instance=ExtResource("4_tbgi4")]
 
 [node name="AIController" parent="GameManager" instance=ExtResource("5_tbgi4")]
-
-[connection signal="check_card" from="GameManager/AIController" to="GameManager" method="_on_ai_controller_check_card"]
-[connection signal="play_card" from="GameManager/AIController" to="GameManager" method="_on_ai_controller_play_card"]

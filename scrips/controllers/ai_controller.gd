@@ -3,7 +3,7 @@ class_name AIController
 
 signal check_card(target_card: Card)
 signal play_card(found_card: Card, current_ai_player: Player)
-signal draw_card
+#signal draw_card
 
 var ai_players: Array = []
 var current_ai_player: Player

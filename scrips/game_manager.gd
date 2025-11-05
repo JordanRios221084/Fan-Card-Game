@@ -31,12 +31,18 @@ enum STATES{
 func _ready() -> void:
 	# Cargar la base de datos de cartas
 	_set_database()
-	
+
 	# Obtener referencias a todos los jugadores
 	_get_players_references()
 	
+	_connect_signals()
+
 	# Comenzar el juego
 	_start_game()
+
+func _connect_signals() -> void:
+	ai_controller.check_card.connect(_on_ai_controller_check_card)
+	ai_controller.play_card.connect(_on_ai_controller_play_card)
 
 # --- Función para obtener referencias a nodos importantes ---
 func _get_players_references() -> void:
