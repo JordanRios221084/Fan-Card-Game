@@ -33,6 +33,9 @@ func add_card_to_hand(new_card: Card) -> void:
 	if is_human:
 		new_card.card_animator.play("flip_card")
 	
+	
+	new_card.card_animator.play("flip_card")
+	
 	# Si es el turno del jugador, ordenar las cartas
 	if _auto_sort_cards:
 		_sort_cards()
@@ -40,6 +43,10 @@ func add_card_to_hand(new_card: Card) -> void:
 	# Posicionar la carta en la mano del jugador
 	_calculate_cards_position()
 	await get_tree().create_timer(TARGET_TIME).timeout
+
+func play_a_card(card_to_play: Card) -> void:
+	current_hand.erase(card_to_play)
+	_calculate_cards_position()
 
 # --- Función para calcular la posición de las cartas en la mano ---
 func _calculate_cards_position() -> void:

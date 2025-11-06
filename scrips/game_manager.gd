@@ -9,10 +9,14 @@ class_name GameManager
 @export var players_container: PlayersContainer
 @export var all_players: Array[Player] = []
 
-# --- variables para los jugadores ---
+# --- Variables para los jugadores ---
 var prev_winner: Player
 var current_player: Player
 var next_player: Player
+
+# --- Variables de control de turnos ---
+var steps: int = 1
+var direction: int = 1
 
 # --- Variable que controla el estado actual ---
 var current_state: STATES
@@ -40,22 +44,22 @@ func _ready() -> void:
 	# Comenzar el juego
 	_start_game()
 
-# --- Función para conectar las señales de los nodos necesarios ---
-func _connect_signals() -> void:
-	ai_controller.check_card.connect(_on_ai_controller_check_card)
-	ai_controller.play_card.connect(_on_ai_controller_play_card)
+# --- Función para cargar la base de datos de cartas ---
+func _set_database() -> void:
+	deck.current_deck = CardDatabase.get_card_database().duplicate()
 
 # --- Función para obtener referencias a nodos importantes ---
 func _get_players_references() -> void:
 	all_players.clear()
 	for node: Node in players_container.total_current_players:
 		var player: Player = node as Player
-		if player:
-			all_players.append(player)
+		all_players.append(player)
 
-# --- Función para cargar la base de datos de cartas ---
-func _set_database() -> void:
-	deck.current_deck = CardDatabase.get_card_database().duplicate()
+# --- Función para conectar las señales de los nodos necesarios ---
+func _connect_signals() -> void:
+	ai_controller.check_card.connect(_on_ai_controller_check_card)
+	ai_controller.play_card.connect(_on_ai_controller_play_card)
+	ai_controller.draw_card.connect(_on_ai_controller_draw_card)
 
 func _start_game() -> void:
 	# Esperar un momento antes de repartir cartas
@@ -93,6 +97,25 @@ func _set_first_player() -> void:
 
 	# Si el bloque anterior no se ejecuta, obtenemos el jugador actual aleatoriamente
 	current_player = all_players.pick_random()
+	current_player.is_turn = true
+
+func _change_current_player_turn() -> void:
+	var total_players: int = all_players.size()
+	current_player.is_turn = false
+
+	var actual_current_player_index: int = all_players.find(current_player)
+	var new_current_player_index: int = (actual_current_player_index + (steps * direction)) % total_players
+
+	current_player = all_players[new_current_player_index]
+	current_player.is_turn = true
+
+	steps = 1
+
+	var new_next_player_index: int = (new_current_player_index + (steps * direction)) % total_players
+	next_player = all_players[new_next_player_index]
+
+	print(current_player)
+	print(next_player)
 
 func _change_state(new_state: STATES) -> void:
 	current_state = new_state
@@ -107,8 +130,13 @@ func _change_state(new_state: STATES) -> void:
 			_change_state(STATES.CHANGE_TURN)
 		STATES.CHANGE_TURN:
 			print("Cambiando el turno del jugador actual!!!")
+			_change_current_player_turn()
 			_change_state(STATES.PLAYING_CARDS)
 		STATES.PLAYING_CARDS:
+			# Verificar si el jugador actual es humano o no
+			if not current_player.is_human:
+				ai_controller.current_ai_player = current_player
+				ai_controller.try_to_process_turn()
 			print("El jugador actual está jugando!!!")
 		STATES.GAME_ENDED:
 			print("El juego a terminado!!!")
@@ -131,16 +159,19 @@ func _is_valid_card(card_to_validate: Card) -> bool:
 	
 	return false # Si ninguna regla se cumple, la carta no es válida
 
+# --- Función para intentar jugar una carta ---
 func _attempt_to_play(target_card: Card, target_player: Player) -> void:
-	# Si la carta es válida
-	if _is_valid_card(target_card):
-		await discard_pile.receive_card(target_card, target_player) # Llamamos al método para descartarla
-		return
-	
-	# Si no es válida y el jugador es humano
-	if target_player.is_human:
+	print("El jugador: ", target_player, ", ha intentado jugar una carta")
+	# Si la carta no es válida
+	if not _is_valid_card(target_card):
 		target_card.card_animator.play("invalid_card") # Reproducimos la animación de carta inválida
 		return
+	
+	# Si la carta es válida
+	target_player.play_a_card(target_card)
+	await discard_pile.receive_card(target_card, target_player) # Llamamos al método para descartarla
+	
+	_change_state(STATES.APPLY_EFFECTS)
 
 # --- Función para escuchar la señal de validar cartas de la IA ----
 func _on_ai_controller_check_card(target_card: Card) -> void:
@@ -152,3 +183,7 @@ func _on_ai_controller_check_card(target_card: Card) -> void:
 func _on_ai_controller_play_card(found_card: Card, origin_player: Player) -> void:
 	# Intentamos jugar la carta
 	_attempt_to_play(found_card, origin_player)
+
+func _on_ai_controller_draw_card() -> void:
+	print("Intento de robar una carta")
+	_change_state(STATES.APPLY_EFFECTS)
