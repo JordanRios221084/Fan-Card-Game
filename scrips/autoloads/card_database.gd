@@ -1,7 +1,7 @@
 # --- Autoload para obtener la base de datos de cartas ---
 extends Node
 
-var card_db: Array = []
+var card_db: Array[CardValues] = []
 var csv_path: String = "res://data/classic.csv"
 
 # Called when the node enters the scene tree for the first time.
