@@ -2,9 +2,11 @@ extends Node
 class_name AIController
 
 # --- Señales del controlador de la IA ---
-signal check_card(target_card: Card)
-signal play_card(found_card: Card, current_ai_player: Player)
-signal draw_card
+signal check_card(card: Card)
+signal play_card(card: Card, layer: Player)
+signal draw_card(player: Player)
+
+@export var game_manager: GameManager
 
 var current_ai_player: Player
 var valid_cards: Array[Card] = []
@@ -18,7 +20,7 @@ func try_to_process_turn() -> void:
 	if not current_ai_player:
 		return
 	
-	_process_turn()
+	await _process_turn()
 
 # --- Función para procesar el turno de la IA ---
 func _process_turn() -> void:
@@ -29,23 +31,21 @@ func _process_turn() -> void:
 	# Simulando que la IA está pensando
 	await get_tree().create_timer(random_wait_time / 1.2).timeout
 
-	# Verificamos que cartas de la mano del jugador IA actual son válidas
-	for card: Card in current_ai_player.current_hand:
-		check_card.emit(card)
+	# Verificar las cartas
+	_check_current_cards(false)
 
 	# Simulando que la IA está pensando
 	await get_tree().create_timer(random_wait_time / 0.8).timeout
 
-	# Si no tiene cartas válidas, terminamos de ejecutar por el momento <-------
+	# Si no tiene cartas válidas
 	if valid_cards.is_empty():
-		draw_card.emit()
-		return
+		draw_card.emit(current_ai_player) # Emitimos la señal para pedir sacar una carta
+		await _check_current_cards(true)
 	
 	# Buscar la carta a jugar dentro de las cartas válidas
-	var ai_found_card: Card = valid_cards.pick_random()
-
-	# Jugar la carta IA encontrada
-	play_card.emit(ai_found_card, current_ai_player)
+	if not valid_cards.is_empty():
+		var ai_found_card: Card = valid_cards.pick_random()
+		play_card.emit(ai_found_card, current_ai_player)
 
 	# Limpiamos las variables
 	_clear_variables()
@@ -54,4 +54,16 @@ func _process_turn() -> void:
 func _clear_variables() -> void:
 	# Reiniciamos las variables para poder manejar nuevos datos
 	current_ai_player = null
-	valid_cards = []
+	valid_cards.clear()
+
+# --- Función para verificar que cartas de la mano del jugador IA actual son válidas ---
+func _check_current_cards(try_draw: bool) -> void:
+	if try_draw:
+		await game_manager.draw_card_finished
+
+	valid_cards.clear()
+
+	for card: Card in current_ai_player.current_hand:
+		check_card.emit(card)
+	
+	await get_tree().create_timer(0.5).timeout

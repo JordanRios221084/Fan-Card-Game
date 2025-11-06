@@ -5,6 +5,7 @@ class_name Player
 # --- Constantes para la posición de las cartas ---
 const CARD_WIDTH: float = 40.0
 const SEPARATION_OFFSET: float = 20.0
+const MAX_HAND_SIZE: int = 10
 const CENTER_POINT: float = 0.0
 const TARGET_TIME: float = 0.2
 
@@ -52,19 +53,23 @@ func play_a_card(card_to_play: Card) -> void:
 func _calculate_cards_position() -> void:
 	var hand_size: int = current_hand.size()
 	var card_selected_index: int = -1
+	var variable_widht: float = 1.0
 
-	for i: int in current_hand.size():
+	for i: int in hand_size:
 		var card: Card = current_hand[i]
 		if card.is_selected:
 			card_selected_index = i
 			break
 	
-	for i: int in current_hand.size():
+	if hand_size > MAX_HAND_SIZE:
+		variable_widht = ((CARD_WIDTH / hand_size) * 10) / CARD_WIDTH
+	
+	for i: int in hand_size:
 		# Obtener la carta actual
 		var card: Card = current_hand[i]
 		
 		# Calcular la posición X basada en el índice de la carta
-		var x_pos: float = CARD_WIDTH * (i - ((hand_size -1) / 2.0))
+		var x_pos: float = (CARD_WIDTH * variable_widht) * (i - ((hand_size -1) / 2.0))
 		var final_position: Vector2
 
 		# Si hay una carta seleccionada, ajustar posiciones
@@ -133,3 +138,4 @@ func colapse_hand() -> void:
 	# Después de colapsar, reordenar las cartas
 	_sort_cards()
 	_calculate_cards_position()
+	_auto_sort_cards = true

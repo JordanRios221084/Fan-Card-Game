@@ -2,6 +2,8 @@
 extends Node
 class_name GameManager
 
+signal draw_card_finished
+
 # --- Referencis a los nodos hijos ---
 @export var deck: Deck
 @export var discard_pile: DiscardPile
@@ -99,6 +101,7 @@ func _set_first_player() -> void:
 	current_player = all_players.pick_random()
 	current_player.is_turn = true
 
+# --- Función para cambiar el turno del jugador actual ---
 func _change_current_player_turn() -> void:
 	var total_players: int = all_players.size()
 	current_player.is_turn = false
@@ -136,7 +139,9 @@ func _change_state(new_state: STATES) -> void:
 			# Verificar si el jugador actual es humano o no
 			if not current_player.is_human:
 				ai_controller.current_ai_player = current_player
-				ai_controller.try_to_process_turn()
+				await ai_controller.try_to_process_turn()
+			
+			_change_state(STATES.APPLY_EFFECTS)
 			print("El jugador actual está jugando!!!")
 		STATES.GAME_ENDED:
 			print("El juego a terminado!!!")
@@ -170,8 +175,18 @@ func _attempt_to_play(target_card: Card, target_player: Player) -> void:
 	# Si la carta es válida
 	target_player.play_a_card(target_card)
 	await discard_pile.receive_card(target_card, target_player) # Llamamos al método para descartarla
-	
-	_change_state(STATES.APPLY_EFFECTS)
+
+# --- Función para robar una carta hasta que se complete el total dado ---
+func _attempt_to_draw(target_player: Player, card_count: int) -> void:
+	for i: int in card_count:
+		var new_card: Card = deck.draw_card()
+		await target_player.add_card_to_hand(new_card)
+		await get_tree().create_timer(0.5).timeout
+
+		if _is_valid_card(new_card):
+			break
+
+	draw_card_finished.emit()
 
 # --- Función para escuchar la señal de validar cartas de la IA ----
 func _on_ai_controller_check_card(target_card: Card) -> void:
@@ -184,6 +199,5 @@ func _on_ai_controller_play_card(found_card: Card, origin_player: Player) -> voi
 	# Intentamos jugar la carta
 	_attempt_to_play(found_card, origin_player)
 
-func _on_ai_controller_draw_card() -> void:
-	print("Intento de robar una carta")
-	_change_state(STATES.APPLY_EFFECTS)
+func _on_ai_controller_draw_card(target_player: Player,) -> void:
+	_attempt_to_draw(target_player, 2)
