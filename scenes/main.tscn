@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://cr8aig6e11asj"]
 
-[ext_resource type="PackedScene" uid="uid://taslkryubnek" path="res://scenes/game_manager.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://taslkryubnek" path="res://scenes/game_manager/game_manager.tscn" id="1_o5qli"]
 [ext_resource type="PackedScene" uid="uid://dt0j27ri56mxn" path="res://scenes/deck/deck.tscn" id="2_sugp2"]
 [ext_resource type="PackedScene" uid="uid://bw8l7m4vdo0o4" path="res://scenes/discard_pile/discard_pile.tscn" id="4_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://b8qq08rle60vg" path="res://scenes/containers/player_container/players_container.tscn" id="4_tbgi4"]
