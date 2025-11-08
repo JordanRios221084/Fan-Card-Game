@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://b8qq08rle60vg"]
 
-[ext_resource type="Script" uid="uid://c26wn140yfhc3" path="res://scrips/containers/players_container.gd" id="1_doubq"]
+[ext_resource type="Script" uid="uid://c26wn140yfhc3" path="res://scenes/containers/player_container/players_container.gd" id="1_doubq"]
 [ext_resource type="PackedScene" uid="uid://bphyou12mr80w" path="res://scenes/player/player.tscn" id="1_tfo80"]
 
 [node name="PlayersContainer" type="Node"]

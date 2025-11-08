@@ -3,7 +3,7 @@ extends Node2D
 class_name Deck
 
 # --- Constantes ---
-const CARD_SCENCE_PATH: String = "res://scenes/cards/card.tscn"
+const CARD_SCENCE_PATH: String = "res://scenes/card/card.tscn"
 
 # --- Nodos ---
 @export var deck_sprite: Sprite2D

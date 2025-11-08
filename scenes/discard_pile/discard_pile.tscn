@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bw8l7m4vdo0o4"]
 
-[ext_resource type="Script" uid="uid://p4xjjm12oide" path="res://scrips/cards/discard_pile.gd" id="1_towwt"]
+[ext_resource type="Script" uid="uid://p4xjjm12oide" path="res://scenes/discard_pile/discard_pile.gd" id="1_towwt"]
 
 [node name="DiscardPile" type="Node2D"]
 script = ExtResource("1_towwt")

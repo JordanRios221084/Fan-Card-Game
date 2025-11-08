@@ -15,16 +15,18 @@ var valid_cards: Array[Card] = []
 func _ready() -> void:
 	pass # Replace with function body.
 
+# --- Función para intentar procesar el turno de la IA ---
 func try_to_process_turn() -> void:
-	# Si no hay un jugador, terminamos de ejecutar
+	# Si no hay un jugador...
 	if not current_ai_player:
-		return
+		return # Terminamos de ejecutar
 	
 	await _process_turn()
 
 # --- Función para procesar el turno de la IA ---
 func _process_turn() -> void:
-	print("Jugador ia actual: ", current_ai_player)
+	print("-- Jugador ia actual: ", current_ai_player, " --")
+	print()
 	# Generamos un tiempo aleatorio para simular pensamiento
 	var random_wait_time: float = randf_range(0.5, 2)
 
@@ -40,12 +42,12 @@ func _process_turn() -> void:
 	# Si no tiene cartas válidas
 	if valid_cards.is_empty():
 		draw_card.emit(current_ai_player) # Emitimos la señal para pedir sacar una carta
-		await _check_current_cards(true)
+		await _check_current_cards(true) # Esperamos a que termine de verificar las cartas
 	
-	# Buscar la carta a jugar dentro de las cartas válidas
+	# Si hay cartas válidas...
 	if not valid_cards.is_empty():
-		var ai_found_card: Card = valid_cards.pick_random()
-		play_card.emit(ai_found_card, current_ai_player)
+		var ai_found_card: Card = valid_cards.pick_random() # Obtenemos una aleatoriamente
+		play_card.emit(ai_found_card, current_ai_player) # Emitimos la señal para jugar la carta
 
 	# Limpiamos las variables
 	_clear_variables()
@@ -58,12 +60,16 @@ func _clear_variables() -> void:
 
 # --- Función para verificar que cartas de la mano del jugador IA actual son válidas ---
 func _check_current_cards(try_draw: bool) -> void:
+	# Intentamos robar una carta
 	if try_draw:
 		await game_manager.draw_card_finished
 
+	# Reiniciamos las cartas válidas
 	valid_cards.clear()
 
+	# Para cada carta en la mano del jugador IA actual...
 	for card: Card in current_ai_player.current_hand:
-		check_card.emit(card)
+		check_card.emit(card) # Emitimos una señal para verificar la carta
 	
+	# Esmerapos 0.5seg
 	await get_tree().create_timer(0.5).timeout

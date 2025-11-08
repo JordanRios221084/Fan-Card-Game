@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dt0j27ri56mxn"]
 
-[ext_resource type="Script" uid="uid://b4s4vlr3027u3" path="res://scrips/cards/deck.gd" id="1_sdhao"]
+[ext_resource type="Script" uid="uid://b4s4vlr3027u3" path="res://scenes/deck/deck.gd" id="1_sdhao"]
 [ext_resource type="Texture2D" uid="uid://brdkenpjphuk0" path="res://assets/sprites/deck.png" id="2_6rnap"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6rnap"]

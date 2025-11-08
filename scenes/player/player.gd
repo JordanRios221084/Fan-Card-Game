@@ -135,7 +135,7 @@ func colapse_hand() -> void:
 	# Esperar a que termine la animación
 	await get_tree().create_timer(TARGET_TIME).timeout
 
-	# Después de colapsar, reordenar las cartas
-	_sort_cards()
-	_calculate_cards_position()
-	_auto_sort_cards = true
+	# Después de colapsar...
+	_sort_cards() # Reordenar las cartas
+	_calculate_cards_position() # Recalcular sus posiciones
+	_auto_sort_cards = true # Auto-ordenar cartas a partir de ahora
