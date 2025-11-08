@@ -17,9 +17,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-CardDatabase="*res://scrips/card_database.gd"
-CardBuilder="*res://scrips/card_builder.gd"
-CardManager="*res://scrips/card_manager.gd"
+CardDatabase="*res://scrips/autoloads/card_database.gd"
+CardBuilder="*res://scrips/autoloads/card_builder.gd"
+CardManager="*res://scrips/autoloads/card_manager.gd"
 
 [debug]
 
