@@ -19,6 +19,8 @@ var next_player: Player
 # --- Variables de control de turnos ---
 var steps: int = 1
 var direction: int = 1
+var new_top_card: Card
+var player_played_card: bool
 
 # --- Variable que controla el estado actual ---
 var current_state: STATES
@@ -40,7 +42,11 @@ func _ready() -> void:
 
 	# Obtener referencias a todos los jugadores
 	_get_players_references()
+
+	# Configuramos los valores para el EffectManager
+	_set_effect_values()
 	
+	# Conectamos las señales necesarias
 	_connect_signals()
 
 	# Comenzar el juego
@@ -56,6 +62,10 @@ func _get_players_references() -> void:
 	for node: Node in players_container.total_current_players:
 		var player: Player = node as Player
 		all_players.append(player)
+
+# --- Función para enviarle la referencia de este nodo al Effectmanager
+func _set_effect_values() -> void:
+	EffectManager.game_manager = self
 
 # --- Función para conectar las señales de los nodos necesarios ---
 func _connect_signals() -> void:
@@ -101,6 +111,15 @@ func _set_first_player() -> void:
 	current_player = all_players.pick_random()
 	current_player.is_turn = true
 
+	# Configuramos el que será el siguiente jugador
+	var next_player_index: int = (all_players.find(current_player) + (steps * direction)) % all_players.size()
+	next_player = all_players[next_player_index]
+
+	print("Jugadores inciales: ")
+	print(current_player)
+	print(next_player)
+	print()
+
 # --- Función para cambiar el turno del jugador actual ---
 func _change_current_player_turn() -> void:
 	# Obtenmos el total de jugadores
@@ -129,56 +148,66 @@ func _change_current_player_turn() -> void:
 
 # --- Función que se encarga de cambiar el estado actual de la partida ---
 func _change_state(new_state: STATES) -> void:
-	# Cambiamos el estado actual al nuevo estado
+	# Actualiza la variable que almacena el estado actual
 	current_state = new_state
 
-	# Buscamos el estado
+    # Selecciona comportamiento según el estado
 	match current_state:
-		STATES.GAME_STARTED: # Estado JUEGO COMENZADO
+		STATES.GAME_STARTED: # Cuando el juego comienza
 			print("*** JUEGO COMENZADO ***")
 			print()
 
-			# Asignamos el primer jugador
+            # Determina y asigna el primer jugador (o el ganador previo)
 			_set_first_player()
 
-			# Cambiamos al siguiente estado
+            # Avanza inmediatamente a aplicar efectos (si los hay)
 			_change_state(STATES.APPLY_EFFECTS)
 			print("--------------------------------------------------------------------------------")
-
-		STATES.APPLY_EFFECTS: # Estado APLICAR EFECTOS
+			
+		STATES.APPLY_EFFECTS: # Aplicar efectos de la carta jugada anteriormente
 			print("### APLICANDO EFECTOS DE LA CARTA JUGADA ###")
+			print("El jugador anterior jugó: ", player_played_card)
 			print()
 
-			# Cambiamos al siguiente estado
+            # Si el jugador anterior jugó una carta, procesar su efecto sobre next_player
+			if player_played_card:
+				await EffectManager.process_effect(discard_pile.top_card.card_effect, next_player)
+				player_played_card = false
+				
+			
 			_change_state(STATES.CHANGE_TURN)
-
-		STATES.CHANGE_TURN: # Estado CAMBIAR TURNO
+			
+		STATES.CHANGE_TURN: # Cambio del turno al siguiente jugador
 			print("$$$ CAMBIANDO EL TURNO DEL JUGADOR ACTUAL $$$")
 			print()
 
-			# Cambiamos el turno de los jugadores
+            # Desactivar interacción visual (opacidad) de la mano del jugador que dejó de tener el turno
+			_set_opacity(current_player.current_hand, false)
+
+            # Cambia la referencia de current_player y calcula next_player
 			_change_current_player_turn()
 
-			# Cambiamos al siguiente estado
+            # Pasar al estado donde el jugador actual puede jugar
 			_change_state(STATES.PLAYING_CARDS)
-
-		STATES.PLAYING_CARDS: # Estado JUGANDO CARTAS
+			
+		STATES.PLAYING_CARDS: # Turno activo: el jugador juega cartas
 			print("¡¡¡ JUGADOR ACTUAL JUGANDO !!!")
 			print()
 
-			# Verificar si el jugador actual es humano o no
+            # Habilitar interacción visual (opacidad) de la mano del jugador con turno
+			_set_opacity(current_player.current_hand, true)
+
+            # Si el jugador es controlado por la IA, pedirle que procese su turno (await)
 			if not current_player.is_human:
-				ai_controller.current_ai_player = current_player # Asignamos el jugador al AICOntroller
-				await ai_controller.try_to_process_turn() # Esperamos a procesar el turno
-			
-			# Cambiamos al siguiente estado
+				ai_controller.current_ai_player = current_player # asignar jugador al controlador IA
+				await ai_controller.try_to_process_turn() # esperar a que la IA haga su acción
+				
+			# Tras jugar (o intentar), volver a aplicar efectos (si corresponde)
 			_change_state(STATES.APPLY_EFFECTS)
 			print("--------------------------------------------------------------------------------")
-
-		STATES.GAME_ENDED: # Estado JUEGO TERMINADO
+			
+		STATES.GAME_ENDED: # Estado de juego terminado
 			print("||| JUEGO TERMINADO |||")
-			# Cambiamos al siguiente estado
-			_change_state(STATES.GAME_ENDED)
 
 # --- Función para verificar si la carta es válida ---
 func _is_valid_card(card_to_validate: Card) -> bool:
@@ -208,23 +237,36 @@ func _attempt_to_play(target_card: Card, target_player: Player) -> void:
 		return
 	
 	# Si la carta es válida...
+	player_played_card = true
 	target_player.play_a_card(target_card) # Jugamos la carta válida
 	await discard_pile.receive_card(target_card, target_player) # Llamamos al método para descartarla
 
 # --- Función para robar una carta hasta que se complete el total dado ---
-func _attempt_to_draw(target_player: Player, card_count: int) -> void:
+func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_speed: float) -> void:
 	# Intentamos robar cartas la cantidad de veces que card_count nos diga
 	for i: int in card_count:
 		var new_card: Card = deck.draw_card() # Robamos la carta del mazo
 		await target_player.add_card_to_hand(new_card) # Esperamos a que el jugador añada la carta a su mano
-		await get_tree().create_timer(0.5).timeout # Añadimos tiempo adicional
+		_set_opacity(current_player.current_hand, true) # Hacemos la opacidad transparente
+		await get_tree().create_timer(draw_speed).timeout # Añadimos tiempo adicional
 
-		# Si la carta es válida...
-		if _is_valid_card(new_card):
-			break # Dejamos de buscar
+		if not forced:
+			# Si la carta es válida...
+			if _is_valid_card(new_card):
+				player_played_card = true
+				break # Dejamos de buscar
 
 	# Emitimos la señal de robo finalizado
 	draw_card_finished.emit()
+
+# --- Función para cambiar la opacidad de las cartas ---
+func _set_opacity(all_cards: Array, enabled: bool) -> void:
+	if enabled:
+		for card: Card in all_cards:
+			card.opacity_sprite.modulate = Color(0, 0, 0, 0)
+	else:
+		for card: Card in all_cards:
+			card.opacity_sprite.modulate = Color(0, 0, 0, 0.25)
 
 # --- Función para escuchar la señal de validar cartas de la IA ----
 func _on_ai_controller_check_card(target_card: Card) -> void:
@@ -239,4 +281,4 @@ func _on_ai_controller_play_card(found_card: Card, origin_player: Player) -> voi
 
 # --- Función para escuchar la señal de robar cartas de la IA ---
 func _on_ai_controller_draw_card(target_player: Player,) -> void:
-	_attempt_to_draw(target_player, 1)
+	draw_a_new_card(target_player, 1, false, 0.5)

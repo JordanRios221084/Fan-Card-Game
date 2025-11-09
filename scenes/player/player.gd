@@ -34,7 +34,6 @@ func add_card_to_hand(new_card: Card) -> void:
 	if is_human:
 		new_card.card_animator.play("flip_card")
 	
-	
 	new_card.card_animator.play("flip_card")
 	
 	# Si es el turno del jugador, ordenar las cartas

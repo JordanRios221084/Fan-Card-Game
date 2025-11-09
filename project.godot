@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 CardDatabase="*res://scrips/autoloads/card_database.gd"
 CardBuilder="*res://scrips/autoloads/card_builder.gd"
 CardManager="*res://scrips/autoloads/card_manager.gd"
+EffectManager="*res://scrips/autoloads/effect_manager.gd"
 
 [debug]
 
