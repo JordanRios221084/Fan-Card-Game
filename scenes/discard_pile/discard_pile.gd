@@ -1,9 +1,6 @@
 extends Node2D
 class_name DiscardPile
 
-# --- Señales ---
-signal card_played(last_card: Card)
-
 # --- Variables ---
 var top_card: Card
 var _discarded_cards: Array = []
@@ -34,6 +31,3 @@ func receive_card(new_card: Card, origin: Node2D) -> void:
 
 	# Mover la carta a la posición de descarte
 	await CardManager.move_card_to_position(new_card, _discard_position, 0.2, random_rotation)
-	
-	# Emitir la señal de carta jugada
-	card_played.emit(new_card)

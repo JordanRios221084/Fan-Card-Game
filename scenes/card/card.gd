@@ -17,6 +17,7 @@ class_name Card
 @export var card_symbol: int
 @export var card_effect: String
 @export var target_color: Color
+@export var effect_used: bool = false
 
 # --- Estados de la carta ---
 var is_selected: bool = false

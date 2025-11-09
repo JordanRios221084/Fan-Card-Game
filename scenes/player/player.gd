@@ -16,6 +16,7 @@ var current_hand: Array[Card] = []
 @export var is_turn: bool = false
 @export var is_human: bool = false
 @export var _auto_sort_cards: bool = false
+@export var card_alligment: Curve
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

@@ -19,8 +19,6 @@ var next_player: Player
 # --- Variables de control de turnos ---
 var steps: int = 1
 var direction: int = 1
-var new_top_card: Card
-var player_played_card: bool
 
 # --- Variable que controla el estado actual ---
 var current_state: STATES
@@ -166,14 +164,13 @@ func _change_state(new_state: STATES) -> void:
 			
 		STATES.APPLY_EFFECTS: # Aplicar efectos de la carta jugada anteriormente
 			print("### APLICANDO EFECTOS DE LA CARTA JUGADA ###")
-			print("El jugador anterior jugó: ", player_played_card)
 			print()
 
-            # Si el jugador anterior jugó una carta, procesar su efecto sobre next_player
-			if player_played_card:
+            # Si la última carta jugada no a procesado su efecto...
+			if discard_pile.top_card.effect_used == false:
+				# Lo procesamos y esperamos para continuar
 				await EffectManager.process_effect(discard_pile.top_card.card_effect, next_player)
-				player_played_card = false
-				
+				discard_pile.top_card.effect_used = true
 			
 			_change_state(STATES.CHANGE_TURN)
 			
@@ -201,8 +198,9 @@ func _change_state(new_state: STATES) -> void:
 			if not current_player.is_human:
 				ai_controller.current_ai_player = current_player # asignar jugador al controlador IA
 				await ai_controller.try_to_process_turn() # esperar a que la IA haga su acción
-				
+
 			# Tras jugar (o intentar), volver a aplicar efectos (si corresponde)
+			await get_tree().create_timer(0.15).timeout
 			_change_state(STATES.APPLY_EFFECTS)
 			print("--------------------------------------------------------------------------------")
 			
@@ -237,7 +235,6 @@ func _attempt_to_play(target_card: Card, target_player: Player) -> void:
 		return
 	
 	# Si la carta es válida...
-	player_played_card = true
 	target_player.play_a_card(target_card) # Jugamos la carta válida
 	await discard_pile.receive_card(target_card, target_player) # Llamamos al método para descartarla
 
@@ -253,7 +250,6 @@ func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_
 		if not forced:
 			# Si la carta es válida...
 			if _is_valid_card(new_card):
-				player_played_card = true
 				break # Dejamos de buscar
 
 	# Emitimos la señal de robo finalizado

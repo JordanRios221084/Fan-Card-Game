@@ -28,7 +28,7 @@ func _process_turn() -> void:
 	print("-- Jugador ia actual: ", current_ai_player, " --")
 	print()
 	# Generamos un tiempo aleatorio para simular pensamiento
-	var random_wait_time: float = randf_range(0.5, 2)
+	var random_wait_time: float = randf_range(0.5, 1)
 
 	# Simulando que la IA está pensando
 	await get_tree().create_timer(random_wait_time / 1.2).timeout
