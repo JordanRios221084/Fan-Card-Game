@@ -1,6 +1,7 @@
-# --- Script del gestor del juego ---
 extends Node
 class_name GameManager
+## Descripción: Este script gestiona la lógica principal del juego, 
+## incluyendo el flujo de turnos, la aplicación de efectos de cartas y la interacción entre jugadores.
 
 signal draw_card_finished
 
@@ -238,7 +239,14 @@ func _attempt_to_play(target_card: Card, target_player: Player) -> void:
 	target_player.play_a_card(target_card) # Jugamos la carta válida
 	await discard_pile.receive_card(target_card, target_player) # Llamamos al método para descartarla
 
-# --- Función para robar una carta hasta que se complete el total dado ---
+## Descripción: Función pública para robar una carta hasta que se complete el total dado.
+## Pertenece a la clase [color=blue][GameManager][/color].
+## [br]
+## Toma [target_player] (Jugador que roba), [card_count] (Cantidad de cartas a robar), 
+## [forced] (bool), y [draw_speed] (Velocidad de robo).
+## [br]
+## Si [forced] es true, robará la cantidad exacta de cartas.
+## Si [forced] es false, robará hasta encontrar una carta válida.
 func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_speed: float) -> void:
 	# Intentamos robar cartas la cantidad de veces que card_count nos diga
 	for i: int in card_count:
@@ -255,7 +263,13 @@ func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_
 	# Emitimos la señal de robo finalizado
 	draw_card_finished.emit()
 
-# --- Función para cambiar la opacidad de las cartas ---
+## Descripción: Función para ajustar la opacidad de las cartas en mano.
+## Función privada.
+## [br]
+## Toma [all_cards] (Array de cartas) y [enabled] (bool).
+## [br]
+## Si [enabled] es true, las cartas serán completamente visibles (opacidad 0).
+## Si [enabled] es false, las cartas tendrán opacidad parcial (0.25).
 func _set_opacity(all_cards: Array, enabled: bool) -> void:
 	if enabled:
 		for card: Card in all_cards:

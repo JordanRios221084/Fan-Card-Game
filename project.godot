@@ -37,6 +37,10 @@ window/size/window_width_override=800
 window/size/window_height_override=480
 window/stretch/mode="viewport"
 
+[dotnet]
+
+project/assembly_name="UNO Card Game"
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
