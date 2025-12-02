@@ -1,7 +1,6 @@
 extends Node2D
 class_name Card
-## [b]Descripción:[/b] Nodo Card que representa una carta.
-## [br]
+## [b]Descripción:[/b] Nodo Card que representa una carta. [br]
 ## Contiene propiedades y nodos hijos relacionados con la carta.
 
 # --- Nodos hijos de la carta ---

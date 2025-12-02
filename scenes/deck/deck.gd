@@ -1,18 +1,23 @@
 # --- Script de la baraja ---
 extends Node2D
 class_name Deck
+## [b]Descripción:[/b] Nodo Deck que representa la baraja del juego. [br]
+## Contiene funciones para manejar la baraja y robar cartas. [br]
 
 # --- Constantes ---
-const CARD_SCENCE_PATH: String = "res://scenes/card/card.tscn"
+const CARD_SCENCE_PATH: String = "res://scenes/card/card.tscn" ## Ruta al recurso de la escena de la carta.
 
 # --- Nodos ---
-@export var deck_sprite: Sprite2D
-@export var deck_collision_shape: CollisionShape2D
+@export var deck_sprite: Sprite2D ## Nodo Sprite2D que representa la imagen de la baraja
+@export var deck_collision_shape: CollisionShape2D ## Nodo CollisionShape2D para la detección de colisiones de la baraja
 
 # --- Baraja actual ---
-var current_deck: Array = []
+var current_deck: Array = [] ## Array que contiene las cartas actuales en la baraja.
 
-# --- Función para robar una carta de la baraja ---
+## Pertenece a: [Deck] [br]
+## [b]Descripción:[/b] Función para robar una carta de la baraja. [br]
+## Mezcla la baraja, comprueba si está vacía y crea una nueva carta si es posible. [br]
+## Devuelve la carta robada o null si la baraja está vacía.
 func draw_card() -> Card:
 	# Mezclar la baraja antes de robar una carta
 	current_deck.shuffle()

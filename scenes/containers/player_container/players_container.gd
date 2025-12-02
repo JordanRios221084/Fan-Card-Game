@@ -1,7 +1,6 @@
 extends Node
 class_name PlayersContainer
-## [b]Descripción:[/b] Contenedor de jugadores que maneja la lista de jugadores en el juego.
-## [br]
+## [b]Descripción:[/b] Contenedor de jugadores que maneja la lista de jugadores en el juego. [br]
 ## Contiene una propiedad para almacenar los jugadores actuales.
 
 # --- Total de jugadores actuales

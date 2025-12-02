@@ -1,12 +1,11 @@
 extends Node
 class_name AIController
-## [b]Descripción:[/b] Controlador de la IA que maneja el comportamiento de los jugadores controlados por la IA.
-## [br]
+## [b]Descripción:[/b] Controlador de la IA que maneja el comportamiento de los jugadores controlados por la IA. [br]
 ## Contiene señales y funciones para procesar los turnos de la IA y verificar las cartas válidas.
 
-signal check_card(card: Card) ## [Class AIController] Verifica si una carta IA es válida para jugar.
-signal play_card(card: Card, layer: Player) ## [signal AIController.play_card] Juega una carta por parte del jugador IA.
-signal draw_card(player: Player) ## [signal AIController.draw_card] Solicita que el jugador IA robe una carta.
+signal check_card(card: Card) ## Clase: [AIController] [br] Verifica si una carta IA es válida para jugar.
+signal play_card(card: Card, layer: Player) ## Clase: [AIController] [br] Juega una carta por parte del jugador IA.
+signal draw_card(player: Player) ## Clase: [AIController] [br] Solicita que el jugador IA robe una carta.
 
 @export var game_manager: GameManager ## Referencia al GameManager para manejar el estado del juego.
 
@@ -18,8 +17,8 @@ var random_wait_time_seconds: float ## Tiempo de espera aleatorio para simular e
 func _ready() -> void:
 	pass # Replace with function body.
 
-## [b]Descripción:[/b] Intenta procesar el turno del jugador IA actual.
-## [br]
+## Pertenece a: [AIController] [br]
+## [b]Descripción:[/b] Intenta procesar el turno del jugador IA actual. [br]
 ## Si no hay un jugador IA actual, la función termina sin hacer nada.
 func try_to_process_turn() -> void:
 	# Si no hay un jugador...
@@ -28,11 +27,10 @@ func try_to_process_turn() -> void:
 	
 	await _process_turn()
 
-## [b]Descripción:[/b] Procesa el turno del jugador IA actual.
-## [br]
+## [Método privado] [br]
+## [b]Descripción:[/b] Procesa el turno del jugador IA actual. [br]
 ## La función simula el pensamiento de la IA, verifica las cartas válidas y decide si
-## jugar una carta o robar una nueva.
-## [br]
+## jugar una carta o robar una nueva. [br]
 ## Si la carta robada es válida, la juega; de lo contrario, termina su turno.
 func _process_turn() -> void:
 	print("-- Jugador ia actual: ", current_ai_player, " --")
@@ -55,14 +53,17 @@ func _process_turn() -> void:
 
 	_clear_variables()
 
-## [b]Descripción:[/b] Limpia las variables del controlador de la IA.
-## [br]
+## [Método privado] [br]
+## [b]Descripción:[/b] Limpia las variables del controlador de la IA. [br]
 ## Reinicia el jugador IA actual y la lista de cartas válidas para preparar el siguiente turno
 func _clear_variables() -> void:
 	current_ai_player = null
 	valid_cards.clear()
 
-# --- Función para verificar que cartas de la mano del jugador IA actual son válidas ---
+## [Método privado] [br]
+## [b]Descripción:[/b] Verifica las cartas actuales en la mano del jugador IA. [br]
+## Si `try_draw` es verdadero, espera a que el jugador termine de robar una carta antes de verificar.
+## Emite una señal para cada carta en la mano del jugador IA para comprobar si es válida.
 func _check_current_cards(try_draw: bool) -> void:
 	# Intentamos robar una carta
 	if try_draw:

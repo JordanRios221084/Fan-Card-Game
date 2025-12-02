@@ -3,28 +3,28 @@ class_name GameManager
 ## Descripción: Este script gestiona la lógica principal del juego, 
 ## incluyendo el flujo de turnos, la aplicación de efectos de cartas y la interacción entre jugadores.
 
-signal draw_card_finished
+signal draw_card_finished ## Señal emitida cuando un jugador termina de robar cartas
 
 # --- Referencis a los nodos hijos ---
-@export var deck: Deck
-@export var discard_pile: DiscardPile
-@export var ai_controller: AIController
-@export var players_container: PlayersContainer
-@export var all_players: Array[Player] = []
+@export var deck: Deck ## Referencia al mazo de cartas
+@export var discard_pile: DiscardPile ## Referencia al montón de descarte
+@export var ai_controller: AIController ## Referencia al controlador de IA
+@export var players_container: PlayersContainer ## Contenedor de los jugadores
+@export var all_players: Array[Player] = [] ## Array que contiene referencias a todos los jugadores
 
 # --- Variables para los jugadores ---
-var prev_winner: Player
-var current_player: Player
-var next_player: Player
+var prev_winner: Player ## Referencia al jugador que ganó la partida anterior
+var current_player: Player ## Referencia al jugador actual
+var next_player: Player ## Referencia al siguiente jugador
 
 # --- Variables de control de turnos ---
-var steps: int = 1
-var direction: int = 1
+var steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más)
+var direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario)
 
-# --- Variable que controla el estado actual ---
-var current_state: STATES
+## Variable que almacena el estado actual del juego
+var current_state: STATES 
 
-# --- Enumerado de estados ---
+## Enumerado que define los posibles estados del juego
 enum STATES{
 	IDLE,
 	GAME_STARTED,
@@ -51,7 +51,10 @@ func _ready() -> void:
 	# Comenzar el juego
 	_start_game()
 
-# --- Función para cargar la base de datos de cartas ---
+## Descripción: Función para establecer la base de datos de cartas en el mazo.
+## Pertenece a la clase [color=blue][GameManager][/color].
+## [br]
+## Esta función duplica la base de datos de cartas y la asigna al mazo de
 func _set_database() -> void:
 	deck.current_deck = CardDatabase.get_card_database().duplicate()
 
