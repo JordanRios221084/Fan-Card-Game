@@ -1,31 +1,20 @@
-extends Node
 class_name GameManager
-## Descripción: Este script gestiona la lógica principal del juego, 
-## incluyendo el flujo de turnos, la aplicación de efectos de cartas y la interacción entre jugadores.
+extends Node
 
-signal draw_card_finished ## Señal emitida cuando un jugador termina de robar cartas
+## Controla la lógica principal del juego, incluyendo turnos, estados y gestión de jugadores.
+##
+## Contiene referencias a nodos clave como el mazo, el montón de descarte, el controlador de IA y los jugadores.
+## También maneja la transición entre diferentes estados del juego y la aplicación de efectos de cartas.
 
-# --- Referencis a los nodos hijos ---
-@export var deck: Deck ## Referencia al mazo de cartas
-@export var discard_pile: DiscardPile ## Referencia al montón de descarte
-@export var ai_controller: AIController ## Referencia al controlador de IA
-@export var players_container: PlayersContainer ## Contenedor de los jugadores
-@export var all_players: Array[Player] = [] ## Array que contiene referencias a todos los jugadores
+# --- Signals ---
 
-# --- Variables para los jugadores ---
-var prev_winner: Player ## Referencia al jugador que ganó la partida anterior
-var current_player: Player ## Referencia al jugador actual
-var next_player: Player ## Referencia al siguiente jugador
+## Señal emitida cuando un jugador termina de robar cartas.
+signal draw_card_finished
 
-# --- Variables de control de turnos ---
-var steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más)
-var direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario)
+# --- Enums ---
 
-## Variable que almacena el estado actual del juego
-var current_state: STATES 
-
-## Enumerado que define los posibles estados del juego
-enum STATES{
+## Define los posibles estados del juego.
+enum GameState {
 	IDLE,
 	GAME_STARTED,
 	APPLY_EFFECTS,
@@ -34,7 +23,38 @@ enum STATES{
 	GAME_ENDED
 }
 
-# Called when the node enters the scene tree for the first time.
+# --- Exports ---
+@export_group("Table References")
+## Referencia al mazo de cartas [Deck].
+@export var deck: Deck
+## Referencia al montón de descarte [DiscardPile].
+@export var discard_pile: DiscardPile
+
+@export_group("Player Management")
+## Referencia al controlador de IA [AIController].
+@export var ai_controller: AIController
+## Contenedor de los jugadores [PlayersContainer].
+@export var players_container: PlayersContainer
+## Array que contiene referencias a todos los jugadores [Player].
+@export var all_players: Array[Player] = []
+
+# --- Public Variables ---
+## Referencia al jugador que ganó la partida anterior.
+var prev_winner: Player
+## Referencia al jugador actual.
+var current_player: Player
+## Referencia al siguiente jugador.
+var next_player: Player
+
+## Cantidad de pasos a mover en el turno (1 o más).
+var steps: int = 1
+## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
+var direction: int = 1
+
+## Variable que almacena el estado actual del juego.
+var current_state: GameState = GameState.IDLE
+
+# --- Engine Functions ---
 func _ready() -> void:
 	# Cargar la base de datos de cartas
 	_set_database()
@@ -42,7 +62,7 @@ func _ready() -> void:
 	# Obtener referencias a todos los jugadores
 	_get_players_references()
 
-	# Configuramos los valores para el EffectManager
+	# Configuramos los valores para el EffectManager (Asumimos que es Autoload)
 	_set_effect_values()
 	
 	# Conectamos las señales necesarias
@@ -51,247 +71,234 @@ func _ready() -> void:
 	# Comenzar el juego
 	_start_game()
 
-## Descripción: Función para establecer la base de datos de cartas en el mazo.
-## Pertenece a la clase [color=blue][GameManager][/color].
-## [br]
-## Esta función duplica la base de datos de cartas y la asigna al mazo de
-func _set_database() -> void:
-	deck.current_deck = CardDatabase.get_card_database().duplicate()
 
-# --- Función para obtener referencias a nodos importantes ---
+# --- Public Functions ---
+## Roba una carta hasta que se alcanza el límite. [br]
+## - [param target_player]: Jugador que robará las cartas. [br]
+## - [param card_count]: Cantidad máxima de cartas a robar. [br]
+## - [param forced]: Si es true, robará todo. Si es false, para al encontrar una válida. [br]
+## - [param draw_speed]: Tiempo de espera entre robos.
+func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_speed: float) -> void:
+	# Intentamos robar cartas la cantidad de veces solicitada
+	for i: int in card_count:
+		var new_card: Card = deck.draw_card() # Robamos la carta del mazo
+		
+		# Esperamos a que el jugador añada la carta a su mano
+		await target_player.add_card_to_hand(new_card) 
+		
+		# Actualizamos visuales
+		for card: Card in current_player.current_hand:
+			CardManager.set_card_opacity(card, true)
+		
+		# Pausa dramática entre robos
+		await get_tree().create_timer(draw_speed).timeout
+
+		if not forced:
+			# Si la carta es válida, dejamos de robar
+			if _is_valid_card(new_card):
+				break
+
+	# Emitimos la señal de robo finalizado
+	draw_card_finished.emit()
+
+# --- Private Functions ---
+## Configura el mazo de cartas con una copia de la base de datos.
+func _set_database() -> void:
+	# Asumimos que CardDatabase es un Autoload o clase estática
+	deck.current_deck = CardDatabase.get_card_database()
+
+
+## Obtiene referencias a todos los jugadores actuales y las almacena en [all_players].
 func _get_players_references() -> void:
 	all_players.clear()
-	for node: Node in players_container.total_current_players:
-		var player: Player = node as Player
-		all_players.append(player)
+	# Accedemos a la variable pública 'current_players' que renombramos en PlayersContainer
+	for node: Node in players_container.current_players:
+		if node is Player:
+			all_players.append(node as Player)
 
-# --- Función para enviarle la referencia de este nodo al Effectmanager
+
+## Configura el [EffectManager] con una referencia al [GameManager] actual.
 func _set_effect_values() -> void:
 	EffectManager.game_manager = self
 
-# --- Función para conectar las señales de los nodos necesarios ---
+
+## Conecta las señales del [AIController] a los métodos correspondientes.
 func _connect_signals() -> void:
 	ai_controller.check_card.connect(_on_ai_controller_check_card)
 	ai_controller.play_card.connect(_on_ai_controller_play_card)
 	ai_controller.draw_card.connect(_on_ai_controller_draw_card)
 
+
+## Inicia el juego repartiendo cartas y configurando el estado inicial.
 func _start_game() -> void:
-	# Esperar un momento antes de repartir cartas
 	await get_tree().create_timer(0.5).timeout
 
 	# Repartir 7 cartas a cada jugador
 	for i: int in range(7):
-		# Para cada jugador
 		for player: Player in all_players:
-			var card: Card = deck.draw_card() # Tomar una carta del mazo
-			await player.add_card_to_hand(card) # Añadir la carta a la mano del jugador
+			var card: Card = deck.draw_card()
+			await player.add_card_to_hand(card)
 	
-	# Esperar un momento después de repartir las cartas
 	await get_tree().create_timer(0.5).timeout
 
-	# Después de repartir, colapsar las manos de todos los jugadores
+	# Colapsar las manos de todos los jugadores (Corregido 'colapse' -> 'collapse')
 	for player: Player in all_players:
-		player.colapse_hand()
+		player.collapse_hand()
 
-	# Esperar un momento después de colapsar las manos
 	await get_tree().create_timer(0.5).timeout
 
 	# Colocar la primera carta en el montón de descarte
-	await discard_pile.receive_card(deck.draw_card(), deck)
+	var first_card: Card = deck.draw_card()
+	CardManager.set_card_opacity(first_card, true)
+	await discard_pile.receive_card(first_card, deck)
 
 	# Marcar el juego como comenzado
-	_change_state(STATES.GAME_STARTED)
+	_change_state(GameState.GAME_STARTED)
 
-# --- Función para determiniar el primer jugador de la partida ---
+
+## Determina y asigna el primer jugador.
 func _set_first_player() -> void:
-	# Si hay una ganador previo, el jugador actual será igual a él
 	if prev_winner:
 		current_player = prev_winner
-		return
-
-	# Si el bloque anterior no se ejecuta, obtenemos el jugador actual aleatoriamente
-	current_player = all_players.pick_random()
+	else:
+		current_player = all_players.pick_random()
+	
 	current_player.is_turn = true
 
-	# Configuramos el que será el siguiente jugador
-	var next_player_index: int = (all_players.find(current_player) + (steps * direction)) % all_players.size()
-	next_player = all_players[next_player_index]
+	# Calculamos el siguiente jugador
+	var current_index: int = all_players.find(current_player)
+	var next_index: int = (current_index + (steps * direction) + all_players.size()) % all_players.size()
+	
+	next_player = all_players[next_index]
 
-	print("Jugadores inciales: ")
-	print(current_player)
-	print(next_player)
+	print("Jugadores iniciales | Actual: {current_player.name} | Siguiente: {next_player.name}")
 	print()
 
-# --- Función para cambiar el turno del jugador actual ---
+
+## Cambia el turno al siguiente jugador según la dirección y los pasos definidos.
 func _change_current_player_turn() -> void:
-	# Obtenmos el total de jugadores
 	var total_players: int = all_players.size()
-	current_player.is_turn = false # Hacemos que el jugador actual ya no tenga el turno
+	current_player.is_turn = false 
 
-	# Buscamos el indice del jugador con turno anterior
 	var prev_current_player_index: int = all_players.find(current_player)
-	# Encontramos el nuevo jugador actual
-	var new_current_player_index: int = (prev_current_player_index + (steps * direction)) % total_players
+	
+	# Cálculo seguro para índices circulares
+	var new_current_player_index: int = (prev_current_player_index + (steps * direction) + total_players) % total_players
 
-	# Asignamos el nuevo indice al jugador actual para cambiarlo
+	# Asignamos nuevo jugador actual
 	current_player = all_players[new_current_player_index]
-	current_player.is_turn = true # Hacemos que el jugador actual tenga turno
+	current_player.is_turn = true 
 
-	# Reiniciamos steps a 1
+	# Reiniciamos pasos a 1
 	steps = 1
 
-	# Obtenemos el siguiente jugador con el que se calcularan los efectos de las cartas
-	var new_next_player_index: int = (new_current_player_index + (steps * direction)) % total_players
-	next_player = all_players[new_next_player_index] # Encontramos el siguiente jugador con el indice
+	# Calculamos el nuevo "siguiente" jugador
+	var new_next_player_index: int = (new_current_player_index + (steps * direction) + total_players) % total_players
+	next_player = all_players[new_next_player_index]
 
-	# Imprimimos para debug
-	print("-- Jugador Actual:", current_player, " --")
-	print("-- Jugador Siguiente: ", next_player, " --")
+	print("-- Jugador Actual: %s --" % current_player.name)
+	print("-- Jugador Siguiente: %s --" % next_player.name)
 
-# --- Función que se encarga de cambiar el estado actual de la partida ---
-func _change_state(new_state: STATES) -> void:
-	# Actualiza la variable que almacena el estado actual
+
+## Máquina de estados principal.
+## Cambia el estado actual y ejecuta la lógica de transición.
+func _change_state(new_state: GameState) -> void:
 	current_state = new_state
 
-    # Selecciona comportamiento según el estado
 	match current_state:
-		STATES.GAME_STARTED: # Cuando el juego comienza
-			print("*** JUEGO COMENZADO ***")
-			print()
-
-            # Determina y asigna el primer jugador (o el ganador previo)
+		GameState.GAME_STARTED:
+			print("*** JUEGO COMENZADO ***\n")
 			_set_first_player()
-
-            # Avanza inmediatamente a aplicar efectos (si los hay)
-			_change_state(STATES.APPLY_EFFECTS)
 			print("--------------------------------------------------------------------------------")
+			_change_state(GameState.APPLY_EFFECTS)
 			
-		STATES.APPLY_EFFECTS: # Aplicar efectos de la carta jugada anteriormente
-			print("### APLICANDO EFECTOS DE LA CARTA JUGADA ###")
-			print()
-
-            # Si la última carta jugada no a procesado su efecto...
-			if discard_pile.top_card.effect_used == false:
-				# Lo procesamos y esperamos para continuar
+		GameState.APPLY_EFFECTS:
+			print("### APLICANDO EFECTOS ###\n")
+			
+			# Si la última carta jugada no ha procesado su efecto...
+			if not discard_pile.top_card.effect_used:
 				await EffectManager.process_effect(discard_pile.top_card.card_effect, next_player)
 				discard_pile.top_card.effect_used = true
 			
-			_change_state(STATES.CHANGE_TURN)
+			_change_state(GameState.CHANGE_TURN)
 			
-		STATES.CHANGE_TURN: # Cambio del turno al siguiente jugador
-			print("$$$ CAMBIANDO EL TURNO DEL JUGADOR ACTUAL $$$")
-			print()
+		GameState.CHANGE_TURN:
+			print("$$$ CAMBIANDO TURNO $$$\n")
+			
+			# Desactivar interacción visual del jugador anterior
+			for card: Card in current_player.current_hand:
+				CardManager.set_card_opacity(card, false)
 
-            # Desactivar interacción visual (opacidad) de la mano del jugador que dejó de tener el turno
-			_set_opacity(current_player.current_hand, false)
-
-            # Cambia la referencia de current_player y calcula next_player
 			_change_current_player_turn()
-
-            # Pasar al estado donde el jugador actual puede jugar
-			_change_state(STATES.PLAYING_CARDS)
+			_change_state(GameState.PLAYING_CARDS)
 			
-		STATES.PLAYING_CARDS: # Turno activo: el jugador juega cartas
-			print("¡¡¡ JUGADOR ACTUAL JUGANDO !!!")
-			print()
+		GameState.PLAYING_CARDS:
+			print("¡¡¡ JUGADOR %s JUGANDO !!!\n" % current_player.name)
+			
+			# Habilitar interacción visual del jugador actual
+			for card: Card in current_player.current_hand:
+				CardManager.set_card_opacity(card, true)
 
-            # Habilitar interacción visual (opacidad) de la mano del jugador con turno
-			_set_opacity(current_player.current_hand, true)
-
-            # Si el jugador es controlado por la IA, pedirle que procese su turno (await)
+			# Si es IA, procesar turno
 			if not current_player.is_human:
-				ai_controller.current_ai_player = current_player # asignar jugador al controlador IA
-				await ai_controller.try_to_process_turn() # esperar a que la IA haga su acción
+				ai_controller.current_ai_player = current_player
+				await ai_controller.try_to_process_turn()
 
-			# Tras jugar (o intentar), volver a aplicar efectos (si corresponde)
-			await get_tree().create_timer(0.15).timeout
-			_change_state(STATES.APPLY_EFFECTS)
-			print("--------------------------------------------------------------------------------")
+			# Nota: Si es humano, el estado se queda aquí esperando input (botones/clics)
 			
-		STATES.GAME_ENDED: # Estado de juego terminado
+			await get_tree().create_timer(0.15).timeout
+			# En el flujo normal, el cambio de estado siguiente lo debe detonar la acción de jugar/robar
+			
+		GameState.GAME_ENDED:
 			print("||| JUEGO TERMINADO |||")
 
-# --- Función para verificar si la carta es válida ---
+
+## Verifica si una carta es válida para jugar según las reglas. [br]
+## Reglas: Coincidir color, coincidir símbolo, o ser carta negra (Wild).
 func _is_valid_card(card_to_validate: Card) -> bool:
-	# Obtenemos la última carta jugada
-	var last_card_played: Card = discard_pile.top_card
+	var last_card: Card = discard_pile.top_card
 
-	# Si la carta tiene el mismo color que la última que se jugó
-	if card_to_validate.card_color == last_card_played.card_color:
-		return true # Devolver true
+	if card_to_validate.card_color == last_card.card_color:
+		return true
 
-	# Si la carta tiene el mismo simbolo que la última que se jugó
-	if card_to_validate.card_symbol == last_card_played.card_symbol:
-		return true # Devolver true
+	if card_to_validate.card_symbol == last_card.card_symbol:
+		return true
 	
-	# Si la carta tiene color negro es un wild card
 	if card_to_validate.card_color == "black":
-		return true # Devolver true
+		return true
 	
-	return false # Si ninguna regla se cumple, la carta no es válida
+	return false
 
-# --- Función para intentar jugar una carta ---
+
+## Intenta jugar una carta para un jugador dado.
 func _attempt_to_play(target_card: Card, target_player: Player) -> void:
-	print("El jugador: ", target_player, ", ha intentado jugar una carta")
-	# Si la carta no es válida
+	print("El jugador %s intenta jugar una carta." % target_player.name)
+	
 	if not _is_valid_card(target_card):
-		target_card.card_animator.play("invalid_card") # Reproducimos la animación de carta inválida
+		target_card.card_animator.play("invalid_card")
 		return
 	
-	# Si la carta es válida...
-	target_player.play_a_card(target_card) # Jugamos la carta válida
-	await discard_pile.receive_card(target_card, target_player) # Llamamos al método para descartarla
+	# Jugar la carta válida
+	target_player.play_a_card(target_card)
+	
+	# Enviarla al descarte
+	await discard_pile.receive_card(target_card, target_player)
+	
+	# Una vez jugada, debemos volver a verificar efectos
+	print("--------------------------------------------------------------------------------")
+	_change_state(GameState.APPLY_EFFECTS)
 
-## Descripción: Función pública para robar una carta hasta que se complete el total dado.
-## Pertenece a la clase [color=blue][GameManager][/color].
-## [br]
-## Toma [target_player] (Jugador que roba), [card_count] (Cantidad de cartas a robar), 
-## [forced] (bool), y [draw_speed] (Velocidad de robo).
-## [br]
-## Si [forced] es true, robará la cantidad exacta de cartas.
-## Si [forced] es false, robará hasta encontrar una carta válida.
-func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_speed: float) -> void:
-	# Intentamos robar cartas la cantidad de veces que card_count nos diga
-	for i: int in card_count:
-		var new_card: Card = deck.draw_card() # Robamos la carta del mazo
-		await target_player.add_card_to_hand(new_card) # Esperamos a que el jugador añada la carta a su mano
-		_set_opacity(current_player.current_hand, true) # Hacemos la opacidad transparente
-		await get_tree().create_timer(draw_speed).timeout # Añadimos tiempo adicional
 
-		if not forced:
-			# Si la carta es válida...
-			if _is_valid_card(new_card):
-				break # Dejamos de buscar
-
-	# Emitimos la señal de robo finalizado
-	draw_card_finished.emit()
-
-## Descripción: Función para ajustar la opacidad de las cartas en mano.
-## Función privada.
-## [br]
-## Toma [all_cards] (Array de cartas) y [enabled] (bool).
-## [br]
-## Si [enabled] es true, las cartas serán completamente visibles (opacidad 0).
-## Si [enabled] es false, las cartas tendrán opacidad parcial (0.25).
-func _set_opacity(all_cards: Array, enabled: bool) -> void:
-	if enabled:
-		for card: Card in all_cards:
-			card.opacity_sprite.modulate = Color(0, 0, 0, 0)
-	else:
-		for card: Card in all_cards:
-			card.opacity_sprite.modulate = Color(0, 0, 0, 0.25)
-
-# --- Función para escuchar la señal de validar cartas de la IA ----
+# --- Signal Callbacks ---
 func _on_ai_controller_check_card(target_card: Card) -> void:
-	# Si la carta es válida
 	if _is_valid_card(target_card):
-		ai_controller.valid_cards.append(target_card) # La agregamos a valid_cards de la IA
+		ai_controller.add_valid_card(target_card)
 
-# --- Función para escuchar la señal de jugar cartas de la IA ----
+
 func _on_ai_controller_play_card(found_card: Card, origin_player: Player) -> void:
-	# Intentamos jugar la carta
 	_attempt_to_play(found_card, origin_player)
 
-# --- Función para escuchar la señal de robar cartas de la IA ---
-func _on_ai_controller_draw_card(target_player: Player,) -> void:
+
+func _on_ai_controller_draw_card(target_player: Player) -> void:
 	draw_a_new_card(target_player, 1, false, 0.5)
+	# Nota: Tras robar, la IA volverá a comprobar sus cartas en su propia lógica

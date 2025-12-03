@@ -1,11 +1,14 @@
-extends Node
 class_name PlayersContainer
-## [b]Descripción:[/b] Contenedor de jugadores que maneja la lista de jugadores en el juego. [br]
-## Contiene una propiedad para almacenar los jugadores actuales.
+extends Node
+## Contenedor que gestiona a todos los nodos de tipo [Player] durante la partida.
+##
+## Guarda referencias a los jugadores actuales en la escena en un arreglo para facilitar su acceso y manipulación.
 
-# --- Total de jugadores actuales
-var total_current_players: Array[Node] ## Lista de nodos que representan a los jugadores actuales en el contenedor.
+# --- Public Variables ---
+## Arreglo de nodos que representan a los jugadores actuales en el contenedor.
+var current_players: Array[Node] = []
 
-# Called when the node enters the scene tree for the first time.
+# --- Engine Functions ---
 func _ready() -> void:
-	total_current_players = get_children()
+	# Asigna los hijos actuales al arreglo.
+	current_players = get_children()

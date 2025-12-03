@@ -1,14 +1,19 @@
 # --- Autoload para obtener la base de datos de cartas ---
 extends Node
+## Script para cargar y proporcionar acceso a la base de datos de cartas desde un archivo CSV.
 
-var card_db: Array[CardValues] = []
-var csv_path: String = "res://data/classic.csv"
+var _card_db: Array[CardValues] = []
+var _csv_path: String = "res://data/classic.csv"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	load_card_database(csv_path)
+	_load_card_database(_csv_path)
 
-func load_card_database(path: String) -> void:
+## Método privado. [br]
+## Carga la base de datos de cartas desde un archivo CSV. [br]
+## Parametros: [br]
+## [param path]: La ruta del archivo CSV que contiene la base de datos de cartas.
+func _load_card_database(path: String) -> void:
 	# --- Cargar la base de datos de cartas desde un archivo CSV ---
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
 	if not file:
@@ -38,8 +43,9 @@ func load_card_database(path: String) -> void:
 		card_value.card_effect = values[4]
 		
 		# Añadir el recurso CardValues a la base de datos de cartas
-		card_db.append(card_value)
+		_card_db.append(card_value)
 
-# --- Función para obtener la base de datos de cartas ---
+## Método para obtener la base de datos de cartas. [br]
+## Retorna: Una copia de la base de datos de cartas.
 func get_card_database() -> Array:
-	return card_db
+	return _card_db.duplicate()

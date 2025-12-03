@@ -1,80 +1,108 @@
-extends Node
 class_name AIController
-## [b]Descripción:[/b] Controlador de la IA que maneja el comportamiento de los jugadores controlados por la IA. [br]
-## Contiene señales y funciones para procesar los turnos de la IA y verificar las cartas válidas.
+extends Node
+## Contiene la lógica para controlar el comportamiento de los jugadores IA durante el juego.
+##
+## Gestiona el turno de los jugadores IA, incluyendo la selección y juego de cartas válidas
+## o la acción de robar cartas cuando no hay opciones disponibles.
 
-signal check_card(card: Card) ## Clase: [AIController] [br] Verifica si una carta IA es válida para jugar.
-signal play_card(card: Card, layer: Player) ## Clase: [AIController] [br] Juega una carta por parte del jugador IA.
-signal draw_card(player: Player) ## Clase: [AIController] [br] Solicita que el jugador IA robe una carta.
+# --- Signals ---
+## Verifica si una carta IA es válida para jugar.
+signal check_card(card: Card)
+## Juega una carta por parte del jugador IA.
+signal play_card(card: Card, layer: Player)
+## Solicita que el jugador IA robe una carta.
+signal draw_card(player: Player)
 
-@export var game_manager: GameManager ## Referencia al GameManager para manejar el estado del juego.
+# --- Exports ---
+@export_group("References")
+## Referencia al [GameManager] para manejar el estado del juego.
+@export var game_manager: GameManager
 
-var current_ai_player: Player ### Referencia al jugador IA actual cuyo turno se está procesando.
-var valid_cards: Array[Card] = [] ## Lista de cartas válidas que el jugador IA puede jugar.
-var random_wait_time_seconds: float ## Tiempo de espera aleatorio para simular el pensamiento de la IA en segundos.
+# --- Public Variables ---
+## Referencia al jugador IA actual cuyo turno se está procesando.
+## Se debe asignar antes de llamar a try_to_process_turn().
+var current_ai_player: Player
 
-# Called when the node enters the scene tree for the first time.
+## Lista de cartas válidas que el jugador IA puede jugar.
+## Se asume que esta lista se llena externamente al emitir [signal AIController.check_card].
+var _valid_cards: Array[Card] = []
+
+# --- Engine Functions ---
 func _ready() -> void:
-	pass # Replace with function body.
+	pass
 
-## Pertenece a: [AIController] [br]
-## [b]Descripción:[/b] Intenta procesar el turno del jugador IA actual. [br]
+
+# --- Public Functions ---
+## Intenta procesar el turno del jugador IA actual.
 ## Si no hay un jugador IA actual, la función termina sin hacer nada.
 func try_to_process_turn() -> void:
-	# Si no hay un jugador...
+	# Si no hay un jugador asignado, terminamos.
 	if not current_ai_player:
-		return # Terminamos de ejecutar
+		return
 	
 	await _process_turn()
 
-## [Método privado] [br]
-## [b]Descripción:[/b] Procesa el turno del jugador IA actual. [br]
-## La función simula el pensamiento de la IA, verifica las cartas válidas y decide si
-## jugar una carta o robar una nueva. [br]
-## Si la carta robada es válida, la juega; de lo contrario, termina su turno.
+
+## Añade una carta válida a la lista de cartas válidas.
+## [param card] La carta que se considera válida para jugar.
+func add_valid_card(card: Card) -> void:
+	# Añade una carta válida a la lista de cartas válidas.
+	_valid_cards.append(card)
+
+
+# --- Private Functions ---
+## Procesa el turno del jugador IA actual.
+## Simula el pensamiento de la IA, verifica las cartas válidas y decide si jugar o robar.
 func _process_turn() -> void:
-	print("-- Jugador ia actual: ", current_ai_player, " --")
+	print("-- Jugador IA actual: ", current_ai_player, " --")
 	print()
+	
+	# Variable local para el tiempo de espera (no necesita ser de clase)
+	var wait_time: float = randf_range(0.5, 1.0)
 
-	random_wait_time_seconds = randf_range(0.5, 1) # Tiempo de espera aleatorio entre 0.5 y 1 segundos
+	# Multiplicador para variar el tiempo de espera inicial
+	await get_tree().create_timer(wait_time * 1.2).timeout
 
-	await get_tree().create_timer(random_wait_time_seconds * 1.2).timeout # Multiplicador para variar el tiempo de espera
+	# Verificamos cartas (Añadido 'await' para asegurar sincronía)
+	await _check_current_cards(false)
 
-	_check_current_cards(false)
-
-	await get_tree().create_timer(random_wait_time_seconds / 0.8).timeout # Divisor para variar el tiempo de espera
-	if valid_cards.is_empty():
+	# Divisor para variar el tiempo de espera intermedio
+	await get_tree().create_timer(wait_time / 0.8).timeout
+	
+	# Lógica de decisión: Robar o Jugar
+	if _valid_cards.is_empty():
 		draw_card.emit(current_ai_player)
+		# Verificamos de nuevo tras robar (esperando a que termine el robo)
 		await _check_current_cards(true)
 	
-	if not valid_cards.is_empty():
-		var ai_found_card: Card = valid_cards.pick_random()
+	if not _valid_cards.is_empty():
+		var ai_found_card: Card = _valid_cards.pick_random()
 		play_card.emit(ai_found_card, current_ai_player)
 
 	_clear_variables()
 
-## [Método privado] [br]
-## [b]Descripción:[/b] Limpia las variables del controlador de la IA. [br]
-## Reinicia el jugador IA actual y la lista de cartas válidas para preparar el siguiente turno
-func _clear_variables() -> void:
-	current_ai_player = null
-	valid_cards.clear()
 
-## [Método privado] [br]
-## [b]Descripción:[/b] Verifica las cartas actuales en la mano del jugador IA. [br]
-## Si `try_draw` es verdadero, espera a que el jugador termine de robar una carta antes de verificar.
-## Emite una señal para cada carta en la mano del jugador IA para comprobar si es válida.
+## Verifica las cartas actuales en la mano del jugador IA.
+## Si [param try_draw] es verdadero, espera a que el jugador termine de robar antes de verificar.
 func _check_current_cards(try_draw: bool) -> void:
-	# Intentamos robar una carta
+	# Intentamos robar una carta si es necesario
 	if try_draw:
 		await game_manager.draw_card_finished
 
-	# Reiniciamos las cartas válidas
-	valid_cards.clear()
+	# Reiniciamos las cartas válidas antes de comprobar
+	_valid_cards.clear()
 
-	# Para cada carta en la mano del jugador IA actual...
-	for card: Card in current_ai_player.current_hand:
-		check_card.emit(card) # Emitimos una señal para verificar la carta
+	# Emitimos señal para cada carta en la mano
+	if current_ai_player and current_ai_player.current_hand:
+		for card: Card in current_ai_player.current_hand:
+			check_card.emit(card)
 	
-	# Esmerapos 0.5seg
+	# Pequeña espera para dar tiempo a procesar las señales o simular "lectura"
 	await get_tree().create_timer(0.5).timeout
+
+
+## Limpia las variables del controlador de la IA.
+## Reinicia el jugador actual y la lista de cartas para el siguiente turno.
+func _clear_variables() -> void:
+	current_ai_player = null
+	_valid_cards.clear()
