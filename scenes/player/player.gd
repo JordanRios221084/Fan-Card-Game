@@ -1,12 +1,10 @@
 class_name Player
 extends Node2D
-
 ## Jugador que contiene la lógica para manejar su mano de cartas.
 ##
 ## Contiene funciones para añadir cartas, ordenar la mano y calcular posiciones.
 
 # --- Constants ---
-
 const CARD_WIDTH: float = 40.0 ## Define el ancho de cada carta en la mano.
 const SEPARATION_OFFSET: float = 20.0 ## Define el desplazamiento al separar cartas.
 const MAX_HAND_SIZE: int = 10 ## Define el tamaño máximo de la mano.
@@ -23,7 +21,6 @@ const _COLOR_WEIGHTS: Dictionary = {
 }
 
 # --- Exports ---
-
 @export_group("Status")
 ## Indica si es el turno del jugador.
 @export var is_turn: bool = false
@@ -35,7 +32,6 @@ const _COLOR_WEIGHTS: Dictionary = {
 @export var _auto_sort_cards: bool = false
 
 # --- Public Variables ---
-
 ## Arreglo que contiene las cartas en la mano del jugador.
 var current_hand: Array[Card] = []
 
@@ -44,8 +40,8 @@ var current_hand: Array[Card] = []
 func _ready() -> void:
 	pass
 
-# --- Public Functions ---
 
+# --- Public Functions ---
 ## Añade una carta a la mano del jugador y actualiza su posición.
 ## Si el jugador es humano, reproduce una animación de voltear la carta.
 ## Si es el turno del jugador, ordena las cartas automáticamente.
@@ -95,8 +91,8 @@ func collapse_hand() -> void:
 	_calculate_cards_position() # Recalcular sus posiciones
 	_auto_sort_cards = true # Reactivar el auto-ordenamiento
 
-# --- Private Functions ---
 
+# --- Private Functions ---
 ## Calcula y actualiza las posiciones de las cartas en la mano del jugador.
 func _calculate_cards_position() -> void:
 	var hand_size: int = current_hand.size()
@@ -147,18 +143,17 @@ func _sort_cards() -> void:
 	# sort_custom usa una función lambda para comparar dos elementos (a, b).
 	current_hand.sort_custom(
 		func(a: Card, b: Card) -> bool:
-			# 1. Comparar por color usando el diccionario constante
+			# Comparar por color usando el diccionario constante
 			var color_a_weight: int = _COLOR_WEIGHTS.get(a.card_color, 99)
 			var color_b_weight: int = _COLOR_WEIGHTS.get(b.card_color, 99)
 
 			if color_a_weight != color_b_weight:
 				return color_a_weight < color_b_weight
 			
-			# 2. Si los colores son iguales, comparar por valor (symbol)
+			# Si los colores son iguales, comparar por valor (symbol)
 			return a.card_symbol < b.card_symbol
 	)
 	
-	# Reordenar los nodos en el árbol de escena para que coincidan con el array
-	# 'self' es el padre de las cartas, no necesitamos buscarlo
+	# Reordenar los nodos en el árbol de escena para que coincidan con el arreglo ordenado
 	for card: Card in current_hand:
 		move_child(card, -1)

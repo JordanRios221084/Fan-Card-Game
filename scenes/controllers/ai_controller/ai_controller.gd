@@ -44,7 +44,7 @@ func try_to_process_turn() -> void:
 
 
 ## Añade una carta válida a la lista de cartas válidas.
-## [param card] La carta que se considera válida para jugar.
+## - [param card] La carta que se considera válida para jugar.
 func add_valid_card(card: Card) -> void:
 	# Añade una carta válida a la lista de cartas válidas.
 	_valid_cards.append(card)

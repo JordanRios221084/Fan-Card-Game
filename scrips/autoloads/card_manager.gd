@@ -13,10 +13,10 @@ signal move_finished
 ## Mueve una carta a una posición y rotación objetivo en un tiempo determinado.
 ## Utiliza un Tween paralelo para animar posición y rotación simultáneamente.
 ##
-## [param card]: La carta (Node2D) a mover.
-## [param target_pos]: La posición objetivo (Vector2).
-## [param target_time_seconds]: Duración de la animación en segundos.
-## [param target_rot_degrees]: Rotación objetivo en grados.
+## - [param card]: La carta (Node2D) a mover.
+## - [param target_pos]: La posición objetivo (Vector2).
+## - [param target_time_seconds]: Duración de la animación en segundos.
+## - [param target_rot_degrees]: Rotación objetivo en grados.
 func move_card_to_position(card: Node2D, target_pos: Vector2, target_time_seconds: float, target_rot_degrees: float) -> void:
 	# Crear un Tween y configurarlo para que ejecute animaciones en paralelo
 	var move_tween: Tween = create_tween().set_parallel(true)

@@ -12,7 +12,7 @@ func _ready() -> void:
 ## Método privado. [br]
 ## Carga la base de datos de cartas desde un archivo CSV. [br]
 ## Parametros: [br]
-## [param path]: La ruta del archivo CSV que contiene la base de datos de cartas.
+## - [param path]: La ruta del archivo CSV que contiene la base de datos de cartas.
 func _load_card_database(path: String) -> void:
 	# --- Cargar la base de datos de cartas desde un archivo CSV ---
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)

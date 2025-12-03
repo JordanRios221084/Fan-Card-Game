@@ -12,7 +12,6 @@ extends Node
 signal draw_card_finished
 
 # --- Enums ---
-
 ## Define los posibles estados del juego.
 enum GameState {
 	IDLE,
