@@ -9,7 +9,7 @@ extends Node
 ## Verifica si una carta IA es válida para jugar.
 signal check_card(card: Card)
 ## Juega una carta por parte del jugador IA.
-signal play_card(card: Card, layer: Player)
+signal play_card(card: Card, player: Player)
 ## Solicita que el jugador IA robe una carta.
 signal draw_card(player: Player)
 
@@ -43,7 +43,7 @@ func try_to_process_turn() -> void:
 	await _process_turn()
 
 
-## Añade una carta válida a la lista de cartas válidas.
+## Añade una carta válida a la lista de cartas válidas. [br]
 ## - [param card] La carta que se considera válida para jugar.
 func add_valid_card(card: Card) -> void:
 	# Añade una carta válida a la lista de cartas válidas.
@@ -84,18 +84,18 @@ func _process_turn() -> void:
 
 ## Verifica las cartas actuales en la mano del jugador IA.
 ## Si [param try_draw] es verdadero, espera a que el jugador termine de robar antes de verificar.
-func _check_current_cards(try_draw: bool) -> void:
-	# Intentamos robar una carta si es necesario
-	if try_draw:
+func _check_current_cards(alredy_drawning: bool) -> void:
+	# Si ya está robando, esperamos a que termine
+	if alredy_drawning:
+		print("Esperando a que el jugador IA termine de robar...")
 		await game_manager.draw_card_finished
 
 	# Reiniciamos las cartas válidas antes de comprobar
 	_valid_cards.clear()
 
 	# Emitimos señal para cada carta en la mano
-	if current_ai_player and current_ai_player.current_hand:
-		for card: Card in current_ai_player.current_hand:
-			check_card.emit(card)
+	for card: Card in current_ai_player.current_hand:
+		check_card.emit(card)
 	
 	# Pequeña espera para dar tiempo a procesar las señales o simular "lectura"
 	await get_tree().create_timer(0.5).timeout

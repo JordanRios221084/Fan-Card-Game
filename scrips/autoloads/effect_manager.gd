@@ -8,18 +8,18 @@ extends Node
 ## Referencia al GameManager. 
 ## Se asigna externamente desde el GameManager en su _ready().
 var game_manager: GameManager
-
+var _arrow_rotation_direction: float = 1.0
+var _arrow_scale_factor: float = -1.0
 
 # --- Engine Functions ---
-func _ready() -> void:
-	pass
-
+func _process(delta: float) -> void:
+	_process_arrow_rotation(delta)
 
 # --- Public Functions ---
-## Procesa los efectos de una carta jugada.
-## Este método es asíncrono para permitir pausas entre la aplicación de efectos y animaciones.
+## Procesa la lógica de los efectos de una carta.
+## Este método es asíncrono para permitir pausas entre la aplicación de efectos y animaciones. [br]
 ##
-## - [param card_effects]: String que contiene los efectos de la carta separados por "_" (ej: "draw/2").
+## - [param card_effects]: String que contiene los efectos de la carta separados por "_" (ej: "draw/2"). [br]
 ## - [param target_player]: Jugador objetivo del efecto.
 func process_effect(card_effects: String, target_player: Player) -> void:
 	if not game_manager:
@@ -59,11 +59,11 @@ func process_effect(card_effects: String, target_player: Player) -> void:
 				push_warning("EffectManager: Efecto desconocido '%s'" % current_effect.base)
 	
 	# Pequeña pausa final para separar visualmente la aplicación de efectos del cambio de turno
-	await get_tree().create_timer(0.5).timeout
+	await game_manager.get_tree().create_timer(0.5).timeout
 
 
 # --- Private Functions ---
-## Parsea un efecto en su base y valor.
+## Parsea un efecto en su base y valor. [br]
 ## Ej: "draw/2" -> { "base": "draw", "value": "2" }
 func _parse_effect(effect: String) -> Dictionary:
 	var result: Dictionary = {
@@ -94,6 +94,10 @@ func _apply_skip_effect(new_steps: String) -> void:
 func _apply_reverse_effect(new_direction: String) -> void:
 	if new_direction and new_direction.is_valid_int():
 		game_manager.direction = game_manager.direction * new_direction.to_int()
+
+		# Actualizar parámetros visuales de la flecha
+		_set_arrows_parameters(new_direction.to_int())
+
 		print("EffectManager: Dirección invertida.")
 	else:
 		# Si no hay valor, asumimos inversión estándar (-1)
@@ -111,3 +115,14 @@ func _apply_draw_effect(target_player: Player, draw_quantity: String) -> void:
 	
 	# Llamamos a draw_a_new_card. Como es async, usamos await aquí también.
 	await game_manager.draw_a_new_card(target_player, amount, true, 0.15)
+
+
+func _set_arrows_parameters(direction: int) -> void:
+	_arrow_rotation_direction = _arrow_rotation_direction * direction
+	var direction_tween: Tween = create_tween()
+	direction_tween.tween_property(game_manager.arrow_indicator, "scale:x", 
+			game_manager.arrow_indicator.scale.x * _arrow_scale_factor, 0.5)
+
+
+func _process_arrow_rotation(delta: float) -> void:
+	game_manager.arrow_indicator.rotation += deg_to_rad(55) * _arrow_rotation_direction * delta

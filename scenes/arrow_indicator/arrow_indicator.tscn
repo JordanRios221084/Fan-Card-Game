@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://03g726qi1d2g"]
+
+[ext_resource type="Texture2D" uid="uid://t12iil706qhc" path="res://assets/sprites/arrow_indicator.png" id="1_016v8"]
+
+[node name="ArrowIndicator" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_016v8")

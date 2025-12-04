@@ -51,3 +51,23 @@ func draw_card() -> Card:
 
 	# Devolver la nueva carta
 	return new_card
+
+## Recupera una carta descartada y la añade de nuevo a la baraja del mazo.
+## La carta es liberada del árbol de escena después de recuperar sus valores. [br]
+## - [param recovered_card]: La carta que se va a recuperar.
+func recover_card(recovered_card: Card) -> void:
+	# Crear una nueva instancia de CardValues para almacenar los valores de la carta recuperada
+	var recovered_card_values: CardValues = CardValues.new()
+
+	# Asignar los valores de la carta recuperada a la nueva instancia
+	recovered_card_values.card_id = recovered_card.card_id
+	recovered_card_values.card_type = recovered_card.card_type
+	recovered_card_values.card_color = recovered_card.card_color
+	recovered_card_values.card_symbol = recovered_card.card_symbol
+	recovered_card_values.card_effect = recovered_card.card_effect
+
+	# Añadir los valores de la carta recuperada de nuevo a la baraja
+	current_deck.append(recovered_card_values)
+
+	# Animar la desaparición de la carta recuperada
+	CardManager.card_scale_down(recovered_card)

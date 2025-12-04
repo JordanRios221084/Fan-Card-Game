@@ -25,7 +25,7 @@ const _COLOR_WEIGHTS: Dictionary = {
 ## Indica si es el turno del jugador.
 @export var is_turn: bool = false
 ## Indica si el jugador es humano.
-@export var is_human: bool = false
+@export var is_human: bool = true
 
 @export_group("Settings")
 ## Indica si las cartas se ordenan automáticamente.

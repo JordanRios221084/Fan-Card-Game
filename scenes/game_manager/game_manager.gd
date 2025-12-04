@@ -1,13 +1,11 @@
 class_name GameManager
 extends Node
-
 ## Controla la lógica principal del juego, incluyendo turnos, estados y gestión de jugadores.
 ##
 ## Contiene referencias a nodos clave como el mazo, el montón de descarte, el controlador de IA y los jugadores.
 ## También maneja la transición entre diferentes estados del juego y la aplicación de efectos de cartas.
 
 # --- Signals ---
-
 ## Señal emitida cuando un jugador termina de robar cartas.
 signal draw_card_finished
 
@@ -28,6 +26,8 @@ enum GameState {
 @export var deck: Deck
 ## Referencia al montón de descarte [DiscardPile].
 @export var discard_pile: DiscardPile
+## Referencia al indicador de flechas.
+@export var arrow_indicator: Node2D
 
 @export_group("Player Management")
 ## Referencia al controlador de IA [AIController].
@@ -63,19 +63,15 @@ func _ready() -> void:
 
 	# Configuramos los valores para el EffectManager (Asumimos que es Autoload)
 	_set_effect_values()
-	
-	# Conectamos las señales necesarias
-	_connect_signals()
 
 	# Comenzar el juego
 	_start_game()
-
 
 # --- Public Functions ---
 ## Roba una carta hasta que se alcanza el límite. [br]
 ## - [param target_player]: Jugador que robará las cartas. [br]
 ## - [param card_count]: Cantidad máxima de cartas a robar. [br]
-## - [param forced]: Si es true, robará todo. Si es false, para al encontrar una válida. [br]
+## - [param forced]: Si es true, robará todo. Si es false, se detiene al encontrar una válida. [br]
 ## - [param draw_speed]: Tiempo de espera entre robos.
 func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_speed: float) -> void:
 	# Intentamos robar cartas la cantidad de veces solicitada
@@ -121,13 +117,6 @@ func _set_effect_values() -> void:
 	EffectManager.game_manager = self
 
 
-## Conecta las señales del [AIController] a los métodos correspondientes.
-func _connect_signals() -> void:
-	ai_controller.check_card.connect(_on_ai_controller_check_card)
-	ai_controller.play_card.connect(_on_ai_controller_play_card)
-	ai_controller.draw_card.connect(_on_ai_controller_draw_card)
-
-
 ## Inicia el juego repartiendo cartas y configurando el estado inicial.
 func _start_game() -> void:
 	await get_tree().create_timer(0.5).timeout
@@ -150,6 +139,9 @@ func _start_game() -> void:
 	var first_card: Card = deck.draw_card()
 	CardManager.set_card_opacity(first_card, true)
 	await discard_pile.receive_card(first_card, deck)
+
+	var arrows_tween: Tween = create_tween()
+	arrows_tween.tween_property(arrow_indicator, "modulate:a", 0.5, 0.5)
 
 	# Marcar el juego como comenzado
 	_change_state(GameState.GAME_STARTED)
@@ -229,6 +221,7 @@ func _change_state(new_state: GameState) -> void:
 				CardManager.set_card_opacity(card, false)
 
 			_change_current_player_turn()
+			ai_controller.current_ai_player = current_player
 			_change_state(GameState.PLAYING_CARDS)
 			
 		GameState.PLAYING_CARDS:
@@ -239,14 +232,15 @@ func _change_state(new_state: GameState) -> void:
 				CardManager.set_card_opacity(card, true)
 
 			# Si es IA, procesar turno
-			if not current_player.is_human:
-				ai_controller.current_ai_player = current_player
-				await ai_controller.try_to_process_turn()
+			# if not current_player.is_human:
+			await ai_controller.try_to_process_turn()
 
 			# Nota: Si es humano, el estado se queda aquí esperando input (botones/clics)
 			
+			# Pequeña espera para evitar cambios bruscos
 			await get_tree().create_timer(0.15).timeout
-			# En el flujo normal, el cambio de estado siguiente lo debe detonar la acción de jugar/robar
+
+			_change_state(GameState.APPLY_EFFECTS)
 			
 		GameState.GAME_ENDED:
 			print("||| JUEGO TERMINADO |||")
@@ -269,7 +263,9 @@ func _is_valid_card(card_to_validate: Card) -> bool:
 	return false
 
 
-## Intenta jugar una carta para un jugador dado.
+## Intenta jugar una carta para un jugador dado. [br]
+## - [param target_card]: Carta que el jugador intenta jugar. [br]
+## - [param target_player]: Jugador que intenta jugar la carta. [br]
 func _attempt_to_play(target_card: Card, target_player: Player) -> void:
 	print("El jugador %s intenta jugar una carta." % target_player.name)
 	
@@ -285,19 +281,21 @@ func _attempt_to_play(target_card: Card, target_player: Player) -> void:
 	
 	# Una vez jugada, debemos volver a verificar efectos
 	print("--------------------------------------------------------------------------------")
-	_change_state(GameState.APPLY_EFFECTS)
 
 
 # --- Signal Callbacks ---
-func _on_ai_controller_check_card(target_card: Card) -> void:
-	if _is_valid_card(target_card):
-		ai_controller.add_valid_card(target_card)
+func _on_discard_pile_first_card_discarded(card: Card) -> void:
+	deck.recover_card(card)
 
 
-func _on_ai_controller_play_card(found_card: Card, origin_player: Player) -> void:
-	_attempt_to_play(found_card, origin_player)
+func _on_ai_controller_play_card(card: Card, player: Player) -> void:
+	_attempt_to_play(card, player)
 
 
-func _on_ai_controller_draw_card(target_player: Player) -> void:
-	draw_a_new_card(target_player, 1, false, 0.5)
+func _on_ai_controller_draw_card(player: Player) -> void:
+	draw_a_new_card(player, 1, false, 0.5)
 	# Nota: Tras robar, la IA volverá a comprobar sus cartas en su propia lógica
+
+func _on_ai_controller_check_card(card: Card) -> void:
+	if _is_valid_card(card):
+		ai_controller.add_valid_card(card)
