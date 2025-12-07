@@ -4,11 +4,22 @@ extends Node
 ##
 ## Guarda referencias a los jugadores actuales en la escena en un arreglo para facilitar su acceso y manipulación.
 
-# --- Public Variables ---
+# --- Private Variables ---
 ## Arreglo de nodos que representan a los jugadores actuales en el contenedor.
-var current_players: Array[Node] = []
+var _current_players: Array[Node] = []
 
 # --- Engine Functions ---
 func _ready() -> void:
 	# Asigna los hijos actuales al arreglo.
-	current_players = get_children()
+	_current_players = get_children()
+
+# --- Public Functions ---
+## Devuelve el arreglo de jugadores actuales en el contenedor.
+func get_current_players() -> Array[Player]:
+	var players: Array[Player] = []
+
+	for player: Player in _current_players:
+		if player is Player:
+			players.append(player)
+	
+	return players

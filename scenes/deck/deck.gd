@@ -6,9 +6,18 @@ extends Node2D
 ## Cada vez que un jugador roba una carta, el mazo se vuelve a barajar.
 ## La carta robada es creada al momento en el autoload [CardBuilder].
 
-# --- Constants ---
+# --- Private Constants ---
 ## Escena precargada de la carta para instanciar nuevas cartas cuando se roba del mazo.
 const _CARD_SCENE: PackedScene = preload("res://scenes/card/card.tscn")
+## Estructura de datos para los colores de la carta.
+## Los colores disponibles son: "red", "blue", "green", "yellow", "black".
+const _COLOR_MAP: Dictionary = {
+	"red": Color(0.996, 0, 0),
+	"blue": Color(0.011, 0.352, 0.886),
+	"green": Color(0.001, 0.729, 0.011),
+	"yellow": Color(1, 0.792, 0.007),
+	"black": Color.BLACK
+}
 
 # --- Exports ---
 @export_group("References")
@@ -24,50 +33,57 @@ var current_deck: Array[CardValues] = []
 
 # --- Public Functions ---
 ## Roba una carta del mazo, mezcla la baraja, comprueba si está vacía y crea una nueva carta si es posible.
-## Devuelve la carta robada o devuelve [color=orange]null[/color] si la baraja está vacía.
+## Devuelve la carta robada o devuelve [param null] si la baraja está vacía.
 func draw_card() -> Card:
-	# Mezclar la baraja antes de robar una carta (según tu lógica solicitada)
-	current_deck.shuffle()
-
-	# Comprobar si la baraja está vacía
 	if current_deck.is_empty():
 		push_warning("Deck: La baraja está vacía. No se puede robar una carta.")
 		return null
 	
-	# Obtener los valores de la carta robada
-	var card_drawn_values: CardValues = current_deck.pop_back()
+	current_deck.shuffle()
 	
-	# Construcción de ruta más segura usando formato de string
+	var card_drawn_values: CardValues = current_deck.pop_back()
 	var card_sprite_path: String = "res://assets/sprites/" + card_drawn_values.card_type + ".png" 
+	var new_card: Card = _build_card(card_drawn_values, card_sprite_path)
 
-	# Instanciar una nueva carta con cast seguro
-	var new_card: Card = _CARD_SCENE.instantiate() as Card
-
-	# Añadir la carta al nodo Deck para que entre en el árbol de escena
 	add_child(new_card)
 
-	# Configurar las propiedades de la carta usando el Autoload
-	CardBuilder.build_card(card_drawn_values, new_card, card_sprite_path)
-
-	# Devolver la nueva carta
 	return new_card
 
 ## Recupera una carta descartada y la añade de nuevo a la baraja del mazo.
 ## La carta es liberada del árbol de escena después de recuperar sus valores. [br]
 ## - [param recovered_card]: La carta que se va a recuperar.
 func recover_card(recovered_card: Card) -> void:
-	# Crear una nueva instancia de CardValues para almacenar los valores de la carta recuperada
 	var recovered_card_values: CardValues = CardValues.new()
 
-	# Asignar los valores de la carta recuperada a la nueva instancia
 	recovered_card_values.card_id = recovered_card.card_id
 	recovered_card_values.card_type = recovered_card.card_type
 	recovered_card_values.card_color = recovered_card.card_color
 	recovered_card_values.card_symbol = recovered_card.card_symbol
 	recovered_card_values.card_effect = recovered_card.card_effect
 
-	# Añadir los valores de la carta recuperada de nuevo a la baraja
 	current_deck.append(recovered_card_values)
-
-	# Animar la desaparición de la carta recuperada
 	CardManager.card_scale_down(recovered_card)
+
+
+# --- Private Functions ---
+## Crea una nueva carta, configura propiedades, textura y el shader del color.
+## Devuelve la carta configurada.
+func _build_card(card_values: CardValues, card_sprite_path: String) -> Card:
+	var card: Card = _CARD_SCENE.instantiate() as Card
+
+	card.card_id = card_values.card_id
+	card.card_type = card_values.card_type
+	card.card_color = card_values.card_color
+	card.card_symbol = card_values.card_symbol
+	card.card_effect = card_values.card_effect
+	card.front_sprite.texture = load(card_sprite_path)
+	card.target_color = _COLOR_MAP.get(card_values.card_color, Color.WHITE)
+
+	if card.front_sprite.material:
+		# Duplicar el material para evitar modificar el original
+		var temp_shader_material: ShaderMaterial = card.front_sprite.material.duplicate() as ShaderMaterial
+		temp_shader_material.set_shader_parameter("target_color", card.target_color)
+
+		card.front_sprite.material = temp_shader_material
+	
+	return card

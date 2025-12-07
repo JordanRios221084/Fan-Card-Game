@@ -74,22 +74,18 @@ func _ready() -> void:
 ## - [param forced]: Si es true, robará todo. Si es false, se detiene al encontrar una válida. [br]
 ## - [param draw_speed]: Tiempo de espera entre robos.
 func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_speed: float) -> void:
-	# Intentamos robar cartas la cantidad de veces solicitada
 	for i: int in card_count:
-		var new_card: Card = deck.draw_card() # Robamos la carta del mazo
+		var new_card: Card = deck.draw_card()
 		
-		# Esperamos a que el jugador añada la carta a su mano
 		await target_player.add_card_to_hand(new_card) 
 		
-		# Actualizamos visuales
 		for card: Card in current_player.current_hand:
 			CardManager.set_card_opacity(card, true)
 		
-		# Pausa dramática entre robos
+		print("Tiempo opcional de espera: ", draw_speed)
 		await get_tree().create_timer(draw_speed).timeout
 
 		if not forced:
-			# Si la carta es válida, dejamos de robar
 			if _is_valid_card(new_card):
 				break
 
@@ -106,10 +102,7 @@ func _set_database() -> void:
 ## Obtiene referencias a todos los jugadores actuales y las almacena en [all_players].
 func _get_players_references() -> void:
 	all_players.clear()
-	# Accedemos a la variable pública 'current_players' que renombramos en PlayersContainer
-	for node: Node in players_container.current_players:
-		if node is Player:
-			all_players.append(node as Player)
+	all_players = players_container.get_current_players()
 
 
 ## Configura el [EffectManager] con una referencia al [GameManager] actual.
@@ -129,19 +122,19 @@ func _start_game() -> void:
 	
 	await get_tree().create_timer(0.5).timeout
 
-	# Colapsar las manos de todos los jugadores (Corregido 'colapse' -> 'collapse')
 	for player: Player in all_players:
 		player.collapse_hand()
 
 	await get_tree().create_timer(0.5).timeout
 
-	# Colocar la primera carta en el montón de descarte
 	var first_card: Card = deck.draw_card()
 	CardManager.set_card_opacity(first_card, true)
 	await discard_pile.receive_card(first_card, deck)
-
+	
+	# No tocar por el momento, se refactorizará la animación luego
 	var arrows_tween: Tween = create_tween()
-	arrows_tween.tween_property(arrow_indicator, "modulate:a", 0.5, 0.5)
+	arrows_tween.tween_property(arrow_indicator, "modulate:a", 0.75, 0.5)
+	#----------------------------------------------------------------------------
 
 	# Marcar el juego como comenzado
 	_change_state(GameState.GAME_STARTED)

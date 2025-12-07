@@ -13,6 +13,15 @@ signal play_card(card: Card, player: Player)
 ## Solicita que el jugador IA robe una carta.
 signal draw_card(player: Player)
 
+# --- Private Constants ---
+## Tiempo de espera estándar para simular el pensamiento de la IA.
+## Se usa un rango para variar el tiempo y hacerlo menos predecible.
+const _WAIT_TIME_SECONDS: Vector2 = Vector2(0.5, 1.0)
+## Multiplicador para ajustar tiempos de espera.
+const _MULTIPLIER_TIME: float = 1.5
+## Divisor para ajustar tiempos de espera.
+const _DIVIDER_TIME: float = 0.5
+
 # --- Exports ---
 @export_group("References")
 ## Referencia al [GameManager] para manejar el estado del juego.
@@ -46,7 +55,6 @@ func try_to_process_turn() -> void:
 ## Añade una carta válida a la lista de cartas válidas. [br]
 ## - [param card] La carta que se considera válida para jugar.
 func add_valid_card(card: Card) -> void:
-	# Añade una carta válida a la lista de cartas válidas.
 	_valid_cards.append(card)
 
 
@@ -57,48 +65,41 @@ func _process_turn() -> void:
 	print("-- Jugador IA actual: ", current_ai_player, " --")
 	print()
 	
-	# Variable local para el tiempo de espera (no necesita ser de clase)
-	var wait_time: float = randf_range(0.5, 1.0)
+	var random_wait_time: float = randf_range(_WAIT_TIME_SECONDS.x, _WAIT_TIME_SECONDS.y)
 
-	# Multiplicador para variar el tiempo de espera inicial
-	await get_tree().create_timer(wait_time * 1.2).timeout
+	print("Tiempo N°1 de espera: ", random_wait_time * _MULTIPLIER_TIME)
+	await get_tree().create_timer(random_wait_time * _MULTIPLIER_TIME).timeout
 
-	# Verificamos cartas (Añadido 'await' para asegurar sincronía)
 	await _check_current_cards(false)
 
-	# Divisor para variar el tiempo de espera intermedio
-	await get_tree().create_timer(wait_time / 0.8).timeout
+	print("Tiempo N°3 de espera: ", random_wait_time / _DIVIDER_TIME)
+	await get_tree().create_timer(random_wait_time / _DIVIDER_TIME).timeout
 	
-	# Lógica de decisión: Robar o Jugar
 	if _valid_cards.is_empty():
 		draw_card.emit(current_ai_player)
-		# Verificamos de nuevo tras robar (esperando a que termine el robo)
 		await _check_current_cards(true)
 	
-	if not _valid_cards.is_empty():
+	if _valid_cards.size() > 0:
 		var ai_found_card: Card = _valid_cards.pick_random()
 		play_card.emit(ai_found_card, current_ai_player)
 
 	_clear_variables()
 
 
-## Verifica las cartas actuales en la mano del jugador IA.
+## Verifica las cartas actuales en la mano del jugador IA. [br]
 ## Si [param try_draw] es verdadero, espera a que el jugador termine de robar antes de verificar.
 func _check_current_cards(alredy_drawning: bool) -> void:
-	# Si ya está robando, esperamos a que termine
 	if alredy_drawning:
 		print("Esperando a que el jugador IA termine de robar...")
 		await game_manager.draw_card_finished
 
-	# Reiniciamos las cartas válidas antes de comprobar
 	_valid_cards.clear()
 
-	# Emitimos señal para cada carta en la mano
 	for card: Card in current_ai_player.current_hand:
 		check_card.emit(card)
 	
-	# Pequeña espera para dar tiempo a procesar las señales o simular "lectura"
-	await get_tree().create_timer(0.5).timeout
+	print("Tiempo N°2 de espera: ", _WAIT_TIME_SECONDS.x)
+	await get_tree().create_timer(_WAIT_TIME_SECONDS.x).timeout
 
 
 ## Limpia las variables del controlador de la IA.

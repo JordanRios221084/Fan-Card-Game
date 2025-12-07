@@ -8,6 +8,14 @@ extends Node2D
 # --- Signals ---
 signal first_card_discarded(card: Card)
 
+# --- Private Constants ---
+## Límites de desplazamiento en grados.
+const _OFFSET_LIMIT: Vector2 = Vector2(-10.0, 10.0)
+## Límites de rotación en grados.
+const _ROTATION_LIMIT: Vector2 = Vector2(-180.0, 180.0)
+## Tiempo de animación para mover cartas al montón de descarte.
+const  _MOVE_TIME_SECONDS: float = 0.4
+
 # --- Public Variables ---
 ## Carta superior del montón de descarte. Dicta el símbolo y color actual.
 ## Puede ser null al inicio hasta que se descarte la primera carta.
@@ -18,12 +26,6 @@ var top_card: Card
 var _discarded_cards: Array[Card] = []
 ## Posición local donde caerán las cartas.
 var _discard_position: Vector2
-## Límites para generar offsets aleatorios al descartar cartas.
-var _negative_offset_limit: float = -15.0
-var _positive_offset_limit: float = 15.0
-## Límites para generar rotaciones aleatorias al descartar cartas (en grados).
-var _negative_rotation_limit: float = -180.0
-var _positive_rotation_limit: float = 180.0
 
 
 # --- Public Functions ---
@@ -33,41 +35,31 @@ var _positive_rotation_limit: float = 180.0
 ## - [param new_card]: La carta que se va a descartar. [br]
 ## - [param origin]: El nodo desde el cual se descarta la carta (Deck o Player).
 func receive_card(new_card: Card, origin: Node) -> void:
-	# Limitar el tamaño del montón de descarte a 4 cartas visibles
-	if _discarded_cards.size() > 4:
-		# Emitir señal si es la primera carta descartada
-		first_card_discarded.emit(_discarded_cards[0])
-		_discarded_cards.pop_front()
-	
-	# Reparentar la carta al montón de descarte
 	new_card.reparent(self)
 
-	# Añadir la carta a la lista de cartas descartadas y actualizar referencia
 	_discarded_cards.append(new_card)
 	new_card.current_parent = self
 
-	# Actualizar la carta superior (vital para las reglas del juego)
 	top_card = new_card
 
-	# Gestión de animaciones según el origen:
-	# Si viene del Mazo (inicio del juego), hay que voltearla.
 	if origin is Deck:
 		new_card.card_animator.play("flip_card")
-	# Si viene de la IA (que suele tener cartas ocultas), hay que voltearla.
-	elif origin is Player and not (origin as Player).is_human:
+	
+	if origin is Player and not (origin as Player).is_human:
 		new_card.card_animator.play("flip_card")
 
-	# Generar una rotación aleatoria para dar efecto de "desorden" natural (Grados).
-	var random_rotation: float = randf_range(_negative_rotation_limit, _positive_rotation_limit)
+	if _discarded_cards.size() > 5:
+		first_card_discarded.emit(_discarded_cards[0])
+		_discarded_cards.pop_front()
 
-	# Generar un pequeño offset aleatorio en X e Y para evitar que las cartas queden perfectamente alineadas.
-	var ramdon_offset: Vector2 = Vector2(randf_range(_negative_offset_limit, _positive_offset_limit), 
-			randf_range(_negative_offset_limit, _positive_offset_limit))
+	# Generar valores aleatorios para rotación y posición
+	var random_rotation: float = randf_range(_ROTATION_LIMIT.x, _ROTATION_LIMIT.y)
+	var random_x_offset: float = randf_range(_OFFSET_LIMIT.x, _OFFSET_LIMIT.y)
+	var random_y_offset: float = randf_range(_OFFSET_LIMIT.x, _OFFSET_LIMIT.y)
+	var random_offset: Vector2 = Vector2(random_x_offset, random_y_offset)
 	
-	# Calcular la posición final de descarte, empezando desde el centro (0,0)
 	_discard_position = Vector2.ZERO
-	# Aplicar el offset generado
-	_discard_position += ramdon_offset
+	_discard_position += random_offset
 
-	# Mover la carta a la posición central del descarte usando el Manager
-	await CardManager.move_card_to_position(new_card, _discard_position, 0.2, random_rotation)
+	print("Tiempo N°3 de espera: ", _MOVE_TIME_SECONDS)
+	await CardManager.move_card_to_position(new_card, _discard_position, _MOVE_TIME_SECONDS, random_rotation)
