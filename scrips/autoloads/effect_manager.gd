@@ -36,25 +36,18 @@ func process_effect(card_effects: String, target_player: Player) -> void:
 		match current_effect.base:
 			"skip":
 				_apply_skip_effect(current_effect.value)
-			
 			"reverse":
 				_apply_reverse_effect(current_effect.value)
-			
 			"draw":
 				await _apply_draw_effect(target_player, current_effect.value)
-			
 			"wild":
 				print("EffectManager: Efecto Comodín (Wild) - Pendiente de implementación.")
-			
 			"challenge":
 				print("EffectManager: Efecto Reto (Challenge) - Pendiente de implementación.")
-			
 			"stack":
 				print("EffectManager: Efecto Acumular (Stack) - Pendiente de implementación.")
-			
 			"none", "":
 				pass
-			
 			_:
 				push_warning("EffectManager: Efecto desconocido '%s'" % current_effect.base)
 	
