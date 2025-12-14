@@ -83,6 +83,7 @@ texture = ExtResource("1_016v8")
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="ArrowLeft"]
 amount = 20
+lifetime = 1.5
 randomness = 1.0
 fixed_fps = 60
 trail_lifetime = 4.68
@@ -95,6 +96,7 @@ texture = ExtResource("1_016v8")
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="ArrowRight"]
 amount = 20
+lifetime = 1.5
 randomness = 1.0
 fixed_fps = 60
 process_material = SubResource("ParticleProcessMaterial_016v8")

@@ -28,7 +28,7 @@ const _COLOR_MAP: Dictionary = {
 
 # --- Public Variables ---
 ## Almacena las cartas que el mazo puede devolver llamando a su función [method Deck.draw_card].
-var current_deck: Array[CardValues] = []
+var current_deck: Array[Dictionary] = []
 
 
 # --- Public Functions ---
@@ -41,9 +41,9 @@ func draw_card() -> Card:
 	
 	current_deck.shuffle()
 	
-	var card_drawn_values: CardValues = current_deck.pop_back()
-	var card_sprite_path: String = "res://assets/sprites/" + card_drawn_values.card_type + ".png" 
-	var new_card: Card = _build_card(card_drawn_values, card_sprite_path)
+	var card_drawn_data: Dictionary = current_deck.pop_back()
+	var card_sprite_path: String = "res://assets/sprites/" + card_drawn_data["Type"] + ".png" 
+	var new_card: Card = _build_card(card_drawn_data, card_sprite_path)
 
 	add_child(new_card)
 
@@ -53,37 +53,28 @@ func draw_card() -> Card:
 ## La carta es liberada del árbol de escena después de recuperar sus valores. [br]
 ## - [param recovered_card]: La carta que se va a recuperar.
 func recover_card(recovered_card: Card) -> void:
-	var recovered_card_values: CardValues = CardValues.new()
+	var recovered_card_data: Dictionary = {}
 
-	recovered_card_values.card_id = recovered_card.card_id
-	recovered_card_values.card_type = recovered_card.card_type
-	recovered_card_values.card_color = recovered_card.card_color
-	recovered_card_values.card_symbol = recovered_card.card_symbol
-	recovered_card_values.card_effect = recovered_card.card_effect
+	recovered_card_data = recovered_card.values
 
-	current_deck.append(recovered_card_values)
+	current_deck.append(recovered_card_data)
 	CardManager.card_scale_down(recovered_card)
 
 
 # --- Private Functions ---
 ## Crea una nueva carta, configura propiedades, textura y el shader del color.
 ## Devuelve la carta configurada.
-func _build_card(card_values: CardValues, card_sprite_path: String) -> Card:
+func _build_card(card_values: Dictionary, card_sprite_path: String) -> Card:
 	var card: Card = _CARD_SCENE.instantiate() as Card
 
-	card.card_id = card_values.card_id
-	card.card_type = card_values.card_type
-	card.card_color = card_values.card_color
-	card.card_symbol = card_values.card_symbol
-	card.card_effect = card_values.card_effect
+	card.values = card_values
 	card.front_sprite.texture = load(card_sprite_path)
-	card.target_color = _COLOR_MAP.get(card_values.card_color, Color.WHITE)
+	card.values["TargetColor"] = _COLOR_MAP[card.values["Color"]]
 
 	if card.front_sprite.material:
 		# Duplicar el material para evitar modificar el original
 		var temp_shader_material: ShaderMaterial = card.front_sprite.material.duplicate() as ShaderMaterial
-		temp_shader_material.set_shader_parameter("target_color", card.target_color)
-
+		temp_shader_material.set_shader_parameter("target_color", card.values["TargetColor"])
 		card.front_sprite.material = temp_shader_material
 	
 	return card

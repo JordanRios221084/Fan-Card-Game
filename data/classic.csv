@@ -1,4 +1,4 @@
-card_id;card_type;card_symbol;card_color;card_effect
+id;type;symbol;color;effect
 card_000;num_0;0;red;none
 card_001;num_0;0;green;none
 card_002;num_0;0;yellow;none

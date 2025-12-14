@@ -21,23 +21,21 @@ extends Node2D
 @export var current_parent: Node2D
 
 @export_group("Properties")
-## Identificador único de la carta.
-@export var card_id: String
-## Tipo de la carta ([i]por ejemplo, "num", "wild", "action"[/i]).
-@export var card_type: String
-## Color de la carta.
-@export var card_color: String
-## Símbolo o número de la carta.
-@export var card_symbol: int
-## Efecto especial de la carta.
-@export var card_effect: String
-## Color objetivo para asignar o cambiar el color de la carta.
-@export var target_color: Color
-## Si es [param True], el efecto de la carta ya ha sido utilizado.
-@export var effect_used: bool = false
+## Estructura de datos para almacenar los valores de la carta. [br]
+## Los campos disponibles son: "ID", "Type", "Symbol", "Color", "Effect", "TargetColor".
+@export  var values: Dictionary = {
+	"ID" : "",
+	"Type" : "",
+	"Symbol" : "",
+	"Color" : "",
+	"Effect" : "",
+	"TargetColor" : ""
+}
 
 # --- Public Variables ---
 ## Indica si la carta está seleccionada.
 var is_selected: bool = false
 ## Indica si la carta ha sido jugada.
 var is_played: bool = false
+## Indica si el efecto de la carta ya ha sido utilizado.
+var is_effect_used: bool = false

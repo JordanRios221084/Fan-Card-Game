@@ -22,36 +22,26 @@ enum GameState {
 
 # --- Exports ---
 @export_group("Table References")
-## Referencia al mazo de cartas [Deck].
-@export var deck: Deck
-## Referencia al montón de descarte [DiscardPile].
-@export var discard_pile: DiscardPile
-## Referencia al indicador de flechas.
-@export var arrow_indicator: Node2D
+
+@export var deck: Deck ## Referencia al mazo de cartas [Deck].
+@export var discard_pile: DiscardPile ## Referencia al montón de descarte [DiscardPile].
+@export var arrow_indicator: Node2D ## Referencia al indicador de flechas.
 
 @export_group("Player Management")
-## Referencia al controlador de IA [AIController].
-@export var ai_controller: AIController
-## Contenedor de los jugadores [PlayersContainer].
-@export var players_container: PlayersContainer
-## Array que contiene referencias a todos los jugadores [Player].
-@export var all_players: Array[Player] = []
+
+@export var ai_controller: AIController ## Referencia al controlador de IA [AIController].
+@export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
+@export var all_players: Array[Player] = [] ## Array que contiene referencias a todos los jugadores [Player].
 
 # --- Public Variables ---
-## Referencia al jugador que ganó la partida anterior.
-var prev_winner: Player
-## Referencia al jugador actual.
-var current_player: Player
-## Referencia al siguiente jugador.
-var next_player: Player
+var prev_winner: Player ## Referencia al jugador que ganó la partida anterior.
+var current_player: Player ## Referencia al jugador actual.
+var next_player: Player ## Referencia al siguiente jugador.
 
-## Cantidad de pasos a mover en el turno (1 o más).
-var steps: int = 1
-## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
-var direction: int = 1
+var steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
+var direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
+var current_state: GameState = GameState.IDLE ## Variable que almacena el estado actual del juego.
 
-## Variable que almacena el estado actual del juego.
-var current_state: GameState = GameState.IDLE
 
 # --- Engine Functions ---
 func _ready() -> void:
@@ -66,6 +56,7 @@ func _ready() -> void:
 
 	# Comenzar el juego
 	_start_game()
+
 
 # --- Public Functions ---
 ## Roba una carta hasta que se alcanza el límite. [br]
@@ -200,9 +191,9 @@ func _change_state(new_state: GameState) -> void:
 			print("### APLICANDO EFECTOS ###\n")
 			
 			# Si la última carta jugada no ha procesado su efecto...
-			if not discard_pile.top_card.effect_used:
-				await EffectManager.process_effect(discard_pile.top_card.card_effect, next_player)
-				discard_pile.top_card.effect_used = true
+			if not discard_pile.top_card.is_effect_used:
+				await EffectManager.process_effect(discard_pile.top_card.values["Effect"], next_player)
+				discard_pile.top_card.is_effect_used = true
 			
 			_change_state(GameState.CHANGE_TURN)
 			
@@ -243,14 +234,14 @@ func _change_state(new_state: GameState) -> void:
 ## Reglas: Coincidir color, coincidir símbolo, o ser carta negra (Wild).
 func _is_valid_card(card_to_validate: Card) -> bool:
 	var last_card: Card = discard_pile.top_card
-
-	if card_to_validate.card_color == last_card.card_color:
-		return true
-
-	if card_to_validate.card_symbol == last_card.card_symbol:
-		return true
 	
-	if card_to_validate.card_color == "black":
+	if card_to_validate.values["Color"] == "black":
+		return true
+
+	if card_to_validate.values["Color"] == last_card.values["Color"]:
+		return true
+
+	if card_to_validate.values["Symbol"] == last_card.values["Symbol"]:
 		return true
 	
 	return false

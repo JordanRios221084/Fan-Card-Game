@@ -134,14 +134,14 @@ func _sort_cards() -> void:
 	current_hand.sort_custom(
 		func(card_a: Card, card_b: Card) -> bool:
 			# Comparar por color usando el diccionario constante
-			var color_a_weight: int = _COLOR_WEIGHTS.get(card_a.card_color, 99)
-			var color_b_weight: int = _COLOR_WEIGHTS.get(card_b.card_color, 99)
+			var color_a_weight: int = _COLOR_WEIGHTS.get(card_a.values["Color"], 99)
+			var color_b_weight: int = _COLOR_WEIGHTS.get(card_b.values["Color"], 99)
 
 			if color_a_weight != color_b_weight:
 				return color_a_weight < color_b_weight
 			
 			# Si los colores son iguales, comparar por valor (symbol)
-			return card_a.card_symbol < card_b.card_symbol
+			return card_a.values["Symbol"] < card_b.values["Symbol"]
 	)
 	
 	# Reordenar los nodos en el árbol de escena para que coincidan con el arreglo ordenado
