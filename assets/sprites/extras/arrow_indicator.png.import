@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d3vo3mvgobj18"
-path="res://.godot/imported/num_7.png-928e503d2b6e9e8e6606ce24fcfe65e6.ctex"
+uid="uid://b32nhkatj32bi"
+path="res://.godot/imported/arrow_indicator.png-0caa03b22aaecd680acff68d99378afe.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/num_7.png"
-dest_files=["res://.godot/imported/num_7.png-928e503d2b6e9e8e6606ce24fcfe65e6.ctex"]
+source_file="res://assets/sprites/extras/arrow_indicator.png"
+dest_files=["res://.godot/imported/arrow_indicator.png-0caa03b22aaecd680acff68d99378afe.ctex"]
 
 [params]
 

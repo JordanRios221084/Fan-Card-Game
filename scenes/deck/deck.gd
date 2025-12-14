@@ -42,7 +42,7 @@ func draw_card() -> Card:
 	current_deck.shuffle()
 	
 	var card_drawn_data: Dictionary = current_deck.pop_back()
-	var card_sprite_path: String = "res://assets/sprites/" + card_drawn_data["Type"] + ".png" 
+	var card_sprite_path: String = "res://assets/sprites/cards/" + card_drawn_data["Type"] + ".png" 
 	var new_card: Card = _build_card(card_drawn_data, card_sprite_path)
 
 	add_child(new_card)

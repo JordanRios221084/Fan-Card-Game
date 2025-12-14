@@ -22,16 +22,17 @@ enum GameState {
 
 # --- Exports ---
 @export_group("Table References")
-
 @export var deck: Deck ## Referencia al mazo de cartas [Deck].
 @export var discard_pile: DiscardPile ## Referencia al montón de descarte [DiscardPile].
 @export var arrow_indicator: Node2D ## Referencia al indicador de flechas.
 
 @export_group("Player Management")
-
 @export var ai_controller: AIController ## Referencia al controlador de IA [AIController].
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
 @export var all_players: Array[Player] = [] ## Array que contiene referencias a todos los jugadores [Player].
+
+@export_group("Classes References")
+@export var effect_manager: EffectManager ## Referencia al manejador de efectos [EffectManager].
 
 # --- Public Variables ---
 var prev_winner: Player ## Referencia al jugador que ganó la partida anterior.
@@ -51,37 +52,12 @@ func _ready() -> void:
 	# Obtener referencias a todos los jugadores
 	_get_players_references()
 
-	# Configuramos los valores para el EffectManager (Asumimos que es Autoload)
-	_set_effect_values()
+	# Inicializamos el effect_manager
+	_start_effect_manager()
 
 	# Comenzar el juego
 	_start_game()
 
-
-# --- Public Functions ---
-## Roba una carta hasta que se alcanza el límite. [br]
-## - [param target_player]: Jugador que robará las cartas. [br]
-## - [param card_count]: Cantidad máxima de cartas a robar. [br]
-## - [param forced]: Si es true, robará todo. Si es false, se detiene al encontrar una válida. [br]
-## - [param draw_speed]: Tiempo de espera entre robos.
-func draw_a_new_card(target_player: Player, card_count: int, forced: bool, draw_speed: float) -> void:
-	for i: int in card_count:
-		var new_card: Card = deck.draw_card()
-		
-		await target_player.add_card_to_hand(new_card) 
-		
-		for card: Card in current_player.current_hand:
-			CardManager.set_card_opacity(card, true)
-		
-		print("Tiempo opcional de espera: ", draw_speed)
-		await get_tree().create_timer(draw_speed).timeout
-
-		if not forced:
-			if _is_valid_card(new_card):
-				break
-
-	# Emitimos la señal de robo finalizado
-	draw_card_finished.emit()
 
 # --- Private Functions ---
 ## Configura el mazo de cartas con una copia de la base de datos.
@@ -96,9 +72,11 @@ func _get_players_references() -> void:
 	all_players = players_container.get_current_players()
 
 
-## Configura el [EffectManager] con una referencia al [GameManager] actual.
-func _set_effect_values() -> void:
-	EffectManager.game_manager = self
+func _start_effect_manager() -> void:
+	effect_manager = EffectManager.new()
+	add_child(effect_manager)
+
+	effect_manager.draw_processed.connect(_on_effect_manager_draw_processed)
 
 
 ## Inicia el juego repartiendo cartas y configurando el estado inicial.
@@ -189,40 +167,42 @@ func _change_state(new_state: GameState) -> void:
 			
 		GameState.APPLY_EFFECTS:
 			print("### APLICANDO EFECTOS ###\n")
+
+			effect_manager.set_game_parameters(steps, direction)
 			
-			# Si la última carta jugada no ha procesado su efecto...
 			if not discard_pile.top_card.is_effect_used:
-				await EffectManager.process_effect(discard_pile.top_card.values["Effect"], next_player)
+				await effect_manager.process_effect(discard_pile.top_card.values["Effect"], next_player)
 				discard_pile.top_card.is_effect_used = true
+			
+			# Obtener los parámetros actualizados del juego
+			var game_params: Dictionary = effect_manager.get_game_parameters()
+			steps = game_params["Steps"]
+			direction = game_params["Direction"]
 			
 			_change_state(GameState.CHANGE_TURN)
 			
 		GameState.CHANGE_TURN:
 			print("$$$ CAMBIANDO TURNO $$$\n")
 			
-			# Desactivar interacción visual del jugador anterior
 			for card: Card in current_player.current_hand:
 				CardManager.set_card_opacity(card, false)
 
 			_change_current_player_turn()
 			ai_controller.current_ai_player = current_player
+
 			_change_state(GameState.PLAYING_CARDS)
 			
 		GameState.PLAYING_CARDS:
 			print("¡¡¡ JUGADOR %s JUGANDO !!!\n" % current_player.name)
+			var transition_time_seconds: float = 0.2
 			
 			# Habilitar interacción visual del jugador actual
 			for card: Card in current_player.current_hand:
 				CardManager.set_card_opacity(card, true)
 
-			# Si es IA, procesar turno
-			# if not current_player.is_human:
 			await ai_controller.try_to_process_turn()
 
-			# Nota: Si es humano, el estado se queda aquí esperando input (botones/clics)
-			
-			# Pequeña espera para evitar cambios bruscos
-			await get_tree().create_timer(0.15).timeout
+			await get_tree().create_timer(transition_time_seconds).timeout
 
 			_change_state(GameState.APPLY_EFFECTS)
 			
@@ -244,7 +224,7 @@ func _is_valid_card(card_to_validate: Card) -> bool:
 	if card_to_validate.values["Symbol"] == last_card.values["Symbol"]:
 		return true
 	
-	return false
+	return false # Carta no válida
 
 
 ## Intenta jugar una carta para un jugador dado. [br]
@@ -257,15 +237,35 @@ func _attempt_to_play(target_card: Card, target_player: Player) -> void:
 		target_card.card_animator.play("invalid_card")
 		return
 	
-	# Jugar la carta válida
 	target_player.play_a_card(target_card)
 	
-	# Enviarla al descarte
 	await discard_pile.receive_card(target_card, target_player)
-	
-	# Una vez jugada, debemos volver a verificar efectos
 	print("--------------------------------------------------------------------------------")
 
+
+## Roba una carta hasta que se alcanza el límite. [br]
+## - [param target_player]: Jugador que robará las cartas. [br]
+## - [param card_count]: Cantidad máxima de cartas a robar. [br]
+## - [param forced]: Si es true, robará todo. Si es false, se detiene al encontrar una válida. [br]
+## - [param draw_speed]: Tiempo de espera entre robos.
+func _draw_a_card(target_player: Player, card_quantity: int, forced: bool, draw_speed: float) -> void:
+	for i: int in card_quantity:
+		var new_card: Card = deck.draw_card()
+		
+		await target_player.add_card_to_hand(new_card) 
+		
+		for card: Card in current_player.current_hand:
+			CardManager.set_card_opacity(card, true)
+		
+		print("Tiempo opcional de espera: ", draw_speed)
+		await get_tree().create_timer(draw_speed).timeout
+
+		if not forced:
+			if _is_valid_card(new_card):
+				break
+
+	# Emitimos la señal de robo finalizado
+	draw_card_finished.emit()
 
 # --- Signal Callbacks ---
 func _on_discard_pile_first_card_discarded(card: Card) -> void:
@@ -277,9 +277,14 @@ func _on_ai_controller_play_card(card: Card, player: Player) -> void:
 
 
 func _on_ai_controller_draw_card(player: Player) -> void:
-	draw_a_new_card(player, 1, false, 0.5)
+	_draw_a_card(player, 1, false, 0.5)
 	# Nota: Tras robar, la IA volverá a comprobar sus cartas en su propia lógica
 
 func _on_ai_controller_check_card(card: Card) -> void:
 	if _is_valid_card(card):
 		ai_controller.add_valid_card(card)
+
+func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> void:
+	var forced: bool = true
+	var draw_speed: float = 0.05
+	_draw_a_card(target_player, amount, forced, draw_speed)

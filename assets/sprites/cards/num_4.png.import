@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b32nhkatj32bi"
-path="res://.godot/imported/arrow_indicator.png-d3656f247c4f02c2af7c1efd2b572651.ctex"
+uid="uid://b0t3hol3frm3r"
+path="res://.godot/imported/num_4.png-852b1c2afce0bd9512bd5fd7b00e02cc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/arrow_indicator.png"
-dest_files=["res://.godot/imported/arrow_indicator.png-d3656f247c4f02c2af7c1efd2b572651.ctex"]
+source_file="res://assets/sprites/cards/num_4.png"
+dest_files=["res://.godot/imported/num_4.png-852b1c2afce0bd9512bd5fd7b00e02cc.ctex"]
 
 [params]
 

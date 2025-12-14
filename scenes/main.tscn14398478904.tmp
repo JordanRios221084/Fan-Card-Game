@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3 uid="uid://cr8aig6e11asj"]
+
+[ext_resource type="PackedScene" uid="uid://taslkryubnek" path="res://scenes/game_manager/game_manager.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://dt0j27ri56mxn" path="res://scenes/deck/deck.tscn" id="2_sugp2"]
+[ext_resource type="PackedScene" uid="uid://bw8l7m4vdo0o4" path="res://scenes/discard_pile/discard_pile.tscn" id="4_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://b8qq08rle60vg" path="res://scenes/containers/player_container/players_container.tscn" id="4_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://gau28iuxx0g6" path="res://scenes/controllers/ai_controller/ai_controller.tscn" id="5_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://03g726qi1d2g" path="res://scenes/arrow_indicator/arrow_indicator.tscn" id="6_tefeu"]
+
+[node name="Main" type="Node2D"]
+
+[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "arrow_indicator", "ai_controller", "players_container") instance=ExtResource("1_o5qli")]
+deck = NodePath("Deck")
+discard_pile = NodePath("DiscardPile")
+arrow_indicator = NodePath("ArrowIndicator")
+ai_controller = NodePath("AIController")
+players_container = NodePath("PlayerContainer")
+
+[node name="ArrowIndicator" parent="GameManager" instance=ExtResource("6_tefeu")]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(640, 360)
+scale = Vector2(3, 3)
+
+[node name="Deck" parent="GameManager" instance=ExtResource("2_sugp2")]
+position = Vector2(75, 80)
+scale = Vector2(3, 3)
+
+[node name="DiscardPile" parent="GameManager" instance=ExtResource("4_jyhfs")]
+position = Vector2(640, 360)
+
+[node name="PlayerContainer" parent="GameManager" instance=ExtResource("4_tbgi4")]
+
+[node name="AIController" parent="GameManager" node_paths=PackedStringArray("game_manager") instance=ExtResource("5_tbgi4")]
+game_manager = NodePath("..")
+
+[connection signal="first_card_discarded" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_first_card_discarded"]
+[connection signal="check_card" from="GameManager/AIController" to="GameManager" method="_on_ai_controller_check_card"]
+[connection signal="draw_card" from="GameManager/AIController" to="GameManager" method="_on_ai_controller_draw_card"]
+[connection signal="play_card" from="GameManager/AIController" to="GameManager" method="_on_ai_controller_play_card"]

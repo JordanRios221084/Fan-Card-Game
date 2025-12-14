@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://03g726qi1d2g"]
+[gd_scene load_steps=8 format=3 uid="uid://03g726qi1d2g"]
 
-[ext_resource type="Texture2D" uid="uid://b32nhkatj32bi" path="res://assets/sprites/arrow_indicator.png" id="1_016v8"]
+[ext_resource type="Texture2D" uid="uid://b32nhkatj32bi" path="res://assets/sprites/extras/arrow_indicator.png" id="1_016v8"]
+[ext_resource type="Script" uid="uid://csknqgkow1p8q" path="res://scenes/arrow_indicator/arrow_indicator.gd" id="1_odjts"]
 
 [sub_resource type="CurveTexture" id="CurveTexture_016v8"]
 
@@ -18,7 +19,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ArrowLeft:scale")
+tracks/0/path = NodePath("Arrows/ArrowLeft:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -30,7 +31,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ArrowRight:scale")
+tracks/1/path = NodePath("Arrows/ArrowRight:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -46,26 +47,26 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ArrowLeft:scale")
+tracks/0/path = NodePath("Arrows/ArrowLeft:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.5, 1),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(1, 1), Vector2(1.25, 1.25), Vector2(1, 1)]
+"values": [Vector2(1, 1), Vector2(1.5, 1.5), Vector2(1, 1)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ArrowRight:scale")
+tracks/1/path = NodePath("Arrows/ArrowRight:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.5, 1),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(1, 1), Vector2(1.25, 1.25), Vector2(1, 1)]
+"values": [Vector2(1.5, 1.5), Vector2(1, 1), Vector2(1.5, 1.5)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_f01cw"]
@@ -74,14 +75,17 @@ _data = {
 &"increase_decrease": SubResource("Animation_016v8")
 }
 
-[node name="ArrowIndicator" type="Node2D"]
+[node name="ArrowIndicator" type="Node2D" node_paths=PackedStringArray("particles", "arrows")]
+script = ExtResource("1_odjts")
+particles = NodePath("Particles")
+arrows = NodePath("Arrows")
 
-[node name="ArrowLeft" type="Sprite2D" parent="."]
+[node name="Particles" type="Node2D" parent="."]
+
+[node name="LeftParticles" type="GPUParticles2D" parent="Particles"]
 position = Vector2(-50, 0)
 rotation = -0.7853982
-texture = ExtResource("1_016v8")
-
-[node name="GPUParticles2D" type="GPUParticles2D" parent="ArrowLeft"]
+scale = Vector2(0.99999994, 0.99999994)
 amount = 20
 lifetime = 1.5
 randomness = 1.0
@@ -89,17 +93,27 @@ fixed_fps = 60
 trail_lifetime = 4.68
 process_material = SubResource("ParticleProcessMaterial_016v8")
 
-[node name="ArrowRight" type="Sprite2D" parent="."]
+[node name="RightParticles" type="GPUParticles2D" parent="Particles"]
 position = Vector2(50, 0)
 rotation = 2.3561945
-texture = ExtResource("1_016v8")
-
-[node name="GPUParticles2D" type="GPUParticles2D" parent="ArrowRight"]
+scale = Vector2(0.99999994, 0.99999994)
 amount = 20
 lifetime = 1.5
 randomness = 1.0
 fixed_fps = 60
 process_material = SubResource("ParticleProcessMaterial_016v8")
+
+[node name="Arrows" type="Node2D" parent="."]
+
+[node name="ArrowLeft" type="Sprite2D" parent="Arrows"]
+position = Vector2(-50, 0)
+rotation = -0.7853982
+texture = ExtResource("1_016v8")
+
+[node name="ArrowRight" type="Sprite2D" parent="Arrows"]
+position = Vector2(50, 0)
+rotation = 2.3561945
+texture = ExtResource("1_016v8")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kykjc3mm8qbj"
-path="res://.godot/imported/wild_draw4.png-a2eb80c43c9a2102dd4618b2e5bc3d6d.ctex"
+uid="uid://di3e12gp301y4"
+path="res://.godot/imported/num_9.png-4b9840840eeef6019295df3d65aa2340.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/wild_draw4.png"
-dest_files=["res://.godot/imported/wild_draw4.png-a2eb80c43c9a2102dd4618b2e5bc3d6d.ctex"]
+source_file="res://assets/sprites/cards/num_9.png"
+dest_files=["res://.godot/imported/num_9.png-4b9840840eeef6019295df3d65aa2340.ctex"]
 
 [params]
 
