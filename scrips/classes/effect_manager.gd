@@ -61,7 +61,7 @@ func process_effect(card_effects: String, target_player: Player) -> void:
 				push_warning("EffectManager: Efecto desconocido '%s'" % current_effect["Name"])
 	
 	_disable_visuals = false
-	await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(0.1).timeout
 
 
 ## Establece los parámetros del juego para los efectos. [br]
