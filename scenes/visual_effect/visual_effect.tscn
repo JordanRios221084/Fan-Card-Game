@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3 uid="uid://7jaeovpr26l0"]
+
+[ext_resource type="Script" uid="uid://cedthsisrvpmv" path="res://scenes/visual_effect/visual_effect.gd" id="1_7dyyi"]
+[ext_resource type="FontFile" uid="uid://c76kveks4037" path="res://assets/fonts/numbers_font.fnt" id="2_6e7ln"]
+[ext_resource type="Texture2D" uid="uid://dwepi7hm6qs2g" path="res://assets/sprites/extras/visual_icon.png" id="2_7dyyi"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7dyyi"]
+atlas = ExtResource("2_7dyyi")
+region = Rect2(0, 0, 20, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6e7ln"]
+atlas = ExtResource("2_7dyyi")
+region = Rect2(20, 0, 20, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kkdg7"]
+atlas = ExtResource("2_7dyyi")
+region = Rect2(40, 0, 20, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6uqi0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7dyyi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6e7ln")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kkdg7")
+}],
+"loop": true,
+"name": &"set_icon",
+"speed": 1.0
+}]
+
+[node name="VisualEffect" type="Node2D" node_paths=PackedStringArray("_effect_label", "_effect_icon_sprite")]
+script = ExtResource("1_7dyyi")
+_effect_label = NodePath("Value")
+_effect_icon_sprite = NodePath("Icon")
+
+[node name="Value" type="Label" parent="."]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = -9.0
+offset_right = 24.0
+offset_bottom = 10.200001
+grow_vertical = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = ExtResource("2_6e7ln")
+theme_override_font_sizes/font_size = 12
+text = "99"
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Icon" type="AnimatedSprite2D" parent="."]
+position = Vector2(-11, 0)
+sprite_frames = SubResource("SpriteFrames_6uqi0")
+animation = &"set_icon"

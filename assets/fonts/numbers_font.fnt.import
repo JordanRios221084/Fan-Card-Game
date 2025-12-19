@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://c76kveks4037"
+path="res://.godot/imported/numbers_font.fnt-e9c3466ccc69354e104f199107ea3b10.fontdata"
+
+[deps]
+
+source_file="res://assets/fonts/numbers_font.fnt"
+dest_files=["res://.godot/imported/numbers_font.fnt-e9c3466ccc69354e104f199107ea3b10.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2

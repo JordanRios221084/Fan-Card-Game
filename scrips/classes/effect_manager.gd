@@ -1,5 +1,5 @@
 class_name EffectManager
-extends Node
+extends Node2D
 ## Se encarga de gestionar y aplicar los efectos de las cartas en el juego. [br]
 ##
 ## Parsea strings de efectos (ej: "draw/2_skip/1") y manipula el estado del juego
@@ -8,6 +8,9 @@ extends Node
 # --- Public Signals ---
 signal draw_processed(target_player: Player, amount: int) ## Señal emitida cuando se procesa el efecto de robar cartas.
 
+# -- Private Constants --
+var _EFFCT_SCENE: PackedScene = preload("res://scenes/visual_effect/visual_effect.tscn")
+
 # --- Public Variables ---
 var game_steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
 var game_direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
@@ -15,6 +18,7 @@ var game_direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 
 # --- Private Variables ---
 #var _arrow_rotation_direction: float = 1.0 ## Dirección de rotación de la flecha indicadora.
 #var _arrow_scale_factor: float = -1.0 ## Factor de escala para invertir la flecha.
+var _disable_visuals: bool = false
 
 # --- Engine Functions ---
 func _ready() -> void:
@@ -39,11 +43,12 @@ func process_effect(card_effects: String, target_player: Player) -> void:
 
 		match current_effect["Name"]:
 			"skip":
-				game_steps = _apply_skip_effect(current_effect["Value"])
+				game_steps = await _apply_skip_effect(current_effect["Value"], target_player)
 			"reverse":
-				game_direction = _apply_reverse_effect(current_effect["Value"])
+				game_direction = await _apply_reverse_effect(current_effect["Value"])
 			"draw":
-				_apply_draw_effect(target_player, current_effect["Value"])
+				_disable_visuals = true
+				await _apply_draw_effect(target_player, current_effect["Value"])
 			"wild":
 				print("EffectManager: Efecto Comodín (Wild) - Pendiente de implementación.")
 			"challenge":
@@ -55,6 +60,7 @@ func process_effect(card_effects: String, target_player: Player) -> void:
 			_:
 				push_warning("EffectManager: Efecto desconocido '%s'" % current_effect["Name"])
 	
+	_disable_visuals = false
 	await get_tree().create_timer(0.5).timeout
 
 
@@ -96,13 +102,17 @@ func _parse_effect(effect: String) -> Dictionary:
 
 ## Aplica el efecto de saltar turnos.
 ## Modifica la variable 'steps' del GameManager.
-func _apply_skip_effect(new_steps: String) -> int:
+func _apply_skip_effect(new_steps: String, target_player: Player) -> int:
+	if not _disable_visuals:
+		await _create_visual_effect(0, 1, target_player) # Icono de salto
+		
 	return new_steps.to_int()
 
 
 ## Aplica el efecto de invertir dirección.
 ## Modifica la variable 'direction' del GameManager.
 func _apply_reverse_effect(new_direction: String) -> int:
+	await _create_visual_effect(0, 2, null) # Icono de reversa
 	return game_direction * new_direction.to_int()
 
 
@@ -114,8 +124,40 @@ func _apply_draw_effect(target_player: Player, draw_quantity: String) -> void:
 		return
 	
 	var amount: int = draw_quantity.to_int()
+	var draw_icon: int = 0
 	
 	draw_processed.emit(target_player, amount)
+
+	await _create_visual_effect(amount, draw_icon, target_player)
+
+
+## Crea y añade un efecto visual a la escena.
+func _create_visual_effect(value: int, icon: int, target_player: Player) -> void:
+	var visual_effect: VisualEffect = _EFFCT_SCENE.instantiate() as VisualEffect
+	add_child(visual_effect) # Añadir a la escena
+
+	# Configurar el efecto visual
+	visual_effect.set_effect(value, icon)
+	visual_effect.scale = Vector2(5.0, 5.0)
+	visual_effect.z_index = 1000
+
+	if target_player:
+		visual_effect.reparent(target_player) # Hacer hijo del jugador objetivo
+
+	# Animaciones de entrada
+	var effect_tween: Tween = create_tween()
+	effect_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	effect_tween.tween_property(visual_effect, "position", Vector2(0, -50), 0.2)
+	await effect_tween.finished
+
+	await get_tree().create_timer(0.5).timeout # Pausa para mostrar el efecto
+
+	# Animaciones de salida
+	effect_tween = create_tween()
+	effect_tween.tween_property(visual_effect, "scale", Vector2(0, 0), 0.2)
+	await effect_tween.finished
+
+	visual_effect.queue_free()
 
 
 ## Inicia el indicador de flechas en la escena.

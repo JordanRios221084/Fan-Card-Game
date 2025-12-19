@@ -77,6 +77,7 @@ func _start_effect_manager() -> void:
 	add_child(effect_manager)
 
 	effect_manager.draw_processed.connect(_on_effect_manager_draw_processed)
+	effect_manager.position = discard_pile.position
 
 
 ## Inicia el juego repartiendo cartas y configurando el estado inicial.
