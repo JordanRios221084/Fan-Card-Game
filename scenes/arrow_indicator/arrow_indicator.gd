@@ -1,5 +1,5 @@
 class_name ArrowIndicator
-extends Node
+extends Node2D
 ## Indicador de flecha que rota para mostrar la dirección del turno en el juego.
 
 # --- Export Groups ---

@@ -24,7 +24,6 @@ enum GameState {
 @export_group("Table References")
 @export var deck: Deck ## Referencia al mazo de cartas [Deck].
 @export var discard_pile: DiscardPile ## Referencia al montón de descarte [DiscardPile].
-@export var arrow_indicator: Node2D ## Referencia al indicador de flechas.
 
 @export_group("Player Management")
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
@@ -114,11 +113,9 @@ func _start_game() -> void:
 	var first_card: Card = deck.draw_card()
 	CardManager.set_card_opacity(first_card, true)
 	await discard_pile.receive_card(first_card, deck)
-	
-	# No tocar por el momento, se refactorizará la animación luego
-	var arrows_tween: Tween = create_tween()
-	arrows_tween.tween_property(arrow_indicator, "modulate:a", 0.75, 0.5)
 	#----------------------------------------------------------------------------
+
+	effect_manager.set_arrows_opacity(1.0)
 
 	# Marcar el juego como comenzado
 	_change_state(GameState.GAME_STARTED)
@@ -190,9 +187,9 @@ func _change_state(new_state: GameState) -> void:
 				discard_pile.top_card.is_effect_used = true
 			
 			# Obtener los parámetros actualizados del juego
-			var game_params: Dictionary = effect_manager.get_game_parameters()
-			steps = game_params["Steps"]
-			direction = game_params["Direction"]
+			var updated_params: Dictionary = effect_manager.get_game_parameters()
+			steps = updated_params["Steps"]
+			direction = updated_params["Direction"]
 			
 			_change_state(GameState.CHANGE_TURN)
 			

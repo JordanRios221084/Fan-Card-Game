@@ -76,6 +76,7 @@ _data = {
 }
 
 [node name="ArrowIndicator" type="Node2D" node_paths=PackedStringArray("particles", "arrows")]
+modulate = Color(1, 1, 1, 0)
 script = ExtResource("1_odjts")
 particles = NodePath("Particles")
 arrows = NodePath("Arrows")
