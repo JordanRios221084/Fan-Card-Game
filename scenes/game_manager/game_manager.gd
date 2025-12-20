@@ -27,9 +27,10 @@ enum GameState {
 @export var arrow_indicator: Node2D ## Referencia al indicador de flechas.
 
 @export_group("Player Management")
-@export var ai_controller: AIController ## Referencia al controlador de IA [AIController].
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
 @export var all_players: Array[Player] = [] ## Array que contiene referencias a todos los jugadores [Player].
+@export var ai_controller: AIController ## Referencia al controlador de IA [AIController].
+@export var player_controller: PlayerController ## Referencia al controlador de jugadores humanos [PlayerController].
 
 @export_group("Classes References")
 @export var effect_manager: EffectManager ## Referencia al manejador de efectos [EffectManager].
@@ -46,16 +47,14 @@ var current_state: GameState = GameState.IDLE ## Variable que almacena el estado
 
 # --- Engine Functions ---
 func _ready() -> void:
-	# Cargar la base de datos de cartas
 	_set_database()
 
-	# Obtener referencias a todos los jugadores
 	_get_players_references()
 
-	# Inicializamos el effect_manager
+	_set_controllers()
+
 	_start_effect_manager()
 
-	# Comenzar el juego
 	_start_game()
 
 
@@ -72,6 +71,21 @@ func _get_players_references() -> void:
 	all_players = players_container.get_current_players()
 
 
+## Configura las señales y referencias de los controladores de IA y jugadores humanos.
+func _set_controllers() -> void:
+	ai_controller.game_manager = self
+	player_controller.game_manager = self
+
+	ai_controller.connect("check_card", _on_controller_check_card)
+	ai_controller.connect("play_card", _on_controller_play_card)
+	ai_controller.connect("draw_card", _on_controller_draw_card)
+
+	player_controller.connect("check_card", _on_controller_check_card)
+	player_controller.connect("play_card", _on_controller_play_card)
+	player_controller.connect("draw_card", _on_controller_draw_card)
+
+
+## Inicia el EffectManager y conecta sus señales.
 func _start_effect_manager() -> void:
 	effect_manager = EffectManager.new()
 	add_child(effect_manager)
@@ -125,7 +139,7 @@ func _set_first_player() -> void:
 	
 	next_player = all_players[next_index]
 
-	print("Jugadores iniciales | Actual: {current_player.name} | Siguiente: {next_player.name}")
+	print("Jugadores iniciales | Actual:" + current_player.name + " | Siguiente: " + next_player.name)
 	print()
 
 
@@ -189,7 +203,8 @@ func _change_state(new_state: GameState) -> void:
 				CardManager.set_card_opacity(card, false)
 
 			_change_current_player_turn()
-			ai_controller.current_ai_player = current_player
+			if current_player.is_human:
+				ai_controller.set_player(current_player)
 
 			_change_state(GameState.PLAYING_CARDS)
 			
@@ -201,7 +216,9 @@ func _change_state(new_state: GameState) -> void:
 			for card: Card in current_player.current_hand:
 				CardManager.set_card_opacity(card, true)
 
-			await ai_controller.try_to_process_turn()
+			# Procesar el turno según el tipo de jugador
+			if current_player.is_human:
+				await ai_controller.try_to_process_turn()
 
 			await get_tree().create_timer(transition_time_seconds).timeout
 
@@ -273,16 +290,15 @@ func _on_discard_pile_first_card_discarded(card: Card) -> void:
 	deck.recover_card(card)
 
 
-func _on_ai_controller_play_card(card: Card, player: Player) -> void:
+func _on_controller_play_card(card: Card, player: Player) -> void:
 	_attempt_to_play(card, player)
 
 
-func _on_ai_controller_draw_card(player: Player) -> void:
+func _on_controller_draw_card(player: Player) -> void:
 	_draw_a_card(player, 1, false, 0.5)
-	# Nota: Tras robar, la IA volverá a comprobar sus cartas en su propia lógica
 
-func _on_ai_controller_check_card(card: Card) -> void:
-	if _is_valid_card(card):
+func _on_controller_check_card(card: Card) -> void:
+	if _is_valid_card(card) and current_player.is_human:
 		ai_controller.add_valid_card(card)
 
 func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> void:

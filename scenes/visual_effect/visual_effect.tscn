@@ -41,9 +41,9 @@ _effect_icon_sprite = NodePath("Icon")
 [node name="Value" type="Label" parent="."]
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_top = -9.0
+offset_top = -10.0
 offset_right = 24.0
-offset_bottom = 10.200001
+offset_bottom = 9.200001
 grow_vertical = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_constants/shadow_offset_x = 0
@@ -55,6 +55,6 @@ vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Icon" type="AnimatedSprite2D" parent="."]
-position = Vector2(-11, 0)
+position = Vector2(-10, 0)
 sprite_frames = SubResource("SpriteFrames_6uqi0")
 animation = &"set_icon"
