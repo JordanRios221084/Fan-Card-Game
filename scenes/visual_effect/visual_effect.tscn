@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://7jaeovpr26l0"]
+[gd_scene load_steps=11 format=3 uid="uid://7jaeovpr26l0"]
 
 [ext_resource type="Script" uid="uid://cedthsisrvpmv" path="res://scenes/visual_effect/visual_effect.gd" id="1_7dyyi"]
 [ext_resource type="FontFile" uid="uid://c76kveks4037" path="res://assets/fonts/numbers_font.fnt" id="2_6e7ln"]
 [ext_resource type="Texture2D" uid="uid://dwepi7hm6qs2g" path="res://assets/sprites/extras/visual_icon.png" id="2_7dyyi"]
+[ext_resource type="Gradient" uid="uid://cmka5ovvhwla5" path="res://resources/gradient_opacity.tres" id="4_6e7ln"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7dyyi"]
 atlas = ExtResource("2_7dyyi")
@@ -33,10 +34,28 @@ animations = [{
 "speed": 1.0
 }]
 
-[node name="VisualEffect" type="Node2D" node_paths=PackedStringArray("_effect_label", "_effect_icon_sprite")]
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_6e7ln"]
+gradient = ExtResource("4_6e7ln")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_7dyyi"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
+gravity = Vector3(0, 0, 0)
+linear_accel_min = 9.999997
+linear_accel_max = 99.99999
+scale_min = 1.5
+scale_max = 15.0
+color_ramp = SubResource("GradientTexture1D_6e7ln")
+hue_variation_min = -2.2351742e-08
+hue_variation_max = 0.99999994
+
+[node name="VisualEffect" type="Node2D" node_paths=PackedStringArray("_effect_label", "_effect_icon_sprite", "_burst_effect")]
 script = ExtResource("1_7dyyi")
 _effect_label = NodePath("Value")
 _effect_icon_sprite = NodePath("Icon")
+_burst_effect = NodePath("BurstParticles")
 
 [node name="Value" type="Label" parent="."]
 anchors_preset = 9
@@ -58,3 +77,15 @@ metadata/_edit_use_anchors_ = true
 position = Vector2(-10, 0)
 sprite_frames = SubResource("SpriteFrames_6uqi0")
 animation = &"set_icon"
+
+[node name="BurstParticles" type="GPUParticles2D" parent="."]
+scale = Vector2(0.5, 0.5)
+emitting = false
+amount = 128
+lifetime = 5.0
+one_shot = true
+speed_scale = 5.0
+explosiveness = 1.0
+randomness = 1.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_7dyyi")

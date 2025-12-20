@@ -9,7 +9,9 @@ extends Node2D
 signal draw_processed(target_player: Player, amount: int) ## Señal emitida cuando se procesa el efecto de robar cartas.
 
 # -- Private Constants --
+## Escena del efecto visual.
 var _EFFCT_SCENE: PackedScene = preload("res://scenes/visual_effect/visual_effect.tscn")
+## Escena del indicador de flechas.
 var _ARROW_SCENE: PackedScene = preload("res://scenes/arrow_indicator/arrow_indicator.tscn")
 
 # --- Public Variables ---
@@ -18,7 +20,7 @@ var game_direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 
 var arrow_indicator: ArrowIndicator ## Indicador de flechas para la dirección del juego.
 
 # --- Private Variables ---
-var _disable_visuals: bool = false
+var _disable_visuals: bool = false ## Indica si se deben deshabilitar los efectos visuales temporalmente.
 
 # --- Engine Functions ---
 func _ready() -> void:
@@ -85,6 +87,8 @@ func get_game_parameters() -> Dictionary:
 	}
 
 
+## Establece la opacidad del indicador de flechas. [br]
+## - [param opacity]: Valor de opacidad entre 0.0 (transparente) y 1.0 (opaco).
 func set_arrows_opacity(opacity: float) -> void:
 	var timeout: float = 0.5
 	var opacity_tween: Tween = create_tween()
@@ -123,7 +127,7 @@ func _apply_draw_effect(target_player: Player, draw_quantity: String) -> void:
 	
 	draw_processed.emit(target_player, amount)
 
-	await _create_visual_effect(amount, draw_icon, target_player)
+	await _create_visual_effect(amount, draw_icon, target_player, true) # Icono de robar cartas
 
 
 ## Aplica el efecto de saltar turnos.
@@ -132,7 +136,7 @@ func _apply_skip_effect(new_steps: String, target_player: Player) -> int:
 	if not _disable_visuals:
 		var skip_icon: int = 1
 
-		await _create_visual_effect(0, skip_icon, target_player) # Icono de salto
+		await _create_visual_effect(0, skip_icon, target_player, true) # Icono de salto
 		
 	return new_steps.to_int()
 
@@ -141,13 +145,13 @@ func _apply_skip_effect(new_steps: String, target_player: Player) -> int:
 ## Modifica la variable 'direction' del GameManager.
 func _apply_reverse_effect(new_direction: String) -> int:
 	var reverse_icon: int = 2
-	await _create_visual_effect(0, reverse_icon, null) # Icono de reversa
+	await _create_visual_effect(0, reverse_icon, null, false) # Icono de reversa
 
 	return game_direction * new_direction.to_int()
 
 
 ## Crea y añade un efecto visual a la escena.
-func _create_visual_effect(value: int, icon: int, target_player: Player) -> void:
+func _create_visual_effect(value: int, icon: int, target_player: Player, play_burst: bool = false) -> void:
 	var visual_effect: VisualEffect = _EFFCT_SCENE.instantiate() as VisualEffect
 	add_child(visual_effect) # Añadir a la escena
 
@@ -165,6 +169,9 @@ func _create_visual_effect(value: int, icon: int, target_player: Player) -> void
 	effect_tween.tween_property(visual_effect, "position", Vector2(0, -50), 0.2)
 	await effect_tween.finished
 
+	if play_burst:
+		visual_effect.play_burst_effect()
+
 	await get_tree().create_timer(0.5).timeout # Pausa para mostrar el efecto
 
 	# Animaciones de salida
@@ -175,6 +182,7 @@ func _create_visual_effect(value: int, icon: int, target_player: Player) -> void
 	visual_effect.queue_free()
 
 
+## Cambia la dirección del indicador de flechas.
 func _change_arrow_direction() -> void:
 	var new_direction: float = arrow_indicator.scale.x * -1
 	var change_speed: float = 0.5

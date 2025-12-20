@@ -6,6 +6,7 @@ extends Node2D
 @export_group("ui")
 @export var _effect_label: Label ## Muestra el valor del efecto.
 @export var _effect_icon_sprite: AnimatedSprite2D ## Icono del efecto.
+@export var _burst_effect: GPUParticles2D ## Efecto de explosión visual.
 
 
 # -- Public Functions --
@@ -18,3 +19,10 @@ func set_effect(value: int, icon: int) -> void:
 		_effect_icon_sprite.position.x = 0
 	
 	_effect_icon_sprite.frame = icon
+
+
+## Reproduce el efecto de explosión visual.
+func play_burst_effect() -> void:
+	_burst_effect.z_index = 1000
+	_burst_effect.scale = Vector2(3.0, 3.0)
+	_burst_effect.emitting = true
