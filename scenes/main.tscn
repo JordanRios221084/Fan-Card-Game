@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://cr8aig6e11asj"]
+[gd_scene load_steps=8 format=3 uid="uid://cr8aig6e11asj"]
 
 [ext_resource type="PackedScene" uid="uid://taslkryubnek" path="res://scenes/game_manager/game_manager.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://bl8ebgm7urawa" path="res://scenes/background/background.tscn" id="2_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://dt0j27ri56mxn" path="res://scenes/deck/deck.tscn" id="2_sugp2"]
 [ext_resource type="PackedScene" uid="uid://bw8l7m4vdo0o4" path="res://scenes/discard_pile/discard_pile.tscn" id="4_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://b8qq08rle60vg" path="res://scenes/containers/player_container/players_container.tscn" id="4_tbgi4"]
@@ -9,12 +10,15 @@
 
 [node name="Main" type="Node2D"]
 
-[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "players_container", "ai_controller", "player_controller") instance=ExtResource("1_o5qli")]
+[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "backgorund", "players_container", "ai_controller", "player_controller") instance=ExtResource("1_o5qli")]
 deck = NodePath("Deck")
 discard_pile = NodePath("DiscardPile")
+backgorund = NodePath("Background")
 players_container = NodePath("PlayerContainer")
 ai_controller = NodePath("AIController")
 player_controller = NodePath("PlayerController")
+
+[node name="Background" parent="GameManager" instance=ExtResource("2_o6xl0")]
 
 [node name="Deck" parent="GameManager" instance=ExtResource("2_sugp2")]
 position = Vector2(75, 80)

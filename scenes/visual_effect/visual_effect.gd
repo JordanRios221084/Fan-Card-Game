@@ -23,6 +23,5 @@ func set_effect(value: int, icon: int) -> void:
 
 ## Reproduce el efecto de explosión visual.
 func play_burst_effect() -> void:
-	_burst_effect.z_index = 1000
-	_burst_effect.scale = Vector2(3.0, 3.0)
+	_burst_effect.z_index = 999
 	_burst_effect.emitting = true

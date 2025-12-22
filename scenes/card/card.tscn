@@ -1,9 +1,18 @@
-[gd_scene load_steps=13 format=3 uid="uid://d1ppxb2hlnmvu"]
+[gd_scene load_steps=15 format=3 uid="uid://d1ppxb2hlnmvu"]
 
 [ext_resource type="Script" uid="uid://b6jmmu8puonvq" path="res://scenes/card/card.gd" id="1_kg30u"]
 [ext_resource type="Texture2D" uid="uid://dwqdpo1skt308" path="res://assets/sprites/cards/action_draw2.png" id="1_ktuci"]
 [ext_resource type="Texture2D" uid="uid://c1whdbu6mk8dm" path="res://assets/sprites/cards/card_back.png" id="2_kg30u"]
+[ext_resource type="Shader" uid="uid://yjf3eopb0w12" path="res://assets/shaders/shadows.gdshader" id="3_2ufkr"]
 [ext_resource type="Texture2D" uid="uid://bv25akttbwms2" path="res://assets/sprites/extras/blank_card.png" id="3_sy11y"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2ufkr"]
+shader = ExtResource("3_2ufkr")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.49803922)
+shader_parameter/shadow_scale = 0.025
+shader_parameter/shadow_min_length = 1.0
+shader_parameter/shadow_max_length = 5.0
+shader_parameter/screen_center = Vector2(640, 360)
 
 [sub_resource type="Shader" id="Shader_kg30u"]
 code = "// color_swap.gdshader
@@ -348,6 +357,10 @@ back_sprite = NodePath("BackSprite")
 opacity_sprite = NodePath("OpacitySprite")
 collision_shape = NodePath("Area2D/CollisionShape2D")
 card_animator = NodePath("AnimationPlayer")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_2ufkr")
+texture = ExtResource("3_sy11y")
 
 [node name="FrontSprite" type="Sprite2D" parent="."]
 z_index = -1

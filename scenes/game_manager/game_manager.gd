@@ -24,6 +24,7 @@ enum GameState {
 @export_group("Table References")
 @export var deck: Deck ## Referencia al mazo de cartas [Deck].
 @export var discard_pile: DiscardPile ## Referencia al montón de descarte [DiscardPile].
+@export var backgorund: Background ## Referencia al fondo del juego [Background].
 
 @export_group("Player Management")
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
@@ -115,7 +116,7 @@ func _start_game() -> void:
 	await discard_pile.receive_card(first_card, deck)
 	#----------------------------------------------------------------------------
 
-	effect_manager.set_arrows_opacity(1.0)
+	effect_manager.set_arrows_opacity(0.75)
 
 	# Marcar el juego como comenzado
 	_change_state(GameState.GAME_STARTED)
@@ -179,12 +180,13 @@ func _change_state(new_state: GameState) -> void:
 			
 		GameState.APPLY_EFFECTS:
 			print("### APLICANDO EFECTOS ###\n")
+			var last_card: Card = discard_pile.top_card
 
-			effect_manager.set_game_parameters(steps, direction)
+			effect_manager.set_game_parameters(steps, direction, backgorund, last_card.values["Color"])
 			
-			if not discard_pile.top_card.is_effect_used:
-				await effect_manager.process_effect(discard_pile.top_card.values["Effect"], next_player)
-				discard_pile.top_card.is_effect_used = true
+			if not last_card.is_effect_used:
+				await effect_manager.process_effect(last_card.values["Effect"], next_player)
+				last_card.is_effect_used = true
 			
 			# Obtener los parámetros actualizados del juego
 			var updated_params: Dictionary = effect_manager.get_game_parameters()

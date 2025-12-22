@@ -10,27 +10,29 @@ signal draw_processed(target_player: Player, amount: int) ## Señal emitida cuan
 
 # -- Private Constants --
 ## Escena del efecto visual.
-var _EFFCT_SCENE: PackedScene = preload("res://scenes/visual_effect/visual_effect.tscn")
+const  _EFFECT_SCENE: PackedScene = preload("res://scenes/visual_effect/visual_effect.tscn")
 ## Escena del indicador de flechas.
-var _ARROW_SCENE: PackedScene = preload("res://scenes/arrow_indicator/arrow_indicator.tscn")
-
-# --- Public Variables ---
-var game_steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
-var game_direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
-var arrow_indicator: ArrowIndicator ## Indicador de flechas para la dirección del juego.
+const _ARROW_SCENE: PackedScene = preload("res://scenes/arrow_indicator/arrow_indicator.tscn")
+## Tiempo de transición para los efectos visuales.
+const _TRANSITION_TIME_SECONDS: float = 0.3
+## Diferencia de color para el fondo.
+const _COLOR_DIFFERENCE: float = 0.7
 
 # --- Private Variables ---
+var _game_steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
+var _game_direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
+var _arrow_indicator: ArrowIndicator ## Indicador de flechas para la dirección del juego.
+var _background: Background ## Referencia al fondo para cambiar colores.
+var _background_new_color: Color ## Nuevo color de fondo a establecer.
 var _disable_visuals: bool = false ## Indica si se deben deshabilitar los efectos visuales temporalmente.
 
 # --- Engine Functions ---
 func _ready() -> void:
-	arrow_indicator = _ARROW_SCENE.instantiate()
-	add_child(arrow_indicator)
-	arrow_indicator.scale = Vector2(3.0, 3.0)
+	_create_arrow_indicator()
 
 
 func _process(delta: float) -> void:
-	arrow_indicator.rotation += deg_to_rad(90) * delta * game_direction
+	_arrow_indicator.rotation += deg_to_rad(90) * delta * _game_direction
 
 
 # --- Public Functions ---
@@ -42,15 +44,17 @@ func _process(delta: float) -> void:
 func process_effect(card_effects: String, target_player: Player) -> void:
 	var effect_list: Array = card_effects.split("_")
 
+	_background.set_background_color(_background_new_color, _TRANSITION_TIME_SECONDS, _COLOR_DIFFERENCE)
+
 	for i: int in range(effect_list.size()):
 		## Efecto actual parseado, contiene su nombre y valor.
 		var current_effect: Dictionary = _parse_effect(effect_list[i])
 
 		match current_effect["Name"]:
 			"skip":
-				game_steps = await _apply_skip_effect(current_effect["Value"], target_player)
+				_game_steps = await _apply_skip_effect(current_effect["Value"], target_player)
 			"reverse":
-				game_direction = await _apply_reverse_effect(current_effect["Value"])
+				_game_direction = await _apply_reverse_effect(current_effect["Value"])
 				_change_arrow_direction()
 			"draw":
 				_disable_visuals = true
@@ -73,17 +77,18 @@ func process_effect(card_effects: String, target_player: Player) -> void:
 ## Establece los parámetros del juego para los efectos. [br]
 ## - [param steps]: Cantidad de pasos a mover en el turno (1 o más). [br]
 ## - [param direction]: Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
-func set_game_parameters(steps: int, direction: int) -> void:
-	game_steps = steps
-	game_direction = direction
-
+func set_game_parameters(steps: int, direction: int, bg: Background, new_color: Color) -> void:
+	_game_steps = steps
+	_game_direction = direction
+	_background = bg
+	_background_new_color = new_color
 
 ## Obtiene los parámetros actuales del juego relacionados con los efectos. [br]
 ## - Retorna un diccionario con las claves "steps" y "direction".
 func get_game_parameters() -> Dictionary:
 	return {
-		"Steps": game_steps,
-		"Direction": game_direction
+		"Steps": _game_steps,
+		"Direction": _game_direction
 	}
 
 
@@ -92,7 +97,15 @@ func get_game_parameters() -> Dictionary:
 func set_arrows_opacity(opacity: float) -> void:
 	var timeout: float = 0.5
 	var opacity_tween: Tween = create_tween()
-	opacity_tween.tween_property(arrow_indicator, "modulate:a", opacity, timeout)
+	opacity_tween.tween_property(_arrow_indicator, "modulate:a", opacity, timeout)
+
+
+## Crea e inicializa el indicador de flechas en la escena.
+func _create_arrow_indicator() -> void:
+	_arrow_indicator = _ARROW_SCENE.instantiate()
+	add_child(_arrow_indicator)
+	_arrow_indicator.scale = Vector2(3.0, 3.0)
+	_arrow_indicator.modulate.a = 0.0
 
 
 # --- Private Functions ---
@@ -112,7 +125,6 @@ func _parse_effect(effect: String) -> Dictionary:
 			result["Value"] = effect_parts[1]
 	
 	return result
-
 
 
 ## Aplica el efecto de robar cartas.
@@ -147,12 +159,12 @@ func _apply_reverse_effect(new_direction: String) -> int:
 	var reverse_icon: int = 2
 	await _create_visual_effect(0, reverse_icon, null, false) # Icono de reversa
 
-	return game_direction * new_direction.to_int()
+	return _game_direction * new_direction.to_int()
 
 
 ## Crea y añade un efecto visual a la escena.
 func _create_visual_effect(value: int, icon: int, target_player: Player, play_burst: bool = false) -> void:
-	var visual_effect: VisualEffect = _EFFCT_SCENE.instantiate() as VisualEffect
+	var visual_effect: VisualEffect = _EFFECT_SCENE.instantiate() as VisualEffect
 	add_child(visual_effect) # Añadir a la escena
 
 	# Configurar el efecto visual
@@ -184,8 +196,8 @@ func _create_visual_effect(value: int, icon: int, target_player: Player, play_bu
 
 ## Cambia la dirección del indicador de flechas.
 func _change_arrow_direction() -> void:
-	var new_direction: float = arrow_indicator.scale.x * -1
+	var new_direction: float = _arrow_indicator.scale.x * -1
 	var change_speed: float = 0.5
 	
 	var direction_tween: Tween = create_tween()
-	direction_tween.tween_property(arrow_indicator, "scale:x", new_direction, change_speed)
+	direction_tween.tween_property(_arrow_indicator, "scale:x", new_direction, change_speed)
