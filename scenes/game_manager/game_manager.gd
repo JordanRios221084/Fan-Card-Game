@@ -25,6 +25,7 @@ enum GameState {
 @export var deck: Deck ## Referencia al mazo de cartas [Deck].
 @export var discard_pile: DiscardPile ## Referencia al montón de descarte [DiscardPile].
 @export var backgorund: Background ## Referencia al fondo del juego [Background].
+@export var foreground: Foreground ## Referencia al primer plano del juego [Foreground].
 
 @export_group("Player Management")
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
@@ -182,7 +183,7 @@ func _change_state(new_state: GameState) -> void:
 			print("### APLICANDO EFECTOS ###\n")
 			var last_card: Card = discard_pile.top_card
 
-			effect_manager.set_game_parameters(steps, direction, backgorund, last_card.values["Color"])
+			effect_manager.set_game_parameters(steps, direction, backgorund, foreground, last_card.values["Color"])
 			
 			if not last_card.is_effect_used:
 				await effect_manager.process_effect(last_card.values["Effect"], next_player)

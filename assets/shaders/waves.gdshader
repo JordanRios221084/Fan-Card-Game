@@ -6,6 +6,7 @@ uniform vec4 top_color: source_color;
 uniform float wave_amp: hint_range(0.0, 0.5);
 uniform float wave_size: hint_range(1.0, 10.0);
 uniform float wave_time_mul: hint_range(0.1, 2.0);
+uniform float wave_dir: hint_range(-1.0, 1.0);
 
 uniform int total_phases: hint_range(2, 600, 1);
 
@@ -36,7 +37,7 @@ void fragment() {
 	float d = fmod(UV.y, 1.0 / t);
 	float i = floor(UV.y * t);
 	float vi = floor(UV.y * t + t * effective_wave_amp);
-	float s = effective_wave_amp * sin((UV.x + TIME * max(1.0 / t, noise(vi)) * wave_time_mul * vi / t) * 2.0 * PI * wave_size);
+	float s = effective_wave_amp * sin((UV.x + wave_dir * TIME * max(1.0 / t, noise(vi)) * wave_time_mul * vi / t) * 2.0 * PI * wave_size);
 	
 	if (d < s) i--;
 	if (d > s + 1.0 / t) i++;

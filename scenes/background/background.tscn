@@ -5,12 +5,13 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pesyb"]
 shader = ExtResource("1_iheb5")
-shader_parameter/bottom_color = Color(0.09803922, 0.09803922, 0.09803922, 1)
+shader_parameter/bottom_color = Color(0.1584723, 0.15847233, 0.1584723, 1)
 shader_parameter/top_color = Color(0.49803922, 0.49803922, 0.49803922, 1)
 shader_parameter/wave_amp = 0.050000002375
-shader_parameter/wave_size = 1.0
-shader_parameter/wave_time_mul = 0.30000001099011997
-shader_parameter/total_phases = 6
+shader_parameter/wave_size = 1.150000007125
+shader_parameter/wave_time_mul = 1.00000004424012
+shader_parameter/wave_dir = 1.0
+shader_parameter/total_phases = 8
 
 [node name="Background" type="ColorRect"]
 material = SubResource("ShaderMaterial_pesyb")

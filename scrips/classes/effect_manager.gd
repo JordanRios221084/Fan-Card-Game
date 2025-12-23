@@ -23,6 +23,7 @@ var _game_steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
 var _game_direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
 var _arrow_indicator: ArrowIndicator ## Indicador de flechas para la dirección del juego.
 var _background: Background ## Referencia al fondo para cambiar colores.
+var _foreground: Foreground ## Referencia al primer plano para efectos visuales.
 var _background_new_color: Color ## Nuevo color de fondo a establecer.
 var _disable_visuals: bool = false ## Indica si se deben deshabilitar los efectos visuales temporalmente.
 
@@ -77,10 +78,11 @@ func process_effect(card_effects: String, target_player: Player) -> void:
 ## Establece los parámetros del juego para los efectos. [br]
 ## - [param steps]: Cantidad de pasos a mover en el turno (1 o más). [br]
 ## - [param direction]: Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
-func set_game_parameters(steps: int, direction: int, bg: Background, new_color: Color) -> void:
+func set_game_parameters(steps: int, direction: int, bg: Background, fg: Foreground, new_color: Color) -> void:
 	_game_steps = steps
 	_game_direction = direction
 	_background = bg
+	_foreground = fg
 	_background_new_color = new_color
 
 ## Obtiene los parámetros actuales del juego relacionados con los efectos. [br]
@@ -158,6 +160,7 @@ func _apply_skip_effect(new_steps: String, target_player: Player) -> int:
 func _apply_reverse_effect(new_direction: String) -> int:
 	var reverse_icon: int = 2
 	await _create_visual_effect(0, reverse_icon, null, false) # Icono de reversa
+	_background.invert_wave_direction()
 
 	return _game_direction * new_direction.to_int()
 
@@ -183,6 +186,7 @@ func _create_visual_effect(value: int, icon: int, target_player: Player, play_bu
 
 	if play_burst:
 		visual_effect.play_burst_effect()
+		_foreground.play_shockwave_effect(visual_effect.get_global_position())
 
 	await get_tree().create_timer(0.5).timeout # Pausa para mostrar el efecto
 

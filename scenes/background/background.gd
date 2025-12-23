@@ -22,3 +22,10 @@ func set_background_color(target_color: Color, transition_time: float = 1.0, dif
 		color_tween.tween_property(_material_shader, "shader_parameter/top_color", target_color, transition_time)
 		color_tween.parallel()
 		color_tween.tween_property(_material_shader, "shader_parameter/bottom_color", target_color.darkened(difference), transition_time)
+
+
+func invert_wave_direction() -> void:
+	if _material_shader:
+		var current_direction: float = _material_shader.get_shader_parameter("wave_dir")
+		var direction_tween: Tween = create_tween()
+		direction_tween.tween_property(_material_shader, "shader_parameter/wave_dir", -current_direction, 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
