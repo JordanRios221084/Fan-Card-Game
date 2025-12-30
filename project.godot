@@ -17,8 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-CardDatabase="*res://scrips/autoloads/card_database.gd"
-CardManager="*res://scrips/autoloads/card_manager.gd"
+CardDatabase="*res://scripts/autoloads/card_database.gd"
+CardManager="*res://scripts/autoloads/card_manager.gd"
 
 [debug]
 
@@ -38,6 +38,19 @@ window/stretch/mode="viewport"
 [dotnet]
 
 project/assembly_name="UNO Card Game"
+
+[file_customization]
+
+folder_colors={
+"res://assets/": "pink",
+"res://data/": "yellow",
+"res://game/": "green",
+"res://game/classes/": "red",
+"res://game/components/": "teal",
+"res://game/containers/": "blue",
+"res://game/controllers/": "orange",
+"res://scripts/": "purple"
+}
 
 [rendering]
 

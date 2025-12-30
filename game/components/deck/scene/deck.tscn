@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://dt0j27ri56mxn"]
+
+[ext_resource type="Script" uid="uid://b4s4vlr3027u3" path="res://game/components/deck/script/deck.gd" id="1_sdhao"]
+[ext_resource type="Texture2D" uid="uid://brdkenpjphuk0" path="res://assets/sprites/extras/deck.png" id="2_6rnap"]
+[ext_resource type="Shader" uid="uid://yjf3eopb0w12" path="res://assets/shaders/shadows.gdshader" id="2_u3j8v"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u3j8v"]
+shader = ExtResource("2_u3j8v")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_scale = 0.025
+shader_parameter/shadow_min_length = 1.0
+shader_parameter/shadow_max_length = 5.0
+shader_parameter/screen_center = Vector2(640, 360)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6rnap"]
+size = Vector2(24, 36)
+
+[node name="Deck" type="Node2D" node_paths=PackedStringArray("deck_sprite", "deck_collision_shape")]
+script = ExtResource("1_sdhao")
+deck_sprite = NodePath("DeckSprite")
+deck_collision_shape = NodePath("Area2D/CollisionShape2D")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_u3j8v")
+texture = ExtResource("2_6rnap")
+
+[node name="DeckSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_6rnap")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_6rnap")
+disabled = true
