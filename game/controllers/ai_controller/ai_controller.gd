@@ -72,5 +72,4 @@ func _check_current_cards(already_drawning: bool) -> void:
 ## Limpia las variables del controlador de la IA.
 ## Reinicia el jugador actual y la lista de cartas para el siguiente turno.
 func _clear_variables() -> void:
-	_player = null
 	_valid_cards.clear()

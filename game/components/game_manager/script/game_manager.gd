@@ -30,8 +30,6 @@ enum GameState {
 @export_group("Player Management")
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
 @export var all_players: Array[Player] = [] ## Array que contiene referencias a todos los jugadores [Player].
-@export var ai_controller: AIController ## Referencia al controlador de IA [AIController].
-@export var player_controller: PlayerController ## Referencia al controlador de jugadores humanos [PlayerController].
 
 @export_group("Classes References")
 @export var effect_manager: EffectManager ## Referencia al manejador de efectos [EffectManager].
@@ -74,16 +72,13 @@ func _get_players_references() -> void:
 
 ## Configura las señales y referencias de los controladores de IA y jugadores humanos.
 func _set_controllers() -> void:
-	ai_controller.game_manager = self
-	player_controller.game_manager = self
+	for player: Player in all_players:
+		var controller: Controller = player.self_cotroller
+		controller.game_manager = self
 
-	ai_controller.connect("check_card", _on_controller_check_card)
-	ai_controller.connect("play_card", _on_controller_play_card)
-	ai_controller.connect("draw_card", _on_controller_draw_card)
-
-	player_controller.connect("check_card", _on_controller_check_card)
-	player_controller.connect("play_card", _on_controller_play_card)
-	player_controller.connect("draw_card", _on_controller_draw_card)
+		controller.connect("check_card", _on_controller_check_card)
+		controller.connect("play_card", _on_controller_play_card)
+		controller.connect("draw_card", _on_controller_draw_card)
 
 
 ## Inicia el EffectManager y conecta sus señales.
@@ -108,7 +103,7 @@ func _start_game() -> void:
 	await get_tree().create_timer(0.5).timeout
 
 	for player: Player in all_players:
-		player.collapse_hand()
+		player.cards_container.collapse_cards(player.current_hand)
 
 	await get_tree().create_timer(0.5).timeout
 
@@ -203,8 +198,6 @@ func _change_state(new_state: GameState) -> void:
 				CardManager.set_card_opacity(card, false)
 
 			_change_current_player_turn()
-			if current_player.is_human:
-				ai_controller.set_player(current_player)
 
 			_change_state(GameState.PLAYING_CARDS)
 			
@@ -216,9 +209,8 @@ func _change_state(new_state: GameState) -> void:
 			for card: Card in current_player.current_hand:
 				CardManager.set_card_opacity(card, true)
 
-			# Procesar el turno según el tipo de jugador
-			if current_player.is_human:
-				await ai_controller.try_to_process_turn()
+			# Procesar el turno del jugador actual
+			await current_player.self_cotroller.try_to_process_turn()
 
 			await get_tree().create_timer(transition_time_seconds).timeout
 
@@ -282,20 +274,20 @@ func _draw_a_card(target_player: Player, card_quantity: int, forced: bool, draw_
 	# Emitimos la señal de robo finalizado
 	draw_card_finished.emit()
 
+
 # --- Signal Callbacks ---
 func _on_discard_pile_first_card_discarded(card: Card) -> void:
 	deck.recover_card(card)
 
-
 func _on_controller_play_card(card: Card, player: Player) -> void:
 	_attempt_to_play(card, player)
-
 
 func _on_controller_draw_card(player: Player) -> void:
 	_draw_a_card(player, 1, false, 0.5)
 
 func _on_controller_check_card(card: Card) -> void:
-	if _is_valid_card(card) and current_player.is_human:
+	if _is_valid_card(card):
+		var ai_controller: AIController = current_player.self_cotroller as AIController
 		ai_controller.add_valid_card(card)
 
 func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> void:
