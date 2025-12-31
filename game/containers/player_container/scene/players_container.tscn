@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c26wn140yfhc3" path="res://game/containers/player_container/script/players_container.gd" id="1_doubq"]
 [ext_resource type="PackedScene" uid="uid://bphyou12mr80w" path="res://game/components/player/scene/player.tscn" id="1_tfo80"]
-[ext_resource type="PackedScene" uid="uid://gau28iuxx0g6" path="res://game/controllers/ai_controller/ai_controller.tscn" id="3_5s4gd"]
+[ext_resource type="PackedScene" uid="uid://gau28iuxx0g6" path="res://game/controllers/ai_controller/scene/ai_controller.tscn" id="3_5s4gd"]
 
 [node name="PlayersContainer" type="Node"]
 script = ExtResource("1_doubq")

@@ -9,14 +9,12 @@
 
 [node name="Main" type="Node2D"]
 
-[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "backgorund", "foreground", "players_container", "ai_controller", "player_controller") instance=ExtResource("1_xkbyp")]
+[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "backgorund", "foreground", "players_container") instance=ExtResource("1_xkbyp")]
 deck = NodePath("Deck")
 discard_pile = NodePath("DiscardPile")
 backgorund = NodePath("Background")
 foreground = NodePath("Foreground")
 players_container = NodePath("PlayerContainer")
-ai_controller = NodePath("")
-player_controller = NodePath("")
 
 [node name="Background" parent="GameManager" instance=ExtResource("2_lx3aj")]
 
