@@ -5,6 +5,7 @@ extends Node2D
 ## Sus propiedades incluyen identificadores, tipo, color, símbolo, efectos y estados.
 ## También contiene referencias a sus nodos hijos para la representación visual y la interacción.
 
+
 # --- Export Variables ---
 @export_group("References")
 ## Textura de la cara frontal de la carta.
@@ -44,7 +45,6 @@ var is_played: bool = false
 var is_effect_used: bool = false
 
 
-# --- Public Functions ---
 ## Se encarga de inicializar el color de la carta
 func set_card_color(color_name: String) -> void:
 	values.target_color = _COLOR_MAP[color_name]

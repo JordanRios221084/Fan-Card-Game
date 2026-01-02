@@ -1,5 +1,5 @@
 class_name Controller
-extends Node
+extends Node2D
 ## Clase base para los controladores del juego.
 
 ## Verifica si una carta IA es válida para jugar.

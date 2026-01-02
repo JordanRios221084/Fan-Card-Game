@@ -4,20 +4,14 @@ extends Node2D
 
 
 # --- Constants ---
-## Define el ancho de cada carta en la mano.
-const CARD_WIDTH: float = 40.0 
-## Define la rotación estándar de las cartas en la mano.
-const CARD_ROTATION: float = 0.0 
-## Define el desplazamiento al separar cartas.
-const SEPARATION_OFFSET: float = 20.0 
-## Define el tamaño máximo de la mano.
-const MAX_HAND_SIZE: int = 10 
-## Define el punto central para posicionar cartas.
-const CENTER_POINT: float = 0.0
-## Tiempo estándar para mover cartas.
-const MOVE_TIME_SECONDS: float = 0.4
-## Tiempo objetivo para sincronizar estados.
-const WAIT_TIME_SECONDS: float = 0.25
+const CARD_WIDTH: float = 40.0 ## Define el ancho de cada carta en la mano.
+const CARD_ROTATION: float = 0.0 ## Define la rotación estándar de las cartas en la mano.
+const SEPARATION_OFFSET: float = 20.0 ## Define el desplazamiento al separar cartas.
+const MAX_HAND_SIZE: int = 10 ## Define el tamaño máximo de la mano.
+const CENTER_POINT: float = 0.0 ## Define el punto central para posicionar cartas.
+const MOVE_TIME_SECONDS: float = 0.4 ## Tiempo estándar para mover cartas.
+const WAIT_TIME_SECONDS: float = 0.25 ## Tiempo objetivo para sincronizar estados.
+
 ## Pesos de los colores para el ordenamiento.
 const COLOR_WEIGHTS: Dictionary = {
 	"red": 0, 
@@ -48,7 +42,7 @@ func collapse_cards(hand: Array[Card]) -> void:
 	auto_sort_cards = true # Activar el auto-ordenamiento
 
 
-## Calcula y actualiza las posiciones de las cartas en la mano del jugador.
+## Calcula y actualiza las posiciones de las cartas en la mano dada del jugador.
 func allign_cards(hand: Array[Card]) -> void:
 	var hand_size: int = hand.size()
 	if hand_size == 0:

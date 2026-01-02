@@ -208,6 +208,10 @@ func _change_state(new_state: GameState) -> void:
 			# Habilitar interacción visual del jugador actual
 			for card: Card in current_player.current_hand:
 				CardManager.set_card_opacity(card, true)
+			
+			if current_player.is_human:
+				for card: Card in current_player.current_hand:
+					card.collision_shape.disabled = false
 
 			# Procesar el turno del jugador actual
 			await current_player.self_cotroller.try_to_process_turn()
@@ -279,16 +283,20 @@ func _draw_a_card(target_player: Player, card_quantity: int, forced: bool, draw_
 func _on_discard_pile_first_card_discarded(card: Card) -> void:
 	deck.recover_card(card)
 
+
 func _on_controller_play_card(card: Card, player: Player) -> void:
 	_attempt_to_play(card, player)
 
+
 func _on_controller_draw_card(player: Player) -> void:
 	_draw_a_card(player, 1, false, 0.5)
+
 
 func _on_controller_check_card(card: Card) -> void:
 	if _is_valid_card(card):
 		var ai_controller: AIController = current_player.self_cotroller as AIController
 		ai_controller.add_valid_card(card)
+
 
 func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> void:
 	var forced: bool = true

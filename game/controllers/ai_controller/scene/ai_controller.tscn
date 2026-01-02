@@ -2,5 +2,6 @@
 
 [ext_resource type="Script" uid="uid://cpwmjxrgtw0rb" path="res://game/controllers/ai_controller/script/ai_controller.gd" id="1_agumj"]
 
-[node name="AIController" type="Node"]
+[node name="AIController" type="Node2D"]
 script = ExtResource("1_agumj")
+metadata/_custom_type_script = "uid://dxrlpdi4rbp02"
