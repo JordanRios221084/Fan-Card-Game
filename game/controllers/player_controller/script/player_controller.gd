@@ -2,17 +2,42 @@ class_name PlayerController
 extends Controller
 ## Contiene la lógica para controlar el comportamiento de los jugadores humanos durante el juego.
 
-var current_hovered_card: Card = null
+
+# --- Enums ---
+## Contiene los estados de hover para las cartas del jugador.
+enum HOVER_STATES {
+    NONE,
+    HOVERING_CARD,
+}
+
+# --- Private Variables ---
+var _current_hover_state: HOVER_STATES = HOVER_STATES.NONE
+
 
 # --- Engine Functions ---
 func _input(event: InputEvent) -> void:
-    var mouse_motion: InputEventMouseMotion
-
-    if event is InputEventMouseMotion:
-        mouse_motion = event
+    if not event is InputEventMouseButton:
+        return
     
-    if mouse_motion:
-        _process_node_hover(_mouse_raycast())
+    var mouse_event: InputEventMouseButton = event as InputEventMouseButton
+    if not mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
+        return
+    
+
+    var node_under_mouse: Node2D = _mouse_raycast()
+    if node_under_mouse and node_under_mouse is Card:
+        var card_under_mouse: Card = node_under_mouse as Card
+        check_card.emit(card_under_mouse)
+    
+        if is_valid_card:
+            play_card.emit(card_under_mouse, _player)
+            is_valid_card = false
+
+            turn_ended.emit()
+    
+    if node_under_mouse and node_under_mouse is Deck:
+        draw_card.emit(_player)
+        await game_manager.draw_card_finished
 
 
 # --- Public Functions ---
@@ -23,13 +48,13 @@ func try_to_process_turn() -> void:
     if not _player:
         return
         
-    await _process_turn()
-
+    _process_turn()
 
 
 # --- Private Functions ---
 func _process_turn() -> void:
-    await get_tree().create_timer(100).timeout
+    print("Procesando el turno del jugador: ", _player)
+    pass
 
 
 ## Devuelve el nodo 2d que está debajo del mouse
@@ -41,42 +66,58 @@ func _mouse_raycast() -> Node2D:
     raycast_parameters.collide_with_areas = true
 
     var result: Array = space_state.intersect_point(raycast_parameters)
-
-    # Si no hay resultados entonces retornamos null
     if result.is_empty():
         return null
 
-    var node_found: Node2D = (result[0].collider as Area2D).get_parent()
+    var node_found: Node2D
+    if (result[0].collider as Area2D).get_parent() is Card:
+        node_found = _get_highest_z_index_card(result)
+    else:
+        node_found = (result[0].collider as Area2D).get_parent() as Node2D
 
     return node_found
 
 
-func _process_node_hover(node: Node2D) -> void:
-    var card_found: Card
-    if node is Card:
-        card_found = node
-    
-    if not card_found:
-        return
+## Devuelve la carta con el índice Z más alto de una lista de resultados de intersección.
+func _get_highest_z_index_card(result: Array) -> Card:
+    var highest_z_index_card: Node2D = (result[0].collider as Area2D).get_parent()
+    var highest_z_index: int = highest_z_index_card.z_index
 
-    if card_found == current_hovered_card:
-        return
-    
-    _change_hover_state(card_found)
-    current_hovered_card = card_found
+    for i: int in range(1, result.size()):
+        var current_card: Card = (result[i].collider as Area2D).get_parent() as Card
+
+        if current_card.z_index > highest_z_index:
+            highest_z_index_card = current_card
+            highest_z_index = current_card.z_index
+
+    return highest_z_index_card
 
 
-
-func _change_hover_state(card: Card) -> void:
-    if not card:
-        return
-    
-    match card.is_selected:
-        true:
-            card.is_selected = false
-            CardManager.move_card_to_position(card, Vector2(card.position.x, 150), 0.25, 0.0)
+# --- Private Functions ---
+func _highlight_card(card: Card, highlight: bool) -> void:
+    match highlight:
+        true: 
+            card.is_selected = highlight
+            card.z_index = 1
         false:
-            card.is_selected = true
-            CardManager.move_card_to_position(card, Vector2(card.position.x, -150), 0.25, 0.0)
+            card.is_selected = highlight
+            card.z_index = 0
     
-    _player.cards_container.allign_cards(_player.current_hand)
+    _player.cards_container.allign_cards()
+
+
+# --- Signal Handlers ---
+func _on_card_mouse_entered_card(card: Card) -> void:
+    if _current_hover_state == HOVER_STATES.NONE:
+        _current_hover_state = HOVER_STATES.HOVERING_CARD
+        _highlight_card(card, true)
+
+
+func _on_card_mouse_exited_card(card: Card) -> void:
+    _highlight_card(card, false)
+
+    var new_card_under_mouse: Card = _mouse_raycast()
+    if new_card_under_mouse and new_card_under_mouse is Card:
+        _highlight_card(new_card_under_mouse, true)
+    else:
+        _current_hover_state = HOVER_STATES.NONE

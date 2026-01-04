@@ -26,14 +26,17 @@ const _WAIT_TIME_SECONDS: float = 0.25
 @export var self_cotroller: Controller
 
 
-# --- Public Variables ---
-## Arreglo que contiene las cartas en la mano del jugador.
-var current_hand: Array[Card] = []
-
-
 # --- Engine Functions ---
 func _ready() -> void:
 	self_cotroller.set_player(self)
+
+	if self_cotroller is PlayerController:
+		is_human = true
+		var player_controller: PlayerController = self_cotroller as PlayerController
+		cards_container.card_selected.connect(player_controller._on_card_mouse_entered_card)
+		cards_container.card_deselected.connect(player_controller._on_card_mouse_exited_card)
+	else:
+		is_human = false
 
 
 # --- Public Functions ---
@@ -41,23 +44,21 @@ func _ready() -> void:
 ## Si el jugador es humano, reproduce una animación de voltear la carta. [br]
 ## Si es el turno del jugador, ordena las cartas automáticamente.
 func add_card_to_hand(new_card: Card) -> void:
-	new_card.reparent(cards_container)
-
-	current_hand.append(new_card)
-	new_card.current_parent = cards_container
+	cards_container.insert_card_to_hand(new_card, is_turn)
 	
 	if is_human or show_cards:
 		new_card.card_animator.play("flip_card")
 	
 	if cards_container.auto_sort_cards:
-		cards_container.sort_cards(current_hand)
+		cards_container.sort_cards()
 	
-	cards_container.allign_cards(current_hand)
+	cards_container.allign_cards()
 	
 	await get_tree().create_timer(_WAIT_TIME_SECONDS).timeout
 
 
-## Elimina una carta de la mano del jugador y actualiza la posición de las cartas restantes.
+## Elimina una carta de la mano del jugador y actualiza la posición de las cartas restantes. [br]
+## [Param card_to_play]: Carta que se va a eliminar de la mano.
 func play_a_card(card_to_play: Card) -> void:
-	current_hand.erase(card_to_play)
-	cards_container.allign_cards(current_hand)
+	cards_container.current_hand.erase(card_to_play)
+	cards_container.allign_cards()

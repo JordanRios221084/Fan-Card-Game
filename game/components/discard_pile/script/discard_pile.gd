@@ -6,7 +6,7 @@ extends Node2D
 ## animaciones relacionadas con el descarte de cartas.
 
 # --- Signals ---
-signal first_card_discarded(card: Card)
+signal first_card_discarded(card: Card) ## Se emite cuando la primera carta es descartada del montón.
 
 # --- Private Constants ---
 ## Límites de desplazamiento en grados.
@@ -62,4 +62,6 @@ func receive_card(new_card: Card, origin: Node) -> void:
 	_discard_position += random_offset
 
 	print("Tiempo N°3 de espera: ", _MOVE_TIME_SECONDS)
+	CardManager.set_card_opacity(new_card, true)
+	new_card.collision_shape.disabled = true
 	await CardManager.move_card_to_position(new_card, _discard_position, _MOVE_TIME_SECONDS, random_rotation)

@@ -17,6 +17,8 @@ foreground = NodePath("Foreground")
 players_container = NodePath("PlayerContainer")
 
 [node name="Background" parent="GameManager" instance=ExtResource("2_lx3aj")]
+mouse_filter = 2
+mouse_behavior_recursive = 1
 
 [node name="Deck" parent="GameManager" instance=ExtResource("3_itumj")]
 position = Vector2(75, 80)
@@ -28,5 +30,7 @@ position = Vector2(640, 360)
 [node name="PlayerContainer" parent="GameManager" instance=ExtResource("5_ioaqv")]
 
 [node name="Foreground" parent="GameManager" instance=ExtResource("8_frwyw")]
+mouse_filter = 2
+mouse_behavior_recursive = 1
 
 [connection signal="first_card_discarded" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_first_card_discarded"]

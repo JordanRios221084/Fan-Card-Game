@@ -11,6 +11,9 @@ signal play_card(card: Card, player: Player)
 ## Solicita que el jugador IA robe una carta.
 @warning_ignore("unused_signal")
 signal draw_card(player: Player)
+## Señal emitida cuando el turno del jugador ha terminado.
+@warning_ignore("unused_signal")
+signal turn_ended
 
 # --- Exports ---
 @export_group("References")
@@ -18,6 +21,10 @@ signal draw_card(player: Player)
 @export var game_manager: GameManager
 
 # --- Public Variables ---
+## Indica si la carta verificada es válida para jugar.
+var is_valid_card: bool
+
+# --- Private Variables ---
 ## Referencia al jugador actual cuyo turno se está procesando.
 ## Se debe asignar antes de llamar a try_to_process_turn().
 var _player: Player
@@ -42,11 +49,4 @@ func try_to_process_turn() -> void:
 ## Procesa el turno del jugador actual.
 func _process_turn() -> void:
 	await get_tree().create_timer(0.1).timeout
-	pass
-
-
-## Verifica las cartas actuales en la mano del jugador. [br]
-## Si [param already_drawning] es verdadero, espera a que el jugador termine de robar antes de verificar.
-func _check_current_cards(already_drawning: bool) -> void:
-	print(already_drawning)
 	pass

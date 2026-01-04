@@ -39,14 +39,15 @@ func _process_turn() -> void:
 	print("Tiempo N°1 de espera: ", random_wait_time * _MULTIPLIER_TIME)
 	await get_tree().create_timer(random_wait_time * _MULTIPLIER_TIME).timeout
 
-	await _check_current_cards(false)
+	await _check_current_cards()
 
 	print("Tiempo N°3 de espera: ", random_wait_time / _DIVIDER_TIME)
 	await get_tree().create_timer(random_wait_time / _DIVIDER_TIME).timeout
 	
 	if _valid_cards.is_empty():
 		draw_card.emit(_player)
-		await _check_current_cards(true)
+		await  game_manager.draw_card_finished
+		await _check_current_cards()
 	
 	if _valid_cards.size() > 0:
 		var ai_found_card: Card = _valid_cards.pick_random()
@@ -55,15 +56,14 @@ func _process_turn() -> void:
 	_clear_variables()
 
 
-func _check_current_cards(already_drawning: bool) -> void:
-	if already_drawning:
-		print("Esperando a que el jugador IA termine de robar...")
-		await game_manager.draw_card_finished
-
+func _check_current_cards() -> void:
 	_valid_cards.clear()
 
-	for card: Card in _player.current_hand:
+	for card: Card in _player.cards_container.current_hand:
 		check_card.emit(card)
+		if is_valid_card:
+			_valid_cards.append(card)
+			is_valid_card = false
 	
 	print("Tiempo N°2 de espera: ", _WAIT_TIME_SECONDS.x)
 	await get_tree().create_timer(0.1).timeout
@@ -73,3 +73,4 @@ func _check_current_cards(already_drawning: bool) -> void:
 ## Reinicia el jugador actual y la lista de cartas para el siguiente turno.
 func _clear_variables() -> void:
 	_valid_cards.clear()
+	turn_ended.emit()

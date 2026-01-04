@@ -38,6 +38,7 @@ func draw_card() -> Card:
 	var new_card: Card = _build_card(card_drawn_data, card_sprite_path)
 
 	add_child(new_card)
+	CardManager.set_card_opacity(new_card, false)
 
 	return new_card
 

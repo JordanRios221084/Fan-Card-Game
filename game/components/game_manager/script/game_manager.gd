@@ -6,8 +6,7 @@ extends Node
 ## También maneja la transición entre diferentes estados del juego y la aplicación de efectos de cartas.
 
 # --- Signals ---
-## Señal emitida cuando un jugador termina de robar cartas.
-signal draw_card_finished
+signal draw_card_finished ## Señal emitida cuando un jugador termina de robar cartas.
 
 # --- Enums ---
 ## Define los posibles estados del juego.
@@ -103,7 +102,7 @@ func _start_game() -> void:
 	await get_tree().create_timer(0.5).timeout
 
 	for player: Player in all_players:
-		player.cards_container.collapse_cards(player.current_hand)
+		player.cards_container.collapse_cards()
 
 	await get_tree().create_timer(0.5).timeout
 
@@ -193,9 +192,6 @@ func _change_state(new_state: GameState) -> void:
 			
 		GameState.CHANGE_TURN:
 			print("$$$ CAMBIANDO TURNO $$$\n")
-			
-			for card: Card in current_player.current_hand:
-				CardManager.set_card_opacity(card, false)
 
 			_change_current_player_turn()
 
@@ -205,19 +201,18 @@ func _change_state(new_state: GameState) -> void:
 			print("¡¡¡ JUGADOR %s JUGANDO !!!\n" % current_player.name)
 			var transition_time_seconds: float = 0.2
 			
-			# Habilitar interacción visual del jugador actual
-			for card: Card in current_player.current_hand:
-				CardManager.set_card_opacity(card, true)
-			
-			if current_player.is_human:
-				for card: Card in current_player.current_hand:
-					card.collision_shape.disabled = false
+			_set_cards_state(true)
 
 			# Procesar el turno del jugador actual
-			await current_player.self_cotroller.try_to_process_turn()
+			current_player.self_cotroller.try_to_process_turn()
+			if current_player.is_human:
+				deck.deck_collision_shape.disabled = false
+
+			await current_player.self_cotroller.turn_ended
+
+			_set_cards_state(false)
 
 			await get_tree().create_timer(transition_time_seconds).timeout
-
 			_change_state(GameState.APPLY_EFFECTS)
 			
 		GameState.GAME_ENDED:
@@ -244,11 +239,7 @@ func _is_valid_card(card_to_validate: Card) -> bool:
 ## Intenta jugar una carta para un jugador dado. [br]
 ## - [param target_card]: Carta que el jugador intenta jugar. [br]
 ## - [param target_player]: Jugador que intenta jugar la carta. [br]
-func _attempt_to_play(target_card: Card, target_player: Player) -> void:
-	if not _is_valid_card(target_card):
-		target_card.card_animator.play("invalid_card")
-		return
-	
+func _play_a_card(target_card: Card, target_player: Player) -> void:
 	target_player.play_a_card(target_card)
 	
 	await discard_pile.receive_card(target_card, target_player)
@@ -260,24 +251,50 @@ func _attempt_to_play(target_card: Card, target_player: Player) -> void:
 ## - [param forced]: Si es true, robará todo. Si es false, se detiene al encontrar una válida. [br]
 ## - [param draw_speed]: Tiempo de espera entre robos.
 func _draw_a_card(target_player: Player, card_quantity: int, forced: bool, draw_speed: float) -> void:
-	for i: int in card_quantity:
-		var new_card: Card = deck.draw_card()
-		
-		await target_player.add_card_to_hand(new_card) 
-		
-		for card: Card in current_player.current_hand:
-			CardManager.set_card_opacity(card, true)
-		
-		print("Tiempo opcional de espera: ", draw_speed)
-		await get_tree().create_timer(draw_speed).timeout
+	deck.deck_collision_shape.disabled = true
 
-		if not forced:
+	if forced:
+		for i: int in card_quantity:
+			var new_card: Card = deck.draw_card()
+			
+			await target_player.add_card_to_hand(new_card)
+			await get_tree().create_timer(draw_speed).timeout
+	else:
+		var stop_drawing: bool = false
+
+		while not stop_drawing:
+			var new_card: Card = deck.draw_card()
+			if current_player.is_human and current_player.is_turn:
+				new_card.collision_shape.disabled = false
+			
+			await target_player.add_card_to_hand(new_card)
+			await get_tree().create_timer(draw_speed).timeout
+
 			if _is_valid_card(new_card):
-				break
+				stop_drawing = true
 
 	# Emitimos la señal de robo finalizado
 	draw_card_finished.emit()
 
+
+## Marca la carta como válida en el controlador del jugador actual.
+func _check_player_controller() -> void:
+	if current_player.is_human:
+		var player_controller: PlayerController = current_player.self_cotroller as PlayerController
+		player_controller.is_valid_card = true
+	
+	if not current_player.is_human:
+		var ai_controller: AIController = current_player.self_cotroller as AIController
+		ai_controller.is_valid_card = true
+
+
+func _set_cards_state(enabled: bool) -> void:
+	# Deshabilitar interacción visual del jugador actual
+	for card: Card in current_player.cards_container.current_hand:
+		CardManager.set_card_opacity(card, enabled)
+	
+		if current_player.is_human:
+			card.collision_shape.disabled = not enabled
 
 # --- Signal Callbacks ---
 func _on_discard_pile_first_card_discarded(card: Card) -> void:
@@ -285,17 +302,20 @@ func _on_discard_pile_first_card_discarded(card: Card) -> void:
 
 
 func _on_controller_play_card(card: Card, player: Player) -> void:
-	_attempt_to_play(card, player)
+	_play_a_card(card, player)
 
 
 func _on_controller_draw_card(player: Player) -> void:
-	_draw_a_card(player, 1, false, 0.5)
+	_draw_a_card(player, 0, false, 0.5)
 
 
 func _on_controller_check_card(card: Card) -> void:
-	if _is_valid_card(card):
-		var ai_controller: AIController = current_player.self_cotroller as AIController
-		ai_controller.add_valid_card(card)
+	if not _is_valid_card(card):
+		if current_player.is_human:
+			card.card_animator.play("invalid_card")
+		return
+	
+	_check_player_controller()
 
 
 func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> void:

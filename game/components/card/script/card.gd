@@ -6,6 +6,11 @@ extends Node2D
 ## También contiene referencias a sus nodos hijos para la representación visual y la interacción.
 
 
+# --- Signals ---
+signal mouse_on_card(card: Card)
+signal mouse_off_card(card: Card)
+
+
 # --- Export Variables ---
 @export_group("References")
 ## Textura de la cara frontal de la carta.
@@ -54,3 +59,11 @@ func set_card_color(color_name: String) -> void:
 		var temp_shader_material: ShaderMaterial = front_sprite.material.duplicate() as ShaderMaterial
 		temp_shader_material.set_shader_parameter("target_color", values.target_color)
 		front_sprite.material = temp_shader_material
+
+
+func _on_area_2d_mouse_entered() -> void:
+	mouse_on_card.emit(self)
+
+
+func _on_area_2d_mouse_exited() -> void:
+	mouse_off_card.emit(self)

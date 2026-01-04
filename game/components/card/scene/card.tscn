@@ -56,7 +56,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("FrontSprite:scale")
+tracks/0/path = NodePath("Sprites/FrontSprite:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -68,7 +68,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("FrontSprite:z_index")
+tracks/1/path = NodePath("Sprites/FrontSprite:z_index")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -80,7 +80,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("BackSprite:scale")
+tracks/2/path = NodePath("Sprites/BackSprite:scale")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -92,7 +92,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("BackSprite:z_index")
+tracks/3/path = NodePath("Sprites/BackSprite:z_index")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -104,7 +104,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("OpacitySprite:scale")
+tracks/4/path = NodePath("Sprites/OpacitySprite:scale")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -116,19 +116,19 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("FrontSprite:rotation")
+tracks/5/path = NodePath("Sprites/OpacitySprite:modulate")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [0.0]
+"values": [Color(0, 0, 0, 0.2509804)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("BackSprite:rotation")
+tracks/6/path = NodePath("Sprites:rotation")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -137,30 +137,6 @@ tracks/6/keys = {
 "update": 0,
 "values": [0.0]
 }
-tracks/7/type = "value"
-tracks/7/imported = false
-tracks/7/enabled = true
-tracks/7/path = NodePath("OpacitySprite:rotation")
-tracks/7/interp = 1
-tracks/7/loop_wrap = true
-tracks/7/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0.0]
-}
-tracks/8/type = "value"
-tracks/8/imported = false
-tracks/8/enabled = true
-tracks/8/path = NodePath("OpacitySprite:modulate")
-tracks/8/interp = 1
-tracks/8/loop_wrap = true
-tracks/8/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(0, 0, 0, 0.2509804)]
-}
 
 [sub_resource type="Animation" id="Animation_kg30u"]
 resource_name = "flip_card"
@@ -168,7 +144,7 @@ length = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("FrontSprite:scale")
+tracks/0/path = NodePath("Sprites/FrontSprite:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -180,7 +156,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("FrontSprite:z_index")
+tracks/1/path = NodePath("Sprites/FrontSprite:z_index")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -192,7 +168,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("BackSprite:scale")
+tracks/2/path = NodePath("Sprites/BackSprite:scale")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -204,7 +180,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("BackSprite:z_index")
+tracks/3/path = NodePath("Sprites/BackSprite:z_index")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -216,7 +192,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("OpacitySprite:scale")
+tracks/4/path = NodePath("Sprites/OpacitySprite:scale")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -232,7 +208,7 @@ length = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("FrontSprite:scale")
+tracks/0/path = NodePath("Sprites/FrontSprite:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -244,7 +220,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("FrontSprite:z_index")
+tracks/1/path = NodePath("Sprites/FrontSprite:z_index")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -256,7 +232,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("BackSprite:scale")
+tracks/2/path = NodePath("Sprites/BackSprite:scale")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -268,7 +244,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("BackSprite:z_index")
+tracks/3/path = NodePath("Sprites/BackSprite:z_index")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -280,7 +256,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("OpacitySprite:scale")
+tracks/4/path = NodePath("Sprites/OpacitySprite:scale")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -296,19 +272,19 @@ length = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("FrontSprite:rotation")
+tracks/0/path = NodePath("Sprites/OpacitySprite:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 0.43633232, 0.0, -0.43633232, 0.0, 0.43633232, 0.0]
+"values": [Color(1, 0, 0, 1), Color(0, 0, 0, 0)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("BackSprite:rotation")
+tracks/1/path = NodePath("Sprites:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -316,30 +292,6 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [0.0, 0.43633232, 0.0, -0.43633232, 0.0, 0.43633232, 0.0]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("OpacitySprite:rotation")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [0.0, 0.43633232, 0.0, -0.43633232, 0.0, 0.43633232, 0.0]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("OpacitySprite:modulate")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.3),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 0, 0, 1), Color(0, 0, 0, 0.2509804)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_6ligt"]
@@ -352,25 +304,27 @@ _data = {
 
 [node name="Card" type="Node2D" node_paths=PackedStringArray("front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "card_animator")]
 script = ExtResource("1_kg30u")
-front_sprite = NodePath("FrontSprite")
-back_sprite = NodePath("BackSprite")
-opacity_sprite = NodePath("OpacitySprite")
+front_sprite = NodePath("Sprites/FrontSprite")
+back_sprite = NodePath("Sprites/BackSprite")
+opacity_sprite = NodePath("Sprites/OpacitySprite")
 collision_shape = NodePath("Area2D/CollisionShape2D")
 card_animator = NodePath("AnimationPlayer")
 
-[node name="Shadow" type="Sprite2D" parent="."]
+[node name="Sprites" type="Node2D" parent="."]
+
+[node name="Shadow" type="Sprite2D" parent="Sprites"]
 material = SubResource("ShaderMaterial_2ufkr")
 texture = ExtResource("3_sy11y")
 
-[node name="FrontSprite" type="Sprite2D" parent="."]
+[node name="FrontSprite" type="Sprite2D" parent="Sprites"]
 z_index = -1
 material = SubResource("ShaderMaterial_sy11y")
 texture = ExtResource("1_ktuci")
 
-[node name="BackSprite" type="Sprite2D" parent="."]
+[node name="BackSprite" type="Sprite2D" parent="Sprites"]
 texture = ExtResource("2_kg30u")
 
-[node name="OpacitySprite" type="Sprite2D" parent="."]
+[node name="OpacitySprite" type="Sprite2D" parent="Sprites"]
 modulate = Color(0, 0, 0, 0.2509804)
 texture = ExtResource("3_sy11y")
 
@@ -384,3 +338,6 @@ disabled = true
 libraries = {
 &"": SubResource("AnimationLibrary_6ligt")
 }
+
+[connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]
