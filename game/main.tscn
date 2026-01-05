@@ -33,4 +33,5 @@ position = Vector2(640, 360)
 mouse_filter = 2
 mouse_behavior_recursive = 1
 
+[connection signal="card_played" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_card_played"]
 [connection signal="first_card_discarded" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_first_card_discarded"]

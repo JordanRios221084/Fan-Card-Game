@@ -13,6 +13,8 @@ signal mouse_off_card(card: Card)
 
 # --- Export Variables ---
 @export_group("References")
+## Contiene los sprites de la carta.
+@export var sprites: Node2D
 ## Textura de la cara frontal de la carta.
 @export var front_sprite: Sprite2D
 ## Textura de la cara trasera de la carta.

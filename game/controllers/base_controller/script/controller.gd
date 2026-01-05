@@ -11,18 +11,11 @@ signal play_card(card: Card, player: Player)
 ## Solicita que el jugador IA robe una carta.
 @warning_ignore("unused_signal")
 signal draw_card(player: Player)
-## Señal emitida cuando el turno del jugador ha terminado.
-@warning_ignore("unused_signal")
-signal turn_ended
 
 # --- Exports ---
 @export_group("References")
 ## Referencia al [GameManager] para manejar el estado del juego.
 @export var game_manager: GameManager
-
-# --- Public Variables ---
-## Indica si la carta verificada es válida para jugar.
-var is_valid_card: bool
 
 # --- Private Variables ---
 ## Referencia al jugador actual cuyo turno se está procesando.

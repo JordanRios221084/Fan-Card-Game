@@ -302,8 +302,9 @@ _data = {
 &"invalid_card": SubResource("Animation_ktuci")
 }
 
-[node name="Card" type="Node2D" node_paths=PackedStringArray("front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "card_animator")]
+[node name="Card" type="Node2D" node_paths=PackedStringArray("sprites", "front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "card_animator")]
 script = ExtResource("1_kg30u")
+sprites = NodePath("Sprites")
 front_sprite = NodePath("Sprites/FrontSprite")
 back_sprite = NodePath("Sprites/BackSprite")
 opacity_sprite = NodePath("Sprites/OpacitySprite")

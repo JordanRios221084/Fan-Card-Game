@@ -61,9 +61,6 @@ func _check_current_cards() -> void:
 
 	for card: Card in _player.cards_container.current_hand:
 		check_card.emit(card)
-		if is_valid_card:
-			_valid_cards.append(card)
-			is_valid_card = false
 	
 	print("Tiempo N°2 de espera: ", _WAIT_TIME_SECONDS.x)
 	await get_tree().create_timer(0.1).timeout
@@ -73,4 +70,3 @@ func _check_current_cards() -> void:
 ## Reinicia el jugador actual y la lista de cartas para el siguiente turno.
 func _clear_variables() -> void:
 	_valid_cards.clear()
-	turn_ended.emit()

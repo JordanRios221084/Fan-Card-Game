@@ -79,14 +79,16 @@ func allign_cards() -> void:
 		if card_selected_index != -1:
 			if card_index < card_selected_index:
 				x_pos -= SEPARATION_OFFSET
+			
 			elif card_index > card_selected_index:
 				if hand_size > MAX_HAND_SIZE +5:
 					x_pos += SEPARATION_OFFSET + hand_size
 				else:
 					x_pos += SEPARATION_OFFSET
+			
 			elif card_index == card_selected_index:
-				y_pos = -20.0
-
+				y_pos = -15.0
+		
 		var final_position: Vector2 = Vector2(x_pos, CENTER_POINT + y_pos)
 		CardManager.move_card_to_position(card, final_position, MOVE_TIME_SECONDS, CARD_ROTATION)
 
@@ -116,13 +118,13 @@ func sort_cards() -> void:
 		move_child(card, -1)
 
 
-func insert_card_to_hand(new_card: Card, is_turn: bool) -> void:
-	if is_turn:
-		CardManager.set_card_opacity(new_card, true)
-	
+func insert_card_to_hand(new_card: Card) -> void:
 	new_card.reparent(self)
 	current_hand.append(new_card)
 	new_card.current_parent = self
+
+	if auto_sort_cards:
+		sort_cards()
 
 	new_card.mouse_on_card.connect(_on_card_mouse_entered_card)
 	new_card.mouse_off_card.connect(_on_card_mouse_exited_card)

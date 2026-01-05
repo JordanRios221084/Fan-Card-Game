@@ -44,13 +44,16 @@ func _ready() -> void:
 ## Si el jugador es humano, reproduce una animación de voltear la carta. [br]
 ## Si es el turno del jugador, ordena las cartas automáticamente.
 func add_card_to_hand(new_card: Card) -> void:
-	cards_container.insert_card_to_hand(new_card, is_turn)
+	cards_container.insert_card_to_hand(new_card)
+
+	if is_turn:
+		CardManager.set_card_opacity(new_card, true)
 	
-	if is_human or show_cards:
+	if is_turn and is_human:
+		new_card.collision_shape.disabled = false
+
+	if show_cards:
 		new_card.card_animator.play("flip_card")
-	
-	if cards_container.auto_sort_cards:
-		cards_container.sort_cards()
 	
 	cards_container.allign_cards()
 	

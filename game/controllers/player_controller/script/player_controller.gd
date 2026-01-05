@@ -11,11 +11,17 @@ enum HOVER_STATES {
 }
 
 # --- Private Variables ---
+## Estado actual de hover del jugador.
 var _current_hover_state: HOVER_STATES = HOVER_STATES.NONE
+## Indica si el controlador está deshabilitado.
+var _enabled: bool = false
 
 
 # --- Engine Functions ---
 func _input(event: InputEvent) -> void:
+    if not _enabled:
+        return
+    
     if not event is InputEventMouseButton:
         return
     
@@ -23,17 +29,12 @@ func _input(event: InputEvent) -> void:
     if not mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
         return
     
-
     var node_under_mouse: Node2D = _mouse_raycast()
+
     if node_under_mouse and node_under_mouse is Card:
         var card_under_mouse: Card = node_under_mouse as Card
         check_card.emit(card_under_mouse)
-    
-        if is_valid_card:
-            play_card.emit(card_under_mouse, _player)
-            is_valid_card = false
-
-            turn_ended.emit()
+        _enabled = false
     
     if node_under_mouse and node_under_mouse is Deck:
         draw_card.emit(_player)
@@ -54,6 +55,7 @@ func try_to_process_turn() -> void:
 # --- Private Functions ---
 func _process_turn() -> void:
     print("Procesando el turno del jugador: ", _player)
+    _enabled = true
     pass
 
 
@@ -116,7 +118,7 @@ func _on_card_mouse_entered_card(card: Card) -> void:
 func _on_card_mouse_exited_card(card: Card) -> void:
     _highlight_card(card, false)
 
-    var new_card_under_mouse: Card = _mouse_raycast()
+    var new_card_under_mouse: Card = _mouse_raycast() as Card
     if new_card_under_mouse and new_card_under_mouse is Card:
         _highlight_card(new_card_under_mouse, true)
     else:

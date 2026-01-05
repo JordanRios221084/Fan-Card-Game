@@ -7,6 +7,7 @@ extends Node2D
 
 # --- Signals ---
 signal first_card_discarded(card: Card) ## Se emite cuando la primera carta es descartada del montón.
+signal card_played ## Se emite cuando una carta es jugada en el montón de descarte.
 
 # --- Private Constants ---
 ## Límites de desplazamiento en grados.
@@ -47,6 +48,9 @@ func receive_card(new_card: Card, origin: Node) -> void:
 	
 	if origin is Player and not (origin as Player).is_human:
 		new_card.card_animator.play("flip_card")
+
+	if origin is Player:
+		card_played.emit()
 
 	if _discarded_cards.size() > 5:
 		first_card_discarded.emit(_discarded_cards[0])
