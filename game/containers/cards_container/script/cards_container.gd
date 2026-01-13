@@ -14,7 +14,7 @@ const CARD_ROTATION: float = 0.0 ## Define la rotación estándar de las cartas 
 const SEPARATION_OFFSET: float = 20.0 ## Define el desplazamiento al separar cartas.
 const MAX_HAND_SIZE: int = 10 ## Define el tamaño máximo de la mano.
 const CENTER_POINT: float = 0.0 ## Define el punto central para posicionar cartas.
-const MOVE_TIME_SECONDS: float = 0.4 ## Tiempo estándar para mover cartas.
+const MOVE_TIME_SECONDS: float = 0.3 ## Tiempo estándar para mover cartas.
 const WAIT_TIME_SECONDS: float = 0.25 ## Tiempo objetivo para sincronizar estados.
 
 ## Pesos de los colores para el ordenamiento.
@@ -85,10 +85,10 @@ func allign_cards() -> void:
 					x_pos += SEPARATION_OFFSET + hand_size
 				else:
 					x_pos += SEPARATION_OFFSET
-			
-			elif card_index == card_selected_index:
-				y_pos = -15.0
-		
+
+		if card_index == card_selected_index:
+			continue
+
 		var final_position: Vector2 = Vector2(x_pos, CENTER_POINT + y_pos)
 		CardManager.move_card_to_position(card, final_position, MOVE_TIME_SECONDS, CARD_ROTATION)
 

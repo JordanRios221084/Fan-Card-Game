@@ -95,27 +95,31 @@ func _start_effect_manager() -> void:
 
 ## Inicia el juego repartiendo cartas y configurando el estado inicial.
 func _start_game() -> void:
-	await get_tree().create_timer(0.5).timeout
+	var wait_time_sec: float = 0.5
+	var medium_opacity: float = 0.75
+
+	await get_tree().create_timer(wait_time_sec).timeout
 
 	# Repartir 7 cartas a cada jugador
 	for i: int in range(7):
 		for player: Player in all_players:
 			var card: Card = deck.draw_card()
-			await player.add_card_to_hand(card)
+			player.add_card_to_hand(card)
+			await get_tree().create_timer(wait_time_sec/4).timeout
 	
-	await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(wait_time_sec).timeout
 
 	for player: Player in all_players:
 		player.cards_container.collapse_cards()
 
-	await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(wait_time_sec).timeout
 
 	var first_card: Card = deck.draw_card()
 	CardManager.set_card_opacity(first_card, true)
 	await discard_pile.receive_card(first_card, deck)
 	#----------------------------------------------------------------------------
 
-	effect_manager.set_arrows_opacity(0.75)
+	effect_manager.set_arrows_opacity(medium_opacity)
 
 	# Marcar el juego como comenzado
 	_change_state(GameState.GAME_STARTED)
@@ -204,7 +208,9 @@ func _change_state(new_state: GameState) -> void:
 		GameState.PLAYING_CARDS:
 			print("¡¡¡ JUGADOR %s JUGANDO !!!\n" % current_player.name)
 			var transition_time_seconds: float = 0.2
-			
+
+			_reset_uno_state()
+
 			_set_cards_deck_state(true)
 
 			# Procesar el turno del jugador actual
@@ -304,6 +310,26 @@ func _set_cards_deck_state(enabled: bool) -> void:
 			deck.deck_collision_shape.disabled = not enabled
 
 
+
+func _reset_uno_state() -> void:
+	print("--")
+	print("---")
+	print("Estado del jugador actual: ", current_player.has_called_uno)
+	print("---")
+	print("--")
+
+	if not current_player.has_called_uno:
+		return
+
+	if current_player.cards_container.current_hand.is_empty():
+		return
+	
+	if current_player.has_called_uno and _is_valid_card(current_player.cards_container.current_hand[0]):
+		return
+	
+	current_player.has_called_uno = false
+
+
 # --- Signal Callbacks ---
 func _on_discard_pile_first_card_discarded(card: Card) -> void:
 	deck.recover_card(card)
@@ -332,10 +358,6 @@ func _on_controller_check_card(card: Card) -> void:
 		return
 	
 	if current_player.is_human:
-		if CardManager.move_tween.is_valid():
-			_set_cards_deck_state(false)
-			CardManager.kill_move_tween()
-			await get_tree().create_timer(0.1).timeout
 		_play_a_card(card, current_player)
 	else:
 		var ai_controller: AIController = current_player.self_cotroller as AIController
@@ -353,7 +375,6 @@ func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> vo
 func _on_controller_two_cards_left(player: Player) -> void:
 	if not player.is_human:
 		return
-	
 	
 	for card: Card in player.cards_container.current_hand:
 		if _is_valid_card(card):

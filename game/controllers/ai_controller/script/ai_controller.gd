@@ -30,8 +30,8 @@ func add_valid_card(card: Card) -> void:
 
 # --- Private Functions ---
 func _process_turn() -> void:
-	print("-- Jugador IA actual: ", _player, " --")
-	print()
+	if _player.cards_container.current_hand.size() == 2:
+		two_cards_left.emit(_player) # Emite una señal si el jugador tiene 2 cartas
 	
 	var random_wait_time: float = randf_range(_WAIT_TIME_SECONDS.x, _WAIT_TIME_SECONDS.y)
 	random_wait_time = 0.1

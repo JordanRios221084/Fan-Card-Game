@@ -99,13 +99,18 @@ func _get_highest_z_index_card(result: Array) -> Card:
 
 # --- Private Functions ---
 func _highlight_card(card: Card, highlight: bool) -> void:
+    var scale_up: float = 3.15
+    var scale_down: float = 3
+
     match highlight:
         true: 
             card.is_selected = highlight
             card.z_index = 1
+            card.scale = Vector2(scale_up, scale_up)
         false:
             card.is_selected = highlight
             card.z_index = 0
+            card.scale = Vector2(scale_down, scale_down)
     
     _player.cards_container.allign_cards()
 
