@@ -102,6 +102,14 @@ func set_arrows_opacity(opacity: float) -> void:
 	opacity_tween.tween_property(_arrow_indicator, "modulate:a", opacity, timeout)
 
 
+func play_uno_effect(target_player: Player) -> void:
+	var uno_icon: int = 3
+	var play_burst: bool = false
+	var on_player: bool = true
+
+	await _create_ui_effect(0, uno_icon, target_player, play_burst, on_player) # Icono de UNO
+
+
 ## Crea e inicializa el indicador de flechas en la escena.
 func _create_arrow_indicator() -> void:
 	_arrow_indicator = _ARROW_SCENE.instantiate()
@@ -142,7 +150,7 @@ func _apply_draw_effect(target_player: Player, draw_quantity: String) -> void:
 	
 	draw_processed.emit(target_player, amount)
 
-	await _create_ui_effect(amount, draw_icon, target_player, play_burst) # Icono de robar cartas
+	await _create_ui_effect(amount, draw_icon, target_player, play_burst, false) # Icono de robar cartas
 
 
 ## Aplica el efecto de saltar turnos.
@@ -152,7 +160,7 @@ func _apply_skip_effect(new_steps: String, target_player: Player) -> int:
 		var skip_icon: int = 1
 		var play_burst: bool = true
 
-		await _create_ui_effect(0, skip_icon, target_player, play_burst) # Icono de salto
+		await _create_ui_effect(0, skip_icon, target_player, play_burst, false) # Icono de salto
 		
 	return new_steps.to_int()
 
@@ -163,14 +171,14 @@ func _apply_reverse_effect(new_direction: String) -> int:
 	var reverse_icon: int = 2
 	var not_play_burst: bool = false
 
-	await _create_ui_effect(0, reverse_icon, null, not_play_burst) # Icono de reversa
+	await _create_ui_effect(0, reverse_icon, null, not_play_burst, false) # Icono de reversa
 	_background.invert_wave_direction()
 
 	return _game_direction * new_direction.to_int()
 
 
 ## Crea y añade un efecto visual a la escena.
-func _create_ui_effect(value: int, icon: int, target_player: Player, play_burst: bool = false) -> void:
+func _create_ui_effect(value: int, icon: int, target_player: Player, play_burst: bool, on_player: bool) -> void:
 	var visual_effect: UIEffect = _EFFECT_SCENE.instantiate() as UIEffect
 	add_child(visual_effect) # Añadir a la escena
 
@@ -181,6 +189,9 @@ func _create_ui_effect(value: int, icon: int, target_player: Player, play_burst:
 
 	if target_player:
 		visual_effect.reparent(target_player) # Hacer hijo del jugador objetivo
+	
+	if on_player:
+		visual_effect.position = Vector2.ZERO
 
 	# Animaciones de entrada
 	var effect_tween: Tween = create_tween()

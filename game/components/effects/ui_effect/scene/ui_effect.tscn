@@ -1,32 +1,56 @@
-[gd_scene load_steps=13 format=3 uid="uid://7jaeovpr26l0"]
+[gd_scene load_steps=17 format=3 uid="uid://7jaeovpr26l0"]
 
 [ext_resource type="Script" uid="uid://cedthsisrvpmv" path="res://game/components/effects/ui_effect/script/ui_effect.gd" id="1_27sio"]
 [ext_resource type="FontFile" uid="uid://c76kveks4037" path="res://assets/fonts/numbers_font.fnt" id="2_2kuux"]
+[ext_resource type="Shader" uid="uid://yjf3eopb0w12" path="res://assets/shaders/shadows.gdshader" id="3_2kuux"]
 [ext_resource type="Texture2D" uid="uid://dwepi7hm6qs2g" path="res://assets/sprites/extras/visual_icon.png" id="3_i0acw"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_7dyyi"]
-atlas = ExtResource("3_i0acw")
-region = Rect2(0, 0, 20, 16)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2kuux"]
+shader = ExtResource("3_2kuux")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.49803922)
+shader_parameter/shadow_scale = 0.025
+shader_parameter/shadow_min_length = 1.0
+shader_parameter/shadow_max_length = 5.0
+shader_parameter/screen_center = Vector2(640, 360)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_6e7ln"]
-atlas = ExtResource("3_i0acw")
-region = Rect2(20, 0, 20, 16)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_i0acw"]
+shader = ExtResource("3_2kuux")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.49803922)
+shader_parameter/shadow_scale = 0.025
+shader_parameter/shadow_min_length = 1.0
+shader_parameter/shadow_max_length = 5.0
+shader_parameter/screen_center = Vector2(640, 360)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_kkdg7"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_2kuux"]
 atlas = ExtResource("3_i0acw")
-region = Rect2(40, 0, 20, 16)
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i0acw"]
+atlas = ExtResource("3_i0acw")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b1lo0"]
+atlas = ExtResource("3_i0acw")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ra4lu"]
+atlas = ExtResource("3_i0acw")
+region = Rect2(96, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_6uqi0"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_7dyyi")
+"texture": SubResource("AtlasTexture_2kuux")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_6e7ln")
+"texture": SubResource("AtlasTexture_i0acw")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_kkdg7")
+"texture": SubResource("AtlasTexture_b1lo0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ra4lu")
 }],
 "loop": true,
 "name": &"set_icon",
@@ -58,20 +82,22 @@ scale_max = 15.0
 scale_curve = SubResource("CurveTexture_6e7ln")
 alpha_curve = SubResource("CurveTexture_kkdg7")
 
-[node name="UIEffect" type="Node2D" node_paths=PackedStringArray("_effect_label", "_effect_icon_sprite", "_burst_effect")]
+[node name="UIEffect" type="Node2D" node_paths=PackedStringArray("_effect_label", "_effect_label_shadow", "_effect_icon_sprite", "_effect_icon_shadow_sprite", "_burst_effect")]
 script = ExtResource("1_27sio")
 _effect_label = NodePath("Value")
+_effect_label_shadow = NodePath("ShadowValue")
 _effect_icon_sprite = NodePath("Icon")
+_effect_icon_shadow_sprite = NodePath("IconShadow")
 _burst_effect = NodePath("BurstParticles")
 
-[node name="Value" type="Label" parent="."]
+[node name="ShadowValue" type="Label" parent="."]
+material = SubResource("ShaderMaterial_2kuux")
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_top = -10.0
+offset_top = -9.0
 offset_right = 24.0
-offset_bottom = 9.200001
+offset_bottom = 10.200001
 grow_vertical = 2
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 1
 theme_override_fonts/font = ExtResource("2_2kuux")
@@ -80,8 +106,29 @@ text = "99"
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
+[node name="Value" type="Label" parent="."]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = -9.0
+offset_right = 24.0
+offset_bottom = 10.200001
+grow_vertical = 2
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = ExtResource("2_2kuux")
+theme_override_font_sizes/font_size = 12
+text = "99"
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="IconShadow" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_i0acw")
+position = Vector2(-9, 0)
+sprite_frames = SubResource("SpriteFrames_6uqi0")
+animation = &"set_icon"
+
 [node name="Icon" type="AnimatedSprite2D" parent="."]
-position = Vector2(-10, 0)
+position = Vector2(-9, 0)
 sprite_frames = SubResource("SpriteFrames_6uqi0")
 animation = &"set_icon"
 

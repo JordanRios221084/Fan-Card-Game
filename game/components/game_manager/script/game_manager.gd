@@ -26,6 +26,7 @@ enum GameState {
 @export var discard_pile: DiscardPile ## Referencia al montón de descarte [DiscardPile].
 @export var backgorund: Background ## Referencia al fondo del juego [Background].
 @export var foreground: Foreground ## Referencia al primer plano del juego [Foreground].
+@export var uno_button: UnoButton ## Referencia al botón "UNO" [Button].
 
 @export_group("Player Management")
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
@@ -42,7 +43,7 @@ var next_player: Player ## Referencia al siguiente jugador.
 var steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
 var direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
 var current_state: GameState = GameState.IDLE ## Variable que almacena el estado actual del juego.
-var draw_till_valid: bool = true ## Indica si el jugador debe robar hasta obtener una carta válida.
+var draw_till_valid: bool = false ## Indica si el jugador debe robar hasta obtener una carta válida.
 
 
 # --- Engine Functions ---
@@ -80,6 +81,7 @@ func _set_controllers() -> void:
 		controller.connect("check_card", _on_controller_check_card)
 		controller.connect("play_card", _on_controller_play_card)
 		controller.connect("draw_card", _on_controller_draw_card)
+		controller.connect("two_cards_left", _on_controller_two_cards_left)
 
 
 ## Inicia el EffectManager y conecta sus señales.
@@ -322,6 +324,7 @@ func _on_controller_draw_card(player: Player) -> void:
 	_draw_a_card(player, card_quantity, forced, draw_speed)
 
 
+## Escucha a la señal del controlador para comprobar una carta dada.
 func _on_controller_check_card(card: Card) -> void:
 	if not _is_valid_card(card):
 		if current_player.is_human:
@@ -329,17 +332,39 @@ func _on_controller_check_card(card: Card) -> void:
 		return
 	
 	if current_player.is_human:
-		if CardManager.move_tween and CardManager.move_tween.is_valid():
-			await CardManager.move_finished
+		if CardManager.move_tween.is_valid():
+			_set_cards_deck_state(false)
+			CardManager.kill_move_tween()
 			await get_tree().create_timer(0.1).timeout
-		
 		_play_a_card(card, current_player)
 	else:
 		var ai_controller: AIController = current_player.self_cotroller as AIController
 		ai_controller.add_valid_card(card)
 
 
+## Escucha al effect manager cuando se ha procesado un efecto de robo de cartas.
 func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> void:
 	var forced: bool = true
 	var draw_speed: float = 0.05
 	_draw_a_card(target_player, amount, forced, draw_speed)
+
+
+## Escucha a la señal del controlador cuando un jugador tiene 2 cartas restantes.
+func _on_controller_two_cards_left(player: Player) -> void:
+	if not player.is_human:
+		return
+	
+	
+	for card: Card in player.cards_container.current_hand:
+		if _is_valid_card(card):
+			uno_button.disabled = false
+			uno_button.visible = true
+			break
+
+
+func _on_uno_button_uno_called() -> void:
+	if not current_player:
+		return
+	
+	current_player.has_called_uno = true
+	effect_manager.play_uno_effect(current_player)

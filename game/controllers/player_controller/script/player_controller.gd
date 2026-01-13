@@ -34,7 +34,8 @@ func _input(event: InputEvent) -> void:
     if node_under_mouse and node_under_mouse is Card:
         var card_under_mouse: Card = node_under_mouse as Card
         check_card.emit(card_under_mouse)
-        _enabled = false
+        if not card_under_mouse in _player.cards_container.current_hand:
+            _enabled = false
     
     if node_under_mouse and node_under_mouse is Deck:
         draw_card.emit(_player)
@@ -54,9 +55,10 @@ func try_to_process_turn() -> void:
 
 # --- Private Functions ---
 func _process_turn() -> void:
-    print("Procesando el turno del jugador: ", _player)
     _enabled = true
-    pass
+
+    if _player.cards_container.current_hand.size() == 2:
+        two_cards_left.emit(_player) # Emite una señal si el jugador tiene 2 cartas
 
 
 ## Devuelve el nodo 2d que está debajo del mouse

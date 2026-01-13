@@ -18,6 +18,8 @@ const _WAIT_TIME_SECONDS: float = 0.25
 @export var is_human: bool = false
 ## Muestra las cartas para el modo DEBUG
 @export var show_cards: bool = false
+## Indica si el jugador ha declarado "UNO".
+@export var has_called_uno: bool = false
 
 @export_group("Components")
 ## Contenedor visual de las cartas
@@ -52,7 +54,7 @@ func add_card_to_hand(new_card: Card) -> void:
 	if is_turn and is_human:
 		new_card.collision_shape.disabled = false
 
-	if show_cards:
+	if show_cards or is_human:
 		new_card.card_animator.play("flip_card")
 	
 	cards_container.allign_cards()

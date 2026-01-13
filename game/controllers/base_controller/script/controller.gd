@@ -11,6 +11,9 @@ signal play_card(card: Card, player: Player)
 ## Solicita que el jugador IA robe una carta.
 @warning_ignore("unused_signal")
 signal draw_card(player: Player)
+## Avisa al [GameManager] que el jugador actual tiene 2 cartas.
+@warning_ignore("unused_signal")
+signal two_cards_left(player: Player)
 
 # --- Exports ---
 @export_group("References")

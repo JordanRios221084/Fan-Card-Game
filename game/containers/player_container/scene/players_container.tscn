@@ -10,8 +10,6 @@ script = ExtResource("1_doubq")
 
 [node name="Player" parent="." node_paths=PackedStringArray("self_cotroller") instance=ExtResource("1_tfo80")]
 position = Vector2(640, 645)
-is_human = true
-show_cards = true
 self_cotroller = NodePath("PlayerController")
 
 [node name="PlayerController" parent="Player" instance=ExtResource("3_t6pt4")]
@@ -19,7 +17,6 @@ self_cotroller = NodePath("PlayerController")
 [node name="Player2" parent="." node_paths=PackedStringArray("self_cotroller") instance=ExtResource("1_tfo80")]
 position = Vector2(75, 360)
 rotation = 1.5707964
-show_cards = true
 self_cotroller = NodePath("AIController")
 
 [node name="AIController" parent="Player2" instance=ExtResource("3_5s4gd")]
@@ -27,7 +24,6 @@ self_cotroller = NodePath("AIController")
 [node name="Player3" parent="." node_paths=PackedStringArray("self_cotroller") instance=ExtResource("1_tfo80")]
 position = Vector2(640, 75)
 rotation = 3.1415927
-show_cards = true
 self_cotroller = NodePath("AIController")
 
 [node name="AIController" parent="Player3" instance=ExtResource("3_5s4gd")]
@@ -35,7 +31,6 @@ self_cotroller = NodePath("AIController")
 [node name="Player4" parent="." node_paths=PackedStringArray("self_cotroller") instance=ExtResource("1_tfo80")]
 position = Vector2(1205, 360)
 rotation = 4.712389
-show_cards = true
 self_cotroller = NodePath("AIController")
 
 [node name="AIController" parent="Player4" instance=ExtResource("3_5s4gd")]

@@ -28,6 +28,7 @@ func move_card_to_position(card: Node2D, target_pos: Vector2, target_time_second
 	move_tween.tween_property(card, "position", target_pos, target_time_seconds)
 	await move_tween.finished
 
+	await get_tree().create_timer(0.1).timeout
 	move_finished.emit()
 
 
@@ -57,4 +58,11 @@ func card_scale_down(card: Card) -> void:
 
 	# Esperar a que la animación termine antes de eliminar la carta
 	await fade_tween.finished
-	card.queue_free()
+	if card:
+		card.queue_free()
+
+
+## Mata el tween de movimiento actual si existe y es válido.
+func kill_move_tween() -> void:
+	if move_tween and move_tween.is_valid():
+		move_tween.kill()

@@ -1,19 +1,21 @@
-[gd_scene load_steps=7 format=3 uid="uid://cr8aig6e11asj"]
+[gd_scene load_steps=8 format=3 uid="uid://cr8aig6e11asj"]
 
 [ext_resource type="PackedScene" uid="uid://taslkryubnek" path="res://game/components/game_manager/scene/game_manager.tscn" id="1_xkbyp"]
 [ext_resource type="PackedScene" uid="uid://bl8ebgm7urawa" path="res://game/components/effects/background/scene/background.tscn" id="2_lx3aj"]
 [ext_resource type="PackedScene" uid="uid://dt0j27ri56mxn" path="res://game/components/deck/scene/deck.tscn" id="3_itumj"]
 [ext_resource type="PackedScene" uid="uid://bw8l7m4vdo0o4" path="res://game/components/discard_pile/scene/discard_pile.tscn" id="4_dp3pf"]
 [ext_resource type="PackedScene" uid="uid://b8qq08rle60vg" path="res://game/containers/player_container/scene/players_container.tscn" id="5_ioaqv"]
+[ext_resource type="PackedScene" uid="uid://qfm5cdnou3dq" path="res://game/components/uno_button/scene/uno_button.tscn" id="6_wjctj"]
 [ext_resource type="PackedScene" uid="uid://1o0g7l64256q" path="res://game/components/effects/foreground/scene/foreground.tscn" id="8_frwyw"]
 
 [node name="Main" type="Node2D"]
 
-[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "backgorund", "foreground", "players_container") instance=ExtResource("1_xkbyp")]
+[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "backgorund", "foreground", "uno_button", "players_container") instance=ExtResource("1_xkbyp")]
 deck = NodePath("Deck")
 discard_pile = NodePath("DiscardPile")
 backgorund = NodePath("Background")
 foreground = NodePath("Foreground")
+uno_button = NodePath("UnoButton")
 players_container = NodePath("PlayerContainer")
 
 [node name="Background" parent="GameManager" instance=ExtResource("2_lx3aj")]
@@ -29,9 +31,12 @@ position = Vector2(640, 360)
 
 [node name="PlayerContainer" parent="GameManager" instance=ExtResource("5_ioaqv")]
 
+[node name="UnoButton" parent="GameManager" instance=ExtResource("6_wjctj")]
+
 [node name="Foreground" parent="GameManager" instance=ExtResource("8_frwyw")]
 mouse_filter = 2
 mouse_behavior_recursive = 1
 
 [connection signal="card_played" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_card_played"]
 [connection signal="first_card_discarded" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_first_card_discarded"]
+[connection signal="uno_called" from="GameManager/UnoButton" to="GameManager" method="_on_uno_button_uno_called"]
