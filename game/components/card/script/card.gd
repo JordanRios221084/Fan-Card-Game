@@ -41,6 +41,11 @@ var is_played: bool = false ## Indica si la carta ha sido jugada.
 var is_effect_used: bool = false ## Indica si el efecto de la carta ya ha sido utilizado.
 
 
+
+
+
+# -------------------- Setters --------------------
+
 ## Se encarga de inicializar el color de la carta
 func set_card_color(color_name: String) -> void:
 	values.target_color = COLOR_MAP[color_name]
@@ -50,6 +55,29 @@ func set_card_color(color_name: String) -> void:
 		var temp_shader_material: ShaderMaterial = front_sprite.material.duplicate() as ShaderMaterial
 		temp_shader_material.set_shader_parameter("target_color", values.target_color)
 		front_sprite.material = temp_shader_material
+
+
+
+
+
+# -------------------- Getters --------------------
+
+## Devuelve el efecto de la carta.
+func get_card_effect() -> String:
+	return values.effect
+
+
+## Devuelve el color de la carta.
+func get_card_color() -> String:
+	return values.color
+
+
+## Devuelve el símbolo de la carta.
+func get_card_symbol() -> int:
+	return values.symbol
+
+
+
 
 
 func _on_area_2d_mouse_entered() -> void:

@@ -10,13 +10,15 @@
 
 [node name="Main" type="Node2D"]
 
-[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "backgorund", "foreground", "uno_button", "players_container") instance=ExtResource("1_xkbyp")]
+[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "uno_button", "players_container") instance=ExtResource("1_xkbyp")]
 deck = NodePath("Deck")
 discard_pile = NodePath("DiscardPile")
-backgorund = NodePath("Background")
-foreground = NodePath("Foreground")
 uno_button = NodePath("UnoButton")
 players_container = NodePath("PlayerContainer")
+steps = null
+direction = null
+current_state = null
+draw_till_valid = null
 
 [node name="Background" parent="GameManager" instance=ExtResource("2_lx3aj")]
 mouse_filter = 2
@@ -29,14 +31,12 @@ scale = Vector2(3, 3)
 [node name="DiscardPile" parent="GameManager" instance=ExtResource("4_dp3pf")]
 position = Vector2(640, 360)
 
-[node name="PlayerContainer" parent="GameManager" instance=ExtResource("5_ioaqv")]
-
 [node name="UnoButton" parent="GameManager" instance=ExtResource("6_wjctj")]
+
+[node name="PlayerContainer" parent="GameManager" instance=ExtResource("5_ioaqv")]
 
 [node name="Foreground" parent="GameManager" instance=ExtResource("8_frwyw")]
 mouse_filter = 2
 mouse_behavior_recursive = 1
 
-[connection signal="card_played" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_card_played"]
 [connection signal="first_card_discarded" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_first_card_discarded"]
-[connection signal="uno_called" from="GameManager/UnoButton" to="GameManager" method="_on_uno_button_uno_called"]

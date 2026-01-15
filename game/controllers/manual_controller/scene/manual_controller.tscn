@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://btrj1w72s7o8u"]
+
+[ext_resource type="Script" uid="uid://d3wpnx40cxmbh" path="res://game/controllers/manual_controller/script/manual_controller.gd" id="1_tbs8d"]
+
+[node name="ManualController" type="Node2D"]
+script = ExtResource("1_tbs8d")
+metadata/_custom_type_script = "uid://dxrlpdi4rbp02"

@@ -2,47 +2,56 @@ class_name Controller
 extends Node2D
 ## Clase base para los controladores del juego.
 
-## Verifica si una carta IA es válida para jugar.
-@warning_ignore("unused_signal")
-signal check_card(card: Card)
-## Juega una carta por parte del jugador IA.
-@warning_ignore("unused_signal")
-signal play_card(card: Card, player: Player)
-## Solicita que el jugador IA robe una carta.
-@warning_ignore("unused_signal")
-signal draw_card(player: Player)
-## Avisa al [GameManager] que el jugador actual tiene 2 cartas.
-@warning_ignore("unused_signal")
-signal two_cards_left(player: Player)
 
-# --- Exports ---
+# --- Signals ---
+signal play_card(card: Card, player: Player) ## Juega una carta por parte del jugador IA.
+signal check_card(card: Card) ## Verifica si una carta IA es válida para jugar.
+signal draw_card(player: Player) ## Solicita que el jugador IA robe una carta.
+signal two_cards_left(player: Player) ## Avisa al [GameManager] que el jugador actual tiene 2 cartas.
+
+# --- Exported Variables ---
 @export_group("References")
-## Referencia al [GameManager] para manejar el estado del juego.
-@export var game_manager: GameManager
-
-# --- Private Variables ---
-## Referencia al jugador actual cuyo turno se está procesando.
-## Se debe asignar antes de llamar a try_to_process_turn().
-var _player: Player
+@export var game_manager: GameManager ## Referencia al [GameManager] para manejar el estado del juego.
+@export var player: Player ## Referencia al jugador asociado a este controlador.
 
 
-# --- Public Functions ---
-## Asigna un nuevo jugador al controlador.
-func set_player(new_player: Player) -> void:
-	_player = new_player
+# --- Engine Functions ---
+func _ready() -> void:
+	player = get_parent() as Player
 
+
+
+
+
+# ---------------------- Control de Turnos --------------------
 
 ## Intenta procesar el turno del jugador actual.
 ## Si no hay un jugador actual, la función termina sin hacer nada.
 func try_to_process_turn() -> void:
-	# Si no hay un jugador asignado, terminamos.
-	if not _player:
-		return
-	
-	await _process_turn()
-
-# --- Private Functions ---
-## Procesa el turno del jugador actual.
-func _process_turn() -> void:
-	await get_tree().create_timer(0.1).timeout
+	print("Base Controller: try_to_process_turn called.")
 	pass
+
+
+
+
+
+# -------------------- Funciones de emisión de señales --------------------
+
+## Emite la señal para jugar una carta por parte del jugador.
+func play_a_card(card_to_play: Card) -> void:
+	play_card.emit(card_to_play, player)
+
+
+## Emite la señal para verificar si una carta es válida para jugar.
+func check_a_card(card_to_check: Card) -> void:
+	check_card.emit(card_to_check)
+
+
+## Emite la señal para que el jugador robe una carta.
+func draw_a_card() -> void:
+	draw_card.emit(player)
+
+
+## Emite la señal para notificar que el jugador tiene dos cartas restantes.
+func notify_two_cards_left() -> void:
+	two_cards_left.emit(player)

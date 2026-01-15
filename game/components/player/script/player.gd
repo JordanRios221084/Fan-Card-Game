@@ -30,18 +30,17 @@ const _WAIT_TIME_SECONDS: float = 0.25
 
 # --- Engine Functions ---
 func _ready() -> void:
-	self_cotroller.set_player(self)
-
-	if self_cotroller is PlayerController:
-		is_human = true
-		var player_controller: PlayerController = self_cotroller as PlayerController
+	if self_cotroller is ManualController:
+		var player_controller: ManualController = self_cotroller as ManualController
 		cards_container.card_selected.connect(player_controller._on_card_mouse_entered_card)
 		cards_container.card_deselected.connect(player_controller._on_card_mouse_exited_card)
+
+		is_human = true
 	else:
 		is_human = false
 
 
-# --- Public Functions ---
+# --- Functions ---
 ## Añade una carta a la mano del jugador y actualiza su posición. [br]
 ## Si el jugador es humano, reproduce una animación de voltear la carta. [br]
 ## Si es el turno del jugador, ordena las cartas automáticamente.
@@ -67,3 +66,9 @@ func add_card_to_hand(new_card: Card) -> void:
 func play_a_card(card_to_play: Card) -> void:
 	cards_container.current_hand.erase(card_to_play)
 	cards_container.allign_cards()
+
+
+## Procesa el turno del jugador llamando a su controlador asociado. [br]
+## Utiliza la función [Controller.try_to_process_turn] del controlador.
+func process_turn() -> void:
+	self_cotroller.try_to_process_turn()

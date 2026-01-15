@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://gau28iuxx0g6"]
+
+[ext_resource type="Script" uid="uid://cpwmjxrgtw0rb" path="res://game/controllers/auto_controller/script/auto_controller.gd" id="1_mugs7"]
+
+[node name="AutoController" type="Node2D"]
+script = ExtResource("1_mugs7")
+metadata/_custom_type_script = "uid://dxrlpdi4rbp02"

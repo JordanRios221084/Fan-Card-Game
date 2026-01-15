@@ -56,3 +56,7 @@ func receive_card(new_card: Card, origin: Node) -> void:
 
 	CardManager.set_card_opacity(new_card, true)
 	await CardManager.move_card_to_position(new_card, discard_position, MOVE_TIME_SECONDS, random_rotation)
+
+
+func check_top_card_effect_used() -> bool:
+	return top_card.is_effect_used
