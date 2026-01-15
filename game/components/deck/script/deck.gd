@@ -6,19 +6,20 @@ extends Node2D
 ## Cada vez que un jugador roba una carta, el mazo se vuelve a barajar.
 ## La carta robada es creada al momento en el autoload [CardBuilder].
 
-# --- Private Constants ---
+
+# --- Constants ---
 ## Escena precargada de la carta para instanciar nuevas cartas cuando se roba del mazo.
-const _CARD_SCENE: PackedScene = preload("res://game/components/card/scene/card.tscn")
+const CARD_SCENE: PackedScene = preload("res://game/components/card/scene/card.tscn")
 
 
-# --- Exports ---
+# --- Export Variables ---
 @export_group("References")
 ## Referencia al [Sprite2D] que contiene la textura del mazo.
 @export var deck_sprite: Sprite2D
 ## Referencia al [CollisionShape2D] que se encarga de las colisiones del mazo.
 @export var deck_collision_shape: CollisionShape2D
 
-# --- Public Variables ---
+# --- Variables ---
 ## Almacena las cartas que el mazo puede devolver llamando a su función [method Deck.draw_card].
 var current_deck: Array[CardValues] = []
 
@@ -42,6 +43,7 @@ func draw_card() -> Card:
 
 	return new_card
 
+
 ## Recupera una carta descartada y la añade de nuevo a la baraja del mazo.
 ## La carta es liberada del árbol de escena después de recuperar sus valores. [br]
 ## - [param recovered_card]: La carta que se va a recuperar.
@@ -58,7 +60,7 @@ func recover_card(recovered_card: Card) -> void:
 ## Crea una nueva carta, configura propiedades, textura y el shader del color.
 ## Devuelve la carta configurada.
 func _build_card(card_values: CardValues, card_sprite_path: String) -> Card:
-	var card: Card = _CARD_SCENE.instantiate() as Card
+	var card: Card = CARD_SCENE.instantiate() as Card
 
 	card.values = card_values
 	card.front_sprite.texture = load(card_sprite_path)
