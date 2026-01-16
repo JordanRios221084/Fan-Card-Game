@@ -6,7 +6,6 @@ extends Node
 ## También maneja la transición entre diferentes estados del juego y la aplicación de efectos de cartas.
 
 # --- Signals ---
-signal draw_card_finished ## Señal emitida cuando un jugador termina de robar cartas.
 signal player_turn_finished ## Señal emitida cuando el turno del jugador actual ha terminado.
 
 # --- Constants ---
@@ -304,7 +303,7 @@ func draw_a_card(target_player: Player, amount: int, forced: bool = false, draw_
 			player_turn_finished.emit()
 	
 	# Emitimos la señal de robo finalizado
-	draw_card_finished.emit()
+	target_player.self_controller.notify_draw_finished()
 
 
 ## Obtiene una nueva carta del mazo y la añade a la mano del jugador objetivo. [br]

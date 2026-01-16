@@ -8,6 +8,7 @@ signal play_card(card: Card, player: Player) ## Juega una carta por parte del ju
 signal check_card(card: Card) ## Verifica si una carta IA es válida para jugar.
 signal draw_card(player: Player) ## Solicita que el jugador IA robe una carta.
 signal two_cards_left(player: Player) ## Avisa al [GameManager] que el jugador actual tiene 2 cartas.
+signal draw_finished() ## Señal que indica que el robo de carta ha finalizado.
 
 # --- Exported Variables ---
 @export_group("References")
@@ -49,9 +50,14 @@ func card_check(card_to_check: Card) -> void:
 ## Emite la señal para que el jugador robe una carta.
 func card_draw() -> void:
 	draw_card.emit(player)
-	await game_manager.draw_card_finished
+	await draw_finished
 
 
 ## Emite la señal para notificar que el jugador tiene dos cartas restantes.
 func notify_two_cards_left() -> void:
 	two_cards_left.emit(player)
+
+
+## Emite la señal para notificar que el robo de carta ha finalizado.
+func notify_draw_finished() -> void:
+	draw_finished.emit()
