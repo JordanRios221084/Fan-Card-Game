@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://bphyou12mr80w"]
+
+[ext_resource type="Script" uid="uid://beau01o3rnhcq" path="res://game/components/player/player.gd" id="1_3vyb7"]
+[ext_resource type="PackedScene" uid="uid://rfqqcpp6j0l2" path="res://game/containers/cards_container/cards_container.tscn" id="2_x53up"]
+
+[node name="Player" type="Node2D" node_paths=PackedStringArray("cards_container")]
+script = ExtResource("1_3vyb7")
+cards_container = NodePath("CardsContainer")
+
+[node name="CardsContainer" parent="." instance=ExtResource("2_x53up")]

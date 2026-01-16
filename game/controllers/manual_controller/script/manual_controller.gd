@@ -31,13 +31,12 @@ func _input(event: InputEvent) -> void:
 
     if node_under_mouse and node_under_mouse is Card:
         var card_under_mouse: Card = node_under_mouse as Card
-        check_a_card(card_under_mouse)
+        card_play(card_under_mouse)
         if not card_under_mouse in player.cards_container.current_hand:
             enabled = false
     
     if node_under_mouse and node_under_mouse is Deck:
-        draw_a_card()
-        await game_manager.draw_card_finished
+        await card_draw()
 
 
 # --- Private Functions ---

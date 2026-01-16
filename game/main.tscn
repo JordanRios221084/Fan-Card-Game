@@ -1,42 +1,47 @@
-[gd_scene load_steps=8 format=3 uid="uid://cr8aig6e11asj"]
+[gd_scene load_steps=9 format=3 uid="uid://cr8aig6e11asj"]
 
-[ext_resource type="PackedScene" uid="uid://taslkryubnek" path="res://game/components/game_manager/scene/game_manager.tscn" id="1_xkbyp"]
-[ext_resource type="PackedScene" uid="uid://bl8ebgm7urawa" path="res://game/components/effects/background/scene/background.tscn" id="2_lx3aj"]
-[ext_resource type="PackedScene" uid="uid://dt0j27ri56mxn" path="res://game/components/deck/scene/deck.tscn" id="3_itumj"]
-[ext_resource type="PackedScene" uid="uid://bw8l7m4vdo0o4" path="res://game/components/discard_pile/scene/discard_pile.tscn" id="4_dp3pf"]
-[ext_resource type="PackedScene" uid="uid://b8qq08rle60vg" path="res://game/containers/player_container/scene/players_container.tscn" id="5_ioaqv"]
-[ext_resource type="PackedScene" uid="uid://qfm5cdnou3dq" path="res://game/components/uno_button/scene/uno_button.tscn" id="6_wjctj"]
-[ext_resource type="PackedScene" uid="uid://1o0g7l64256q" path="res://game/components/effects/foreground/scene/foreground.tscn" id="8_frwyw"]
+[ext_resource type="PackedScene" uid="uid://taslkryubnek" path="res://game/components/game_manager/game_manager.tscn" id="1_xkbyp"]
+[ext_resource type="PackedScene" uid="uid://bl8ebgm7urawa" path="res://game/components/vfx/background/background.tscn" id="2_lx3aj"]
+[ext_resource type="PackedScene" uid="uid://dt0j27ri56mxn" path="res://game/components/table_elements/deck/deck.tscn" id="3_itumj"]
+[ext_resource type="PackedScene" uid="uid://bw8l7m4vdo0o4" path="res://game/components/table_elements/discard_pile/discard_pile.tscn" id="4_dp3pf"]
+[ext_resource type="PackedScene" uid="uid://b8qq08rle60vg" path="res://game/containers/player_container/players_container.tscn" id="5_ioaqv"]
+[ext_resource type="PackedScene" uid="uid://qfm5cdnou3dq" path="res://game/components/table_elements/uno_button/uno_button.tscn" id="6_wjctj"]
+[ext_resource type="PackedScene" uid="uid://cn2ie6u6y04wm" path="res://game/components/vfx/effect_manager/effect_manager.tscn" id="7_xkbyp"]
+[ext_resource type="PackedScene" uid="uid://1o0g7l64256q" path="res://game/components/vfx/foreground/foreground.tscn" id="8_frwyw"]
 
 [node name="Main" type="Node2D"]
 
-[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "uno_button", "players_container") instance=ExtResource("1_xkbyp")]
-deck = NodePath("Deck")
-discard_pile = NodePath("DiscardPile")
-uno_button = NodePath("UnoButton")
-players_container = NodePath("PlayerContainer")
-steps = null
-direction = null
-current_state = null
-draw_till_valid = null
+[node name="GameManager" parent="." node_paths=PackedStringArray("deck", "discard_pile", "effect_manager", "uno_button", "players_container") instance=ExtResource("1_xkbyp")]
+deck = NodePath("TableElements/Deck")
+discard_pile = NodePath("TableElements/DiscardPile")
+effect_manager = NodePath("EffectManager")
+uno_button = NodePath("TableElements/UnoButton")
+players_container = NodePath("TableElements/PlayerContainer")
 
 [node name="Background" parent="GameManager" instance=ExtResource("2_lx3aj")]
 mouse_filter = 2
 mouse_behavior_recursive = 1
 
-[node name="Deck" parent="GameManager" instance=ExtResource("3_itumj")]
+[node name="EffectManager" parent="GameManager" node_paths=PackedStringArray("background", "foreground") instance=ExtResource("7_xkbyp")]
+background = NodePath("../Background")
+foreground = NodePath("../Foreground")
+
+[node name="TableElements" type="Node" parent="GameManager"]
+
+[node name="Deck" parent="GameManager/TableElements" instance=ExtResource("3_itumj")]
 position = Vector2(75, 80)
 scale = Vector2(3, 3)
 
-[node name="DiscardPile" parent="GameManager" instance=ExtResource("4_dp3pf")]
+[node name="DiscardPile" parent="GameManager/TableElements" instance=ExtResource("4_dp3pf")]
 position = Vector2(640, 360)
 
-[node name="UnoButton" parent="GameManager" instance=ExtResource("6_wjctj")]
+[node name="UnoButton" parent="GameManager/TableElements" instance=ExtResource("6_wjctj")]
 
-[node name="PlayerContainer" parent="GameManager" instance=ExtResource("5_ioaqv")]
+[node name="PlayerContainer" parent="GameManager/TableElements" instance=ExtResource("5_ioaqv")]
 
 [node name="Foreground" parent="GameManager" instance=ExtResource("8_frwyw")]
 mouse_filter = 2
 mouse_behavior_recursive = 1
 
-[connection signal="first_card_discarded" from="GameManager/DiscardPile" to="GameManager" method="_on_discard_pile_first_card_discarded"]
+[connection signal="draw_processed" from="GameManager/EffectManager" to="GameManager" method="_on_effect_manager_draw_processed"]
+[connection signal="first_card_discarded" from="GameManager/TableElements/DiscardPile" to="GameManager" method="_on_discard_pile_first_card_discarded"]

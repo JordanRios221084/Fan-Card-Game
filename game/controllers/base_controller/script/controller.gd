@@ -26,7 +26,6 @@ func _ready() -> void:
 # ---------------------- Control de Turnos --------------------
 
 ## Intenta procesar el turno del jugador actual.
-## Si no hay un jugador actual, la función termina sin hacer nada.
 func try_to_process_turn() -> void:
 	print("Base Controller: try_to_process_turn called.")
 	pass
@@ -38,18 +37,19 @@ func try_to_process_turn() -> void:
 # -------------------- Funciones de emisión de señales --------------------
 
 ## Emite la señal para jugar una carta por parte del jugador.
-func play_a_card(card_to_play: Card) -> void:
+func card_play(card_to_play: Card) -> void:
 	play_card.emit(card_to_play, player)
 
 
 ## Emite la señal para verificar si una carta es válida para jugar.
-func check_a_card(card_to_check: Card) -> void:
+func card_check(card_to_check: Card) -> void:
 	check_card.emit(card_to_check)
 
 
 ## Emite la señal para que el jugador robe una carta.
-func draw_a_card() -> void:
+func card_draw() -> void:
 	draw_card.emit(player)
+	await game_manager.draw_card_finished
 
 
 ## Emite la señal para notificar que el jugador tiene dos cartas restantes.

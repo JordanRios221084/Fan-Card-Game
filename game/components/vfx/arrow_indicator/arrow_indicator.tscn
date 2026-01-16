@@ -1,0 +1,127 @@
+[gd_scene load_steps=9 format=3 uid="uid://03g726qi1d2g"]
+
+[ext_resource type="Script" uid="uid://csknqgkow1p8q" path="res://game/components/vfx/arrow_indicator/arrow_indicator.gd" id="1_yrrk2"]
+[ext_resource type="Texture2D" uid="uid://b32nhkatj32bi" path="res://assets/sprites/extras/arrow_indicator.png" id="2_jsrpo"]
+
+[sub_resource type="Curve" id="Curve_odjts"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.90909094, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_f01cw"]
+curve = SubResource("Curve_odjts")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_016v8"]
+emission_shape = 1
+emission_sphere_radius = 10.0
+inherit_velocity_ratio = 0.25
+gravity = Vector3(0, 0, 0)
+scale_max = 10.0
+alpha_curve = SubResource("CurveTexture_f01cw")
+
+[sub_resource type="Animation" id="Animation_odjts"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Arrows/ArrowLeft:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Arrows/ArrowRight:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_016v8"]
+resource_name = "increase_decrease"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Arrows/ArrowLeft:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.5, 1.5), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Arrows/ArrowRight:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1.5, 1.5), Vector2(1, 1), Vector2(1.5, 1.5)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_f01cw"]
+_data = {
+&"RESET": SubResource("Animation_odjts"),
+&"increase_decrease": SubResource("Animation_016v8")
+}
+
+[node name="ArrowIndicator" type="Node2D" node_paths=PackedStringArray("particles", "arrows")]
+modulate = Color(1, 1, 1, 0)
+script = ExtResource("1_yrrk2")
+particles = NodePath("Particles")
+arrows = NodePath("Arrows")
+
+[node name="Particles" type="Node2D" parent="."]
+
+[node name="LeftParticles" type="GPUParticles2D" parent="Particles"]
+position = Vector2(-50, 0)
+rotation = -0.7853982
+scale = Vector2(0.99999994, 0.99999994)
+amount = 32
+lifetime = 1.5
+randomness = 1.0
+fixed_fps = 60
+trail_lifetime = 4.68
+process_material = SubResource("ParticleProcessMaterial_016v8")
+
+[node name="RightParticles" type="GPUParticles2D" parent="Particles"]
+position = Vector2(50, 0)
+rotation = 2.3561945
+scale = Vector2(0.99999994, 0.99999994)
+amount = 32
+lifetime = 1.5
+randomness = 1.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_016v8")
+
+[node name="Arrows" type="Node2D" parent="."]
+
+[node name="ArrowLeft" type="Sprite2D" parent="Arrows"]
+position = Vector2(-50, 0)
+rotation = -0.7853982
+texture = ExtResource("2_jsrpo")
+
+[node name="ArrowRight" type="Sprite2D" parent="Arrows"]
+position = Vector2(50, 0)
+rotation = 2.3561945
+texture = ExtResource("2_jsrpo")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_f01cw")
+}
+autoplay = "increase_decrease"
