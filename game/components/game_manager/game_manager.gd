@@ -55,8 +55,6 @@ func _ready() -> void:
 	set_controllers()
 	start_game()
 
-	get_tree().debug_collisions_hint = turn_hitbox
-
 
 
 

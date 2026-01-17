@@ -63,13 +63,8 @@ func start_arrows_indicator() -> void:
 
 func flip_arrows_indicator() -> void:
 	var flip_tween: Tween = create_tween()
-	var duration: float = 0.25
+	var duration: float = 0.5
 	flip_tween.tween_property(arrow_indicator, "scale:x", arrow_indicator.scale.x * -1, duration)
-
-
-
-
-
 
 
 
@@ -137,6 +132,7 @@ func parse_effect(effect: String) -> Dictionary:
 
 
 
+
 # -------------------- Gestión de Parámetros del Juego --------------------
 
 ## Establece los parámetros del juego necesarios para procesar los efectos. [br]
@@ -199,6 +195,7 @@ func draw_effect(target_player: Player, amount: int) -> void:
 ## - [param disable]: Si es [true], deshabilita los efectos visuales; si es [false], los habilita.
 func toggle_visual_effects(disable: bool) -> void:
 	disable_visuals = disable
+
 
 
 

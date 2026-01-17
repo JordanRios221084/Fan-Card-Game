@@ -334,6 +334,7 @@ texture = ExtResource("3_1fhtg")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("RectangleShape2D_ktuci")
 disabled = true
+debug_color = Color(0.6439237, 0.5212706, 0, 0.41960785)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
