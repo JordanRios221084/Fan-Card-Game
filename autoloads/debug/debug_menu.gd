@@ -1,14 +1,21 @@
 extends CanvasLayer
 
 
+# --- Exported Variables ---
 @export var fps_label: Label ## Etiqueta para mostrar los FPS.
 @export var toggle_hitboxes_button: CheckBox ## Botón para activar/desactivar la visualización de hitboxes.
+
+# --- Variables ---
+var game_tree: SceneTree ## Escena de todo el juego.
+var root: Node ## La raiz de la la escena principal.
+
 
 
 # -------------------- Engine Functions --------------------
 
 func _ready() -> void:
-	pass # Replace with function body.
+	game_tree = get_tree()
+	root = game_tree.root
 
 
 func _process(_delta: float) -> void:
@@ -34,26 +41,19 @@ func toggle_menu() -> void:
 
 ## Activa o desactiva la visualización de hitboxes en la escena.
 func toggle_hitboxes(enable: bool) -> void:
-	var game_tree: SceneTree = get_tree()
-	var root: Node = game_tree.root
-
 	game_tree.debug_collisions_hint = enable
+	game_tree.call_group("debug_collision", "queue_redraw")
 
-	_force_update_collision_shapes(root)
 
-
-## Función recursiva para forzar el redibujado de las formas de colisión.
-func _force_update_collision_shapes(node: Node) -> void:
-	# Si es una forma de colisión, forzamos el redibujado
-	if node is CollisionShape2D or node is CollisionPolygon2D:
-		var canvas_node: CanvasItem = node as CanvasItem
-		canvas_node.queue_redraw()
-
-	# Repetir para todos los hijos
-	for child: Node in node.get_children():
-		_force_update_collision_shapes(child)
+## Voltea todas las cartas de los rivales para poder verlas
+func flip_opponent_cards() -> void:
+	game_tree.call_group("opponent_cards", "flip_card")
 
 
 ## Señal conectada al botón para activar/desactivar hitboxes.
 func _on_button_toggled(toggled_on: bool) -> void:
 	toggle_hitboxes(toggled_on)
+
+
+func _on_button_pressed() -> void:
+	flip_opponent_cards()

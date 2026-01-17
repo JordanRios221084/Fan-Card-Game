@@ -54,7 +54,12 @@ func add_card_to_hand(new_card: Card) -> void:
 		new_card.collision_shape.disabled = false
 
 	if show_cards or is_human:
-		new_card.card_animator.play("flip_card")
+		new_card.flip_card()
+	
+	if is_human:
+		new_card.add_to_group("player_cards")
+	else:
+		new_card.add_to_group("opponent_cards")
 	
 	cards_container.allign_cards()
 	

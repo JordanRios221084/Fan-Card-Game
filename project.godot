@@ -51,6 +51,14 @@ folder_colors={
 "res://game/controllers/": "orange"
 }
 
+[global_group]
+
+cards=""
+opponent_cards=""
+player_cards=""
+discarded_cards=""
+debug_collision=""
+
 [input]
 
 toggle_debug={

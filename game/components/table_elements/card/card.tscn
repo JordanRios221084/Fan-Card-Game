@@ -302,7 +302,7 @@ _data = {
 &"invalid_card": SubResource("Animation_ktuci")
 }
 
-[node name="Card" type="Node2D" node_paths=PackedStringArray("sprites", "front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "card_animator")]
+[node name="Card" type="Node2D" node_paths=PackedStringArray("sprites", "front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "card_animator") groups=["cards"]]
 script = ExtResource("1_bsk3f")
 sprites = NodePath("Sprites")
 front_sprite = NodePath("Sprites/FrontSprite")
@@ -331,7 +331,7 @@ texture = ExtResource("3_1fhtg")
 
 [node name="Area2D" type="Area2D" parent="."]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" groups=["debug_collision"]]
 shape = SubResource("RectangleShape2D_ktuci")
 disabled = true
 debug_color = Color(0.6439237, 0.5212706, 0, 0.41960785)

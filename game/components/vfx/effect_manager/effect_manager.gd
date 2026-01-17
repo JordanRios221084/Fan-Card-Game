@@ -178,6 +178,7 @@ func reverse_effect() -> void:
 		return
 	
 	await create_visual_effect("reverse", screen_center)
+	background.invert_wave_direction()
 	flip_arrows_indicator()
 
 

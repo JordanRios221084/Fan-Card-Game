@@ -3,10 +3,9 @@
 [ext_resource type="Script" uid="uid://vu1itg6vvblf" path="res://autoloads/debug/debug_menu.gd" id="1_4mcsi"]
 
 [node name="DebugMenu" type="CanvasLayer" node_paths=PackedStringArray("fps_label", "toggle_hitboxes_button")]
-visible = false
 script = ExtResource("1_4mcsi")
-fps_label = NodePath("Control/VBoxContainer/Label")
-toggle_hitboxes_button = NodePath("Control/VBoxContainer/Button")
+fps_label = NodePath("Control/VBoxContainer/FPSLabel")
+toggle_hitboxes_button = NodePath("Control/VBoxContainer/ToggleHitboxes")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -22,17 +21,23 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -67.0
+offset_top = -120.0
 offset_right = 172.0
 grow_vertical = 0
 
-[node name="Label" type="Label" parent="Control/VBoxContainer"]
+[node name="FPSLabel" type="Label" parent="Control/VBoxContainer"]
 layout_mode = 2
 text = "FPS: "
 
-[node name="Button" type="CheckBox" parent="Control/VBoxContainer"]
+[node name="ToggleHitboxes" type="CheckBox" parent="Control/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Toggle Hitboxes"
 
-[connection signal="toggled" from="Control/VBoxContainer/Button" to="." method="_on_button_toggled"]
+[node name="Button" type="Button" parent="Control/VBoxContainer"]
+layout_mode = 2
+text = "Flip Opponents Cards"
+alignment = 0
+
+[connection signal="toggled" from="Control/VBoxContainer/ToggleHitboxes" to="." method="_on_button_toggled"]
+[connection signal="pressed" from="Control/VBoxContainer/Button" to="." method="_on_button_pressed"]

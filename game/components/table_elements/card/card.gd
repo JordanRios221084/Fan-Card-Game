@@ -98,3 +98,12 @@ func _on_area_2d_mouse_exited() -> void:
 ## Reproduce la animación de carta inválida.
 func play_invalid_animation() -> void:
 	card_animator.play("invalid_card")
+
+
+## Voltea la carta para mostrar o ocultar su sprite. [br]
+## - [param flip_state]: El estado al que se quiere voltear la carta ("Flip" y "Unflip")
+func flip_card() -> void:
+	if front_sprite.z_index == -1:
+		card_animator.play("flip_card")
+	else:
+		card_animator.play("flip_card_again")

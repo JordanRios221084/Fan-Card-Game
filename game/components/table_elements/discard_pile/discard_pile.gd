@@ -44,6 +44,10 @@ func receive_card(new_card: Card, origin: Node) -> void:
 	
 	new_card.current_parent = self
 	top_card = new_card
+	
+	remove_card_from_group(top_card)
+
+	top_card.add_to_group("discarded_cards")
 
 	# Generar valores aleatorios para rotación y posición
 	var random_rotation: float = randf_range(ROTATION_LIMIT.x, ROTATION_LIMIT.y)
@@ -60,3 +64,10 @@ func receive_card(new_card: Card, origin: Node) -> void:
 
 func check_top_card_effect_used() -> bool:
 	return top_card.is_effect_used
+
+
+func remove_card_from_group(card: Card) -> void:
+	if card in get_tree().get_nodes_in_group("player_cards"):
+		card.remove_from_group("player_cards")
+	elif card in get_tree().get_nodes_in_group("opponent_cards"):
+		card.remove_from_group("opponent_cards")
