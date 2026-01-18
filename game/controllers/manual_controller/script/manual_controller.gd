@@ -23,6 +23,9 @@ func _input(event: InputEvent) -> void:
     if not event is InputEventMouseButton:
         return
     
+    if DebugMenu.console.visible:
+        return
+    
     var mouse_event: InputEventMouseButton = event as InputEventMouseButton
     if not mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
         return

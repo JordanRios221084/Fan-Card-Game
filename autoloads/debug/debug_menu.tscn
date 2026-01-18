@@ -1,13 +1,32 @@
-[gd_scene load_steps=2 format=3 uid="uid://cjrbmek3h8kbq"]
+[gd_scene load_steps=5 format=3 uid="uid://cjrbmek3h8kbq"]
 
 [ext_resource type="Script" uid="uid://vu1itg6vvblf" path="res://autoloads/debug/debug_menu.gd" id="1_4mcsi"]
 
-[node name="DebugMenu" type="CanvasLayer" node_paths=PackedStringArray("fps_label", "toggle_hitboxes_button")]
-script = ExtResource("1_4mcsi")
-fps_label = NodePath("Control/VBoxContainer/FPSLabel")
-toggle_hitboxes_button = NodePath("Control/VBoxContainer/ToggleHitboxes")
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4mcsi"]
+bg_color = Color(0.09803922, 0.09803922, 0.09803922, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
 
-[node name="Control" type="Control" parent="."]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o111b"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_bottom = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oll34"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[node name="DebugMenu" type="CanvasLayer" node_paths=PackedStringArray("menu", "fps_label", "toggle_hitboxes_button", "console", "input_text", "text_log")]
+script = ExtResource("1_4mcsi")
+menu = NodePath("Menu")
+fps_label = NodePath("Menu/VBoxContainer/FPSLabel")
+toggle_hitboxes_button = NodePath("Menu/VBoxContainer/ToggleHitboxes")
+console = NodePath("Console")
+input_text = NodePath("Console/VBoxContainer/Input")
+text_log = NodePath("Console/VBoxContainer/Log")
+
+[node name="Menu" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -16,28 +35,59 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Menu"]
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -120.0
-offset_right = 172.0
+offset_left = 20.0
+offset_top = -140.0
+offset_right = 196.0
+offset_bottom = -20.0
 grow_vertical = 0
 
-[node name="FPSLabel" type="Label" parent="Control/VBoxContainer"]
+[node name="FPSLabel" type="Label" parent="Menu/VBoxContainer"]
 layout_mode = 2
 text = "FPS: "
 
-[node name="ToggleHitboxes" type="CheckBox" parent="Control/VBoxContainer"]
+[node name="ToggleHitboxes" type="CheckBox" parent="Menu/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Toggle Hitboxes"
 
-[node name="Button" type="Button" parent="Control/VBoxContainer"]
+[node name="FlipCards" type="Button" parent="Menu/VBoxContainer"]
 layout_mode = 2
 text = "Flip Opponents Cards"
-alignment = 0
 
-[connection signal="toggled" from="Control/VBoxContainer/ToggleHitboxes" to="." method="_on_button_toggled"]
-[connection signal="pressed" from="Control/VBoxContainer/Button" to="." method="_on_button_pressed"]
+[node name="Console" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Console"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+mouse_filter = 0
+theme_override_constants/separation = 0
+
+[node name="Log" type="RichTextLabel" parent="Console/VBoxContainer"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.5882353, 0.5882353, 0.5882353, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_4mcsi")
+
+[node name="Input" type="LineEdit" parent="Console/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_o111b")
+theme_override_styles/focus = SubResource("StyleBoxFlat_oll34")
+
+[connection signal="toggled" from="Menu/VBoxContainer/ToggleHitboxes" to="." method="_on_button_toggled"]
+[connection signal="pressed" from="Menu/VBoxContainer/FlipCards" to="." method="_on_button_pressed"]
+[connection signal="text_submitted" from="Console/VBoxContainer/Input" to="." method="_on_input_text_submitted"]

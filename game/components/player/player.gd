@@ -78,3 +78,7 @@ func play_a_card(card_to_play: Card) -> void:
 ## Utiliza la función [Controller.try_to_process_turn] del controlador.
 func process_turn() -> void:
 	self_controller.try_to_process_turn()
+
+
+func change_show_cards() -> void:
+	show_cards = not show_cards
