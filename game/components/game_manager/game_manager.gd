@@ -180,6 +180,9 @@ func set_first_player() -> void:
 	var next_index: int = (current_index + (steps * direction) + all_players.size()) % all_players.size()
 	next_player = all_players[next_index]
 
+	DebugMenu.update_players_labels(current_player.name, next_player.name)
+	DebugMenu.update_direction_label(direction)
+
 
 ## Aplica los efectos de la carta superior del montón de descarte si es necesario.
 func apply_card_effects() -> void:
@@ -214,6 +217,9 @@ func change_current_player_turn() -> void:
 	# Calculamos el "siguiente" jugador
 	var next_player_index: int = (new_current_player_index + (steps * direction) + total_players) % total_players
 	next_player = all_players[next_player_index]
+
+	DebugMenu.update_players_labels(current_player.name, next_player.name)
+	DebugMenu.update_direction_label(direction)
 
 
 ## Procesa el turno del jugador actual, permitiéndole jugar cartas o robar.

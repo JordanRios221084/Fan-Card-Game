@@ -17,11 +17,13 @@ border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oll34"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[node name="DebugMenu" type="CanvasLayer" node_paths=PackedStringArray("menu", "fps_label", "toggle_hitboxes_button", "console", "input_text", "text_log")]
+[node name="DebugMenu" type="CanvasLayer" node_paths=PackedStringArray("menu", "fps_label", "current_player_label", "next_player_label", "direction_label", "console", "input_text", "text_log")]
 script = ExtResource("1_4mcsi")
 menu = NodePath("Menu")
 fps_label = NodePath("Menu/VBoxContainer/FPSLabel")
-toggle_hitboxes_button = NodePath("Menu/VBoxContainer/ToggleHitboxes")
+current_player_label = NodePath("Menu/VBoxContainer/CurrentPLabel")
+next_player_label = NodePath("Menu/VBoxContainer/NextPLabel")
+direction_label = NodePath("Menu/VBoxContainer/DirectionLabel")
 console = NodePath("Console")
 input_text = NodePath("Console/VBoxContainer/Input")
 text_log = NodePath("Console/VBoxContainer/Log")
@@ -43,22 +45,25 @@ anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 20.0
 offset_top = -140.0
-offset_right = 196.0
+offset_right = 209.0
 offset_bottom = -20.0
 grow_vertical = 0
 
 [node name="FPSLabel" type="Label" parent="Menu/VBoxContainer"]
 layout_mode = 2
-text = "FPS: "
+text = "FPS: 999"
 
-[node name="ToggleHitboxes" type="CheckBox" parent="Menu/VBoxContainer"]
+[node name="CurrentPLabel" type="Label" parent="Menu/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
-text = "Toggle Hitboxes"
+text = "Jugador Actual: -----"
 
-[node name="FlipCards" type="Button" parent="Menu/VBoxContainer"]
+[node name="NextPLabel" type="Label" parent="Menu/VBoxContainer"]
 layout_mode = 2
-text = "Flip Opponents Cards"
+text = "Siguiente Jugador: -----"
+
+[node name="DirectionLabel" type="Label" parent="Menu/VBoxContainer"]
+layout_mode = 2
+text = "Dirección: 1"
 
 [node name="Console" type="Control" parent="."]
 layout_mode = 3
@@ -88,6 +93,4 @@ layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_o111b")
 theme_override_styles/focus = SubResource("StyleBoxFlat_oll34")
 
-[connection signal="toggled" from="Menu/VBoxContainer/ToggleHitboxes" to="." method="_on_button_toggled"]
-[connection signal="pressed" from="Menu/VBoxContainer/FlipCards" to="." method="_on_button_pressed"]
 [connection signal="text_submitted" from="Console/VBoxContainer/Input" to="." method="_on_input_text_submitted"]

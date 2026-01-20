@@ -5,7 +5,9 @@ extends CanvasLayer
 @export_group("Debug Menu Components")
 @export var menu: Control ## Contenedor del menú de depuración.
 @export var fps_label: Label ## Etiqueta para mostrar los FPS.
-@export var toggle_hitboxes_button: CheckBox ## Botón para activar/desactivar la visualización de hitboxes.
+@export var current_player_label: Label ## Etiqueta para mostrar el jugador actual.
+@export var next_player_label: Label ## Etiqueta para mostrar el siguiente jugador.
+@export var direction_label: Label ## Etiqueta para mostrar la dirección del juego.
 
 @export_group("Console Components")
 @export var console: Control ## Contenedor de la consola de comandos.
@@ -15,7 +17,8 @@ extends CanvasLayer
 # --- Variables ---
 var game_tree: SceneTree ## Escena de todo el juego.
 var root: Node ## La raiz de la la escena principal.
-var last_text_submitted: Array[String] = [] ## Último texto enviado en la consola.
+var text_submitted: Array[String] = [] ## Último texto enviado en la consola.
+var current_text_index: int = -1 ## Índice del texto actual en el historial de comandos.
 
 
 
@@ -38,8 +41,11 @@ func _input(event: InputEvent) -> void:
 	var input_event: InputEventKey = event as InputEventKey
 	if input_event and input_event.is_action_pressed("toggle_console"):
 		toggle_console()
+
+		if console.visible:
+			input_text.grab_focus()
 	
-	if input_event and input_event.is_action_pressed("get_last_text_submitted") and console.visible:
+	if input_event and input_event.is_action_pressed("last_text") and console.visible:
 		get_last_text_submission()
 
 
@@ -53,8 +59,14 @@ func toggle_menu() -> void:
 	menu.visible = not menu.visible
 
 
+## Activa o desactiva la visibilidad de la consola de comandos.
+func toggle_console() -> void:
+	console.visible = not console.visible
+
+
 ## Activa o desactiva la visualización de hitboxes en la escena.
-func toggle_hitboxes(enable: bool) -> void:
+func toggle_hitboxes() -> void:
+	var enable: bool = not game_tree.debug_collisions_hint
 	game_tree.debug_collisions_hint = enable
 	game_tree.call_group("debug_collision", "queue_redraw")
 
@@ -65,18 +77,15 @@ func flip_opponent_cards() -> void:
 	game_tree.call_group("players", "change_show_cards")
 
 
+## Actualiza las etiquetas de los jugadores actual y siguiente.
+func update_players_labels(current_player: String, next_player: String) -> void:
+	current_player_label.text = str("Jugador Actual: ", current_player)
+	next_player_label.text = str("Siguiente Jugador: ", next_player)
 
 
-
-# -------------------- Señales del Menú de Depuración --------------------
-
-## Señal conectada al botón para activar/desactivar hitboxes.
-func _on_button_toggled(toggled_on: bool) -> void:
-	toggle_hitboxes(toggled_on)
-
-
-func _on_button_pressed() -> void:
-	flip_opponent_cards()
+## Actualiza la etiqueta de dirección del juego.
+func update_direction_label(direction: int) -> void:
+	direction_label.text = "Dirección: " + str(direction)
 
 
 
@@ -84,28 +93,11 @@ func _on_button_pressed() -> void:
 
 # -------------------- Funciones de Gstión de comandos --------------------
 
-## Activa o desactiva la visibilidad de la consola de comandos.
-func toggle_console() -> void:
-	console.visible = not console.visible
-
-
-## Rellena el campo de texto con el último comando enviado.
-func get_last_text_submission() -> void:
-	if last_text_submitted.size() == 0:
-		return
-	
-	var current_text: String = input_text.text
-	if current_text in last_text_submitted:
-		var current_index: int = last_text_submitted.find(current_text)
-		var next_index: int = (current_index + 1) % last_text_submitted.size()
-		input_text.text = last_text_submitted[next_index]
-	else:
-		input_text.text = last_text_submitted[last_text_submitted.size() - 1]
-
 
 ## Añade un nuevo comando al historial de comandos enviados.
-func set_last_text_submission(new_text: String) -> void:
-	last_text_submitted.append(new_text)
+func set_text_submission(new_text: String) -> void:
+	text_submitted.append(new_text)
+	current_text_index = text_submitted.size() - 1
 
 
 ## Añade un nuevo mensaje al log de la consola.
@@ -114,34 +106,53 @@ func add_log_message(new_message: String) -> void:
 	text_log.scroll_to_line(text_log.get_line_count() - 1)
 
 
+## Rellena el campo de texto con el último comando enviado.
+func get_last_text_submission() -> void:
+	if text_submitted.size() == 0:
+		return
+	
+	if current_text_index < 0:
+		current_text_index = text_submitted.size() - 1
+	
+	input_text.text = text_submitted[current_text_index]
+	print(current_text_index)
+	current_text_index -= 1
+
+
+
+
+
+# -------------------- Motor de comandos --------------------
+
 ## Procesa un comando introducido en la consola.
 func process_command(command: String) -> void:
 	var parts: PackedStringArray = command.strip_edges().split(" ")
 	var command_name: String = parts[0].to_lower()
 
 	match command_name:
-		"toggle":
-			toggle_command(parts)
+		"/debug":
+			debug_command(parts)
+		"/flipcards":
+			flip_opponent_cards()
 		_:
-			add_log_message("Comando desconocido: " + 
-			parts[0])
-	
-	
-	input_text.grab_focus()
+			if command_name.contains("/"):
+				add_log_message("Comando desconocido: " + command_name)
 
 
-## Función para el comando "toggle".
-func toggle_command(parts: PackedStringArray) -> void:
+## Función para el comando "debug".
+func debug_command(parts: PackedStringArray) -> void:
 	if parts.size() < 2:
-		add_log_message("Uso: toggle <entity>")
+		add_log_message("Uso: debug <Option> <Entity>")
 		return
 	
-	var entity: String = parts[1].to_lower()
-	match entity:
-		"debugmenu", "debug_menu":
+	var option_name: String = parts[1].to_lower()
+	match option_name:
+		"menu":
 			toggle_menu()
+		"hitboxes":
+			toggle_hitboxes()
 		_:
-			add_log_message("Entidad desconocida: " + entity)
+			add_log_message("Opcion desconocida: " + option_name)
 
 
 
@@ -154,9 +165,8 @@ func _on_input_text_submitted(new_text: String) -> void:
 	input_text.clear()
 
 	if new_text.strip_edges() == "":
-		input_text.grab_focus()
 		return
 	
-	set_last_text_submission(new_text)
+	set_text_submission(new_text)
 	add_log_message(new_text)
 	process_command(new_text)
