@@ -20,7 +20,7 @@ var move_tween: Tween ## Tween utilizado para animar el movimiento de las cartas
 ## - [param target_pos]: La posición objetivo (Vector2). [br]
 ## - [param target_time_seconds]: Duración de la animación en segundos. [br]
 ## - [param target_rot_degrees]: Rotación objetivo en grados.
-func move_card_to_position(card: Node2D, target_pos: Vector2, target_time_seconds: float, target_rot_degrees: float) -> void:
+func move_card_to_position(card: Card, target_pos: Vector2, target_time_seconds: float, target_rot_degrees: float) -> void:
 	move_tween = create_tween().set_parallel(true)
 	
 	move_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -29,6 +29,7 @@ func move_card_to_position(card: Node2D, target_pos: Vector2, target_time_second
 	await move_tween.finished
 
 	await get_tree().create_timer(0.1).timeout
+	
 	move_finished.emit()
 
 

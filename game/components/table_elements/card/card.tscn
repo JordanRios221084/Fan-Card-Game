@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://d1ppxb2hlnmvu"]
+[gd_scene format=3 uid="uid://d1ppxb2hlnmvu"]
 
 [ext_resource type="Script" uid="uid://b6jmmu8puonvq" path="res://game/components/table_elements/card/card.gd" id="1_bsk3f"]
 [ext_resource type="Shader" uid="uid://yjf3eopb0w12" path="res://assets/shaders/shadows.gdshader" id="2_yqa4q"]
@@ -302,44 +302,43 @@ _data = {
 &"invalid_card": SubResource("Animation_ktuci")
 }
 
-[node name="Card" type="Node2D" node_paths=PackedStringArray("sprites", "front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "card_animator") groups=["cards"]]
+[node name="Card" type="Node2D" unique_id=1320705512 node_paths=PackedStringArray("sprites", "front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "area_2d", "card_animator") groups=["cards"]]
 script = ExtResource("1_bsk3f")
 sprites = NodePath("Sprites")
 front_sprite = NodePath("Sprites/FrontSprite")
 back_sprite = NodePath("Sprites/BackSprite")
 opacity_sprite = NodePath("Sprites/OpacitySprite")
 collision_shape = NodePath("Area2D/CollisionShape2D")
+area_2d = NodePath("Area2D")
 card_animator = NodePath("AnimationPlayer")
 
-[node name="Sprites" type="Node2D" parent="."]
+[node name="Sprites" type="Node2D" parent="." unique_id=765862882]
 
-[node name="Shadow" type="Sprite2D" parent="Sprites"]
+[node name="Shadow" type="Sprite2D" parent="Sprites" unique_id=184731076]
 material = SubResource("ShaderMaterial_2ufkr")
 texture = ExtResource("3_1fhtg")
 
-[node name="FrontSprite" type="Sprite2D" parent="Sprites"]
+[node name="FrontSprite" type="Sprite2D" parent="Sprites" unique_id=872508761]
 z_index = -1
 material = SubResource("ShaderMaterial_sy11y")
 texture = ExtResource("4_0t60j")
 
-[node name="BackSprite" type="Sprite2D" parent="Sprites"]
+[node name="BackSprite" type="Sprite2D" parent="Sprites" unique_id=1713358908]
 texture = ExtResource("5_k4t2p")
 
-[node name="OpacitySprite" type="Sprite2D" parent="Sprites"]
+[node name="OpacitySprite" type="Sprite2D" parent="Sprites" unique_id=1299877800]
 modulate = Color(0, 0, 0, 0.2509804)
 texture = ExtResource("3_1fhtg")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=669260016]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" groups=["debug_collision"]]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=608748455 groups=["debug_collision"]]
 shape = SubResource("RectangleShape2D_ktuci")
 disabled = true
 debug_color = Color(0.6439237, 0.5212706, 0, 0.41960785)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_6ligt")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1728628951]
+libraries/ = SubResource("AnimationLibrary_6ligt")
 
 [connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]
