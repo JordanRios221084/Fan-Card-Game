@@ -9,12 +9,14 @@ signal check_card(card: Card) ## Verifica si una carta IA es válida para jugar.
 signal draw_card(player: Player) ## Solicita que el jugador IA robe una carta.
 signal two_cards_left(player: Player) ## Avisa al [GameManager] que el jugador actual tiene 2 cartas.
 signal draw_finished() ## Señal que indica que el robo de carta ha finalizado.
+signal color_selected(color: String)
 
 # --- Exported Variables ---
 @export_group("References")
 @export var game_manager: GameManager ## Referencia al [GameManager] para manejar el estado del juego.
 @export var player: Player ## Referencia al jugador asociado a este controlador.
 
+const COLOR_MAP: Array[String] = ["red", "green", "blue", "yellow", "black"]
 
 # --- Engine Functions ---
 func _ready() -> void:
@@ -29,8 +31,9 @@ func _ready() -> void:
 ## Intenta procesar el turno del jugador actual.
 func try_to_process_turn() -> void:
 	print("Base Controller: try_to_process_turn called.")
-	pass
 
+func try_to_select_color() -> void:
+	print("Base Controller: try_to_select_color called.")
 
 
 
@@ -51,6 +54,9 @@ func card_check(card_to_check: Card) -> void:
 func card_draw() -> void:
 	draw_card.emit(player)
 	await draw_finished
+
+func color_select(color: String) -> void:
+	color_selected.emit(color)
 
 
 ## Emite la señal para notificar que el jugador tiene dos cartas restantes.

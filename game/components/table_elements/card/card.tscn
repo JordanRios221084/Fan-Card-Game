@@ -302,14 +302,13 @@ _data = {
 &"invalid_card": SubResource("Animation_ktuci")
 }
 
-[node name="Card" type="Node2D" unique_id=1320705512 node_paths=PackedStringArray("sprites", "front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "area_2d", "card_animator") groups=["cards"]]
+[node name="Card" type="Node2D" unique_id=1320705512 node_paths=PackedStringArray("sprites", "front_sprite", "back_sprite", "opacity_sprite", "collision_shape", "card_animator") groups=["cards"]]
 script = ExtResource("1_bsk3f")
 sprites = NodePath("Sprites")
 front_sprite = NodePath("Sprites/FrontSprite")
 back_sprite = NodePath("Sprites/BackSprite")
 opacity_sprite = NodePath("Sprites/OpacitySprite")
 collision_shape = NodePath("Area2D/CollisionShape2D")
-area_2d = NodePath("Area2D")
 card_animator = NodePath("AnimationPlayer")
 
 [node name="Sprites" type="Node2D" parent="." unique_id=765862882]

@@ -1,0 +1,16 @@
+[remap]
+
+importer="bitmap"
+type="BitMap"
+uid="uid://bsg2j8y3cethv"
+path="res://.godot/imported/wild_menu_fragment_mask_3.bmp-b0282e928d50b74722d51a794cfa1ff4.res"
+
+[deps]
+
+source_file="res://assets/sprites/extras/wild_menu_fragment_mask_3.bmp"
+dest_files=["res://.godot/imported/wild_menu_fragment_mask_3.bmp-b0282e928d50b74722d51a794cfa1ff4.res"]
+
+[params]
+
+create_from=0
+threshold=0.5

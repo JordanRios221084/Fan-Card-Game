@@ -28,6 +28,7 @@ enum GameState {
 @export var discard_pile: DiscardPile ## Referencia al montón de descarte [DiscardPile].
 @export var effect_manager: EffectManager ## Referencia al manejador de efectos [EffectManager].
 @export var uno_button: UnoButton ## Referencia al botón "UNO" [Button].
+@export var wild_menu: WildMenu
 
 @export_group("Player Management")
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
@@ -88,6 +89,7 @@ func set_controllers() -> void:
 		controller.connect("play_card", _on_controller_play_card)
 		controller.connect("draw_card", _on_controller_draw_card)
 		controller.connect("two_cards_left", _on_controller_two_cards_left)
+		controller.connect("color_selected", _on_controller_color_selected)
 
 
 ## Inicia el juego repartiendo cartas y configurando el estado inicial.
@@ -192,7 +194,7 @@ func apply_card_effects() -> void:
 	
 	# Aplicar efecto si no ha sido usado aún
 	if not discard_pile.check_top_card_effect_used():
-		await effect_manager.process_effect(last_card, next_player)
+		await effect_manager.process_effect(last_card, next_player, current_player)
 	
 	get_new_parameters() # Actualizamos parámetros del juego desde el EffectManager
 
@@ -257,6 +259,7 @@ func get_new_parameters() -> void:
 ## Reglas: Coincidir color, coincidir símbolo, o ser carta negra (Wild).
 func is_valid_card(card_to_validate: Card) -> bool:
 	var last_card: Card = discard_pile.top_card
+	print(last_card.values.color)
 	
 	if card_to_validate.get_card_color() == "black":
 		return true
@@ -380,5 +383,21 @@ func _on_controller_two_cards_left(player: Player) -> void:
 	pass
 
 
+func _on_controller_color_selected(color: String) -> void:
+	effect_manager.color_received.emit(color)
+
+
 func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> void:
 	draw_a_card(target_player, amount, true, 0.1)
+
+
+func _on_effect_manager_process_wild_selection() -> void:
+	current_player.process_color_selection()
+
+
+func _on_effect_manager_show_wild_menu() -> void:
+	wild_menu.show_self()
+
+
+func _on_wild_menu_color_selected(color: String) -> void:
+	effect_manager.color_received.emit(color)

@@ -79,6 +79,9 @@ func play_a_card(card_to_play: Card) -> void:
 func process_turn() -> void:
 	self_controller.try_to_process_turn()
 
+func process_color_selection() -> void:
+	self_controller.try_to_select_color()
+
 
 func change_show_cards() -> void:
 	show_cards = not show_cards

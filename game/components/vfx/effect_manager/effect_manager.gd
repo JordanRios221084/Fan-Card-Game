@@ -7,6 +7,9 @@ extends Node2D
 
 # --- Signals ---
 signal draw_processed(target_player: Player, amount: int) ## Señal emitida cuando se procesa el efecto de robar cartas.
+signal process_wild_selection
+signal color_received(color: String)
+signal show_wild_menu
 
 # --- Exported Variables ---
 @export_group("References")
@@ -77,7 +80,7 @@ func flip_arrows_indicator() -> void:
 ##
 ## - [param card_effects]: String que contiene los efectos de la carta separados por "_" (ej: "draw/2"). [br]
 ## - [param target_player]: Jugador objetivo del efecto.
-func process_effect(card: Card, target_player: Player) -> void:
+func process_effect(card: Card, target_player: Player, current_player: Player) -> void:
 	var effect_list: Array = card.get_card_effect().split("_")
 	var bg_new_color: Color = card.get_card_color()
 	card.is_effect_used = true
@@ -97,7 +100,7 @@ func process_effect(card: Card, target_player: Player) -> void:
 				await draw_effect(target_player, int(current_effect.value))
 				toggle_visual_effects(true)
 			"wild":
-				print("EffectManager: Efecto Comodín (Wild) - Pendiente de implementación.")
+				await wild_effect(current_player, card)
 			"challenge":
 				print("EffectManager: Efecto Reto (Challenge) - Pendiente de implementación.")
 			"stack":
@@ -190,6 +193,19 @@ func draw_effect(target_player: Player, amount: int) -> void:
 		await create_visual_effect("draw", screen_center, target_player, true, amount)
 	
 	draw_processed.emit(target_player, amount)
+
+func wild_effect(player: Player, wild_card: Card) -> void:
+	if player.is_human:
+		show_wild_menu.emit()
+	
+	process_wild_selection.emit()
+	
+	var color: String = await color_received
+
+	await get_tree().create_timer(0.5).timeout
+	
+	wild_card.set_card_color(color)
+	background.set_background_color(color)
 
 
 ## Habilita o deshabilita los efectos visuales. [br]

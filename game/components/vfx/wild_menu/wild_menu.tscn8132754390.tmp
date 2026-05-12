@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://ccklq686r7trn"]
+
+[ext_resource type="Script" uid="uid://bxgf4f5k31wn3" path="res://game/components/vfx/wild_menu/wild_menu.gd" id="1_b5y3i"]
+[ext_resource type="Texture2D" uid="uid://csl0svbhq85oi" path="res://assets/sprites/extras/wild_menu.png" id="1_g7lps"]
+[ext_resource type="Texture2D" uid="uid://bhrdmcbv2ef0h" path="res://assets/sprites/extras/wild_menu_fragment.png" id="2_185ld"]
+[ext_resource type="Texture2D" uid="uid://dvxcikwkq7jbe" path="res://assets/sprites/extras/wild_menu_fragment_base.png" id="2_m2g67"]
+[ext_resource type="BitMap" uid="uid://dm4nmxw8oppw8" path="res://assets/sprites/extras/wild_menu_fragment_mask_1.bmp" id="4_mapug"]
+[ext_resource type="BitMap" uid="uid://blchx3jilhb42" path="res://assets/sprites/extras/wild_menu_fragment_mask_2.bmp" id="5_d0e7w"]
+[ext_resource type="BitMap" uid="uid://bsg2j8y3cethv" path="res://assets/sprites/extras/wild_menu_fragment_mask_3.bmp" id="6_iulre"]
+[ext_resource type="BitMap" uid="uid://cj2tvo6bn1anr" path="res://assets/sprites/extras/wild_menu_fragment_mask_4.bmp" id="7_b5y3i"]
+
+[node name="WildMenu" type="Node2D" unique_id=2594410]
+visible = false
+modulate = Color(1, 1, 1, 0)
+script = ExtResource("1_b5y3i")
+
+[node name="Sprites" type="Node2D" parent="." unique_id=1001971314]
+
+[node name="MainSprite" type="Sprite2D" parent="Sprites" unique_id=479475728]
+position = Vector2(0, -32)
+texture = ExtResource("1_g7lps")
+
+[node name="Controls" type="Control" parent="." unique_id=1521376619]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -64.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RedButton" type="TextureButton" parent="Controls" unique_id=1467631394]
+modulate = Color(0, 0, 0, 0.7019608)
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 36.0
+offset_bottom = 40.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("2_m2g67")
+texture_hover = ExtResource("2_185ld")
+texture_click_mask = ExtResource("4_mapug")
+
+[node name="BlueButton" type="TextureButton" parent="Controls" unique_id=237680039]
+modulate = Color(0, 0, 0, 0.7019608)
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 36.0
+offset_bottom = 40.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("2_m2g67")
+texture_hover = ExtResource("2_185ld")
+texture_click_mask = ExtResource("5_d0e7w")
+flip_h = true
+
+[node name="GreenButton" type="TextureButton" parent="Controls" unique_id=1862223524]
+modulate = Color(0, 0, 0, 0.7019608)
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 36.0
+offset_bottom = 40.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("2_m2g67")
+texture_hover = ExtResource("2_185ld")
+texture_click_mask = ExtResource("6_iulre")
+flip_h = true
+flip_v = true
+
+[node name="YellowButton" type="TextureButton" parent="Controls" unique_id=1796011165]
+modulate = Color(0, 0, 0, 0.7019608)
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 36.0
+offset_bottom = 40.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("2_m2g67")
+texture_hover = ExtResource("2_185ld")
+texture_click_mask = ExtResource("7_b5y3i")
+flip_v = true
+
+[connection signal="pressed" from="Controls/RedButton" to="." method="_on_red_button_pressed"]
+[connection signal="pressed" from="Controls/BlueButton" to="." method="_on_blue_button_pressed"]
+[connection signal="pressed" from="Controls/GreenButton" to="." method="_on_green_button_pressed"]
+[connection signal="pressed" from="Controls/YellowButton" to="." method="_on_yellow_button_pressed"]

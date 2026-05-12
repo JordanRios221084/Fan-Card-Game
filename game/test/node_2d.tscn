@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://b02rt4egmemn1"]
+
+[ext_resource type="PackedScene" uid="uid://ccklq686r7trn" path="res://game/components/vfx/wild_menu/wild_menu.tscn" id="1_bykev"]
+
+[node name="Node2D" type="Node2D" unique_id=1066219575]
+
+[node name="WildMenu" parent="." unique_id=2594410 instance=ExtResource("1_bykev")]
+position = Vector2(616.00006, 432)
+scale = Vector2(5, 5)

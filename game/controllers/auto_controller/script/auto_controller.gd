@@ -47,6 +47,48 @@ func try_to_process_turn() -> void:
 
 	clear_variables()
 
+func try_to_select_color() -> void:
+	var cards: Dictionary = count_cards()
+	
+	var most_repeated_color: String
+	var max_value: float = - INF
+	
+	for color: String in cards:
+		if cards[color] > max_value:
+			max_value = cards[color]
+			most_repeated_color = color
+	
+	var random_wait_time: float = randf_range(WAIT_TIME_SECONDS.x, WAIT_TIME_SECONDS.y)
+	random_wait_time = 0.1 # Ajuste temporal para pruebas rápidas
+
+	await get_tree().create_timer(random_wait_time * MULTIPLIER_TIME).timeout
+	
+	color_select(most_repeated_color)
+
+func count_cards() -> Dictionary:
+	var all_cards: Dictionary = {
+		"red" : 0,
+		"blue" : 0,
+		"yellow" : 0,
+		"green" : 0
+	}
+	
+	for card: Card in player.cards_container.current_hand:
+		match  card.get_card_color():
+			"red":
+				all_cards.red += 1
+			"blue":
+				all_cards.blue += 1
+			"yellow":
+				all_cards.yellow += 1
+			"green":
+				all_cards.green += 1
+			_:
+				print("Wild card detectado, no se añade")
+	
+	return all_cards
+
+
 
 ## Verifica las cartas actuales del jugador para determinar cuáles son válidas para jugar. [br]
 ## Emite la señal [signal AutoController.card_check] para cada carta en la mano del jugador.

@@ -48,6 +48,7 @@ var is_effect_used: bool = false ## Indica si el efecto de la carta ya ha sido u
 
 ## Se encarga de inicializar el color de la carta
 func set_card_color(color_name: String) -> void:
+	values.color = color_name
 	values.target_color = COLOR_MAP[color_name]
 
 	if front_sprite.material:

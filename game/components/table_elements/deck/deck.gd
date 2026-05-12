@@ -51,6 +51,10 @@ func recover_card(recovered_card: Card) -> void:
 	var recovered_card_data: CardValues = CardValues.new()
 
 	recovered_card_data = recovered_card.values
+	
+	if recovered_card_data.type == "wild_card" or recovered_card_data.type == "wild_draw":
+		recovered_card_data.color = "black"
+		recovered_card_data.target_color = Color.BLACK
 
 	current_deck.append(recovered_card_data)
 	CardManager.card_scale_down(recovered_card)

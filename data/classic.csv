@@ -99,3 +99,7 @@ card_096;action_draw2;12;red;stack_draw/2_skip/2
 card_097;action_draw2;12;green;stack_draw/2_skip/2
 card_098;action_draw2;12;yellow;stack_draw/2_skip/2
 card_099;action_draw2;12;blue;stack_draw/2_skip/2
+card_100;wild_card;13;black;wild
+card_101;wild_card;13;black;wild
+card_102;wild_card;13;black;wild
+card_103;wild_card;13;black;wild
