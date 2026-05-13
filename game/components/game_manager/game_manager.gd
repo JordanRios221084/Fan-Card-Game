@@ -41,7 +41,7 @@ enum GameState {
 @export var current_state: GameState = GameState.IDLE ## Variable que almacena el estado actual del juego.
 @export var draw_till_valid: bool = true ## Indica si el jugador debe robar hasta obtener una carta válida.
 @export var challenge_wild_draw: bool = true 
-@export var stack_draw_cards: bool = true
+@export var stack_draw_cards: bool = false
 @export var minimum_draw_cards: int = 1 ## Cantidad mínima de cartas a robar cuando un jugador no puede jugar.
 
 # --- Public Variables ---
@@ -49,6 +49,7 @@ var current_player: Player ## Referencia al jugador actual.
 var next_player: Player ## Referencia al siguiente jugador.
 
 var turn_hitbox: bool = true ## Indica si el hitbox del turno está activo.
+var is_stack_active: bool = false
 
 
 # -------------------- Engine Functions --------------------
@@ -264,6 +265,13 @@ func get_new_parameters() -> void:
 ## Reglas: Coincidir color, coincidir símbolo, o ser carta negra (Wild).
 func is_valid_card(card_to_validate: Card) -> bool:
 	var last_card: Card = discard_pile.top_card
+	print("Estado del stack: ", is_stack_active)
+	
+	if is_stack_active:
+		if card_to_validate.get_card_symbol() == last_card.get_card_symbol():
+			return true
+		else:
+			return false
 	
 	if card_to_validate.get_card_color() == "black":
 		return true
@@ -441,3 +449,21 @@ func _on_effect_manager_check_current_player_cards() -> void:
 func _on_challenge_menu_choice_maked(choice: bool) -> void:
 	effect_manager.choice_maked.emit(choice)
 	print("Game Manager: ", choice)
+
+
+func _on_effect_manager_check_next_player_cards(card: Card) -> void:
+	var current_draw_card_type: String = card.get_card_type()
+	
+	for p_card: Card in next_player.cards_container.current_hand:
+		if p_card.get_card_type() == current_draw_card_type:
+			await get_tree().create_timer(0.1).timeout
+			
+			effect_manager.recovered_draw_card.emit(p_card)
+			return
+	
+	await get_tree().create_timer(0.1).timeout
+	effect_manager.recovered_draw_card.emit(null)
+
+
+func _on_effect_manager_current_stack_state(active: bool) -> void:
+	is_stack_active = active

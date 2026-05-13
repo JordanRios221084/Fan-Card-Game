@@ -14,6 +14,9 @@ signal choice_maked(choice: bool)
 signal process_choice
 signal check_current_player_cards
 signal target_draw_player(player: Player)
+signal check_next_player_cards(card: Card)
+signal recovered_draw_card(card: Card)
+signal current_stack_state(active: bool)
 
 # --- Exported Variables ---
 @export_group("References")
@@ -34,6 +37,7 @@ var disable_visuals: bool = false ## Indica si se deben deshabilitar los efectos
 var process_arrows_animation: bool = false ## Indica si se debe animar el indicador de flechas.
 var game_manager_steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
 var game_manager_direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
+var stacked_draw: int = 0
 var screen_center: Vector2 ## Centro de la pantalla para posicionar efectos visuales.
 var challenge_rule: bool
 var stack_rule: bool
@@ -104,34 +108,47 @@ func process_effect(card: Card, target_player: Player, current_player: Player) -
 				await reverse_effect()
 			"draw":
 				var choice: bool = false
+				var draw_card: Card
 				
-				if card.values.type == "wild_draw4" and challenge_rule:
-					process_choice.emit()
+				if stack_rule:
+					check_next_player_cards.emit(card)
 					
-					print("Antes de la elección")
-					choice = await choice_maked
-					print("Después de la elección")
+					draw_card = await recovered_draw_card
 				
-				if choice:
-					check_current_player_cards.emit()
+				if not draw_card:
+					if card.values.type == "wild_draw4" and challenge_rule:
+						process_choice.emit()
+						
+						choice = await choice_maked
 					
-					var new_target_player: Player = await target_draw_player
 					
-					print("Si esto no aparece, vamos mal jajaja")
-					
-					if new_target_player:
-						await draw_effect(new_target_player as Player, int(current_effect.value))
-						break
+					if choice:
+						check_current_player_cards.emit()
+						
+						var new_target_player: Player = await target_draw_player
+						
+						if new_target_player:
+							await draw_effect(new_target_player as Player, int(current_effect.value) + stacked_draw)
+							stacked_draw = 0
+							break
+						else:
+							await draw_effect(target_player, int(current_effect.value) + 2 + stacked_draw)
+							stacked_draw = 0
 					else:
-						await draw_effect(target_player, int(current_effect.value) + 2)
+						await draw_effect(target_player, int(current_effect.value) + stacked_draw)
+						stacked_draw = 0
 				else:
-					await draw_effect(target_player, int(current_effect.value))
+					stacked_draw += int(current_effect.value)
+					stack_state_report()
+					break
+					
+				stack_state_report()
+				
+				await get_tree().create_timer(0.1)
 				
 				toggle_visual_effects(true)
 			"wild":
 				await wild_effect(current_player, card)
-			"stack":
-				print("EffectManager: Efecto Acumular (Stack) - Pendiente de implementación.")
 			"none":
 				pass
 			_:
@@ -226,6 +243,7 @@ func draw_effect(target_player: Player, amount: int) -> void:
 	
 	draw_processed.emit(target_player, amount)
 
+
 func wild_effect(player: Player, wild_card: Card) -> void:
 	if player.is_human:
 		show_wild_menu.emit()
@@ -239,6 +257,13 @@ func wild_effect(player: Player, wild_card: Card) -> void:
 	wild_card.set_card_color(color)
 	background.set_background_color(color)
 
+
+func stack_state_report() -> void:
+	print("-------------Stack actual:", stacked_draw)
+	if stacked_draw > 0:
+		current_stack_state.emit(true)
+	else:
+		current_stack_state.emit(false)
 
 
 ## Habilita o deshabilita los efectos visuales. [br]

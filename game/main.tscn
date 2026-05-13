@@ -53,6 +53,8 @@ mouse_filter = 2
 mouse_behavior_recursive = 1
 
 [connection signal="check_current_player_cards" from="GameManager/EffectManager" to="GameManager" method="_on_effect_manager_check_current_player_cards"]
+[connection signal="check_next_player_cards" from="GameManager/EffectManager" to="GameManager" method="_on_effect_manager_check_next_player_cards"]
+[connection signal="current_stack_state" from="GameManager/EffectManager" to="GameManager" method="_on_effect_manager_current_stack_state"]
 [connection signal="draw_processed" from="GameManager/EffectManager" to="GameManager" method="_on_effect_manager_draw_processed"]
 [connection signal="process_choice" from="GameManager/EffectManager" to="GameManager" method="_on_effect_manager_process_choice"]
 [connection signal="process_wild_selection" from="GameManager/EffectManager" to="GameManager" method="_on_effect_manager_process_wild_selection"]
