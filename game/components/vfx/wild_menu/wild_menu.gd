@@ -25,11 +25,9 @@ func button_action(btn_name: String) -> void:
 
 
 func show_self() -> void:
-	self.visible = true
-	
-	var modulate_tween: Tween = create_tween()
-	modulate_tween.tween_property(self, "modulate:a", 1.0, 0.2)
-	await modulate_tween.finished
+	var scale_tween: Tween = create_tween()
+	scale_tween.tween_property(self, "scale", Vector2.ONE * 4, 0.2)
+	await scale_tween.finished
 	
 	for button: TextureButton in all_buttons:
 		button.disabled = false
@@ -39,11 +37,9 @@ func hide_self() -> void:
 	for button: TextureButton in all_buttons:
 		button.disabled = true
 	
-	var modulate_tween: Tween = create_tween()
-	modulate_tween.tween_property(self, "modulate:a", 1.0, 0.2)
-	await modulate_tween.finished
-	
-	self.visible = false
+	var scale_tween: Tween = create_tween()
+	scale_tween.tween_property(self, "scale", Vector2.ZERO, 0.2)
+	await scale_tween.finished
 
 func _on_red_button_pressed() -> void:
 	button_action("red")

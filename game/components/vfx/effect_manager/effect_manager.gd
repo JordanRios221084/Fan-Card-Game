@@ -10,6 +10,10 @@ signal draw_processed(target_player: Player, amount: int) ## Señal emitida cuan
 signal process_wild_selection
 signal color_received(color: String)
 signal show_wild_menu
+signal choice_maked(choice: bool)
+signal process_choice
+signal check_current_player_cards
+signal target_draw_player(player: Player)
 
 # --- Exported Variables ---
 @export_group("References")
@@ -31,6 +35,8 @@ var process_arrows_animation: bool = false ## Indica si se debe animar el indica
 var game_manager_steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
 var game_manager_direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
 var screen_center: Vector2 ## Centro de la pantalla para posicionar efectos visuales.
+var challenge_rule: bool
+var stack_rule: bool
 
 
 # -------------------- Engine Functions --------------------
@@ -97,12 +103,33 @@ func process_effect(card: Card, target_player: Player, current_player: Player) -
 			"reverse":
 				await reverse_effect()
 			"draw":
-				await draw_effect(target_player, int(current_effect.value))
+				var choice: bool = false
+				
+				if card.values.type == "wild_draw4" and challenge_rule:
+					process_choice.emit()
+					
+					print("Antes de la elección")
+					choice = await choice_maked
+					print("Después de la elección")
+				
+				if choice:
+					check_current_player_cards.emit()
+					
+					var new_target_player: Player = await target_draw_player
+					
+					print("Si esto no aparece, vamos mal jajaja")
+					
+					if new_target_player:
+						await draw_effect(new_target_player as Player, int(current_effect.value))
+						break
+					else:
+						await draw_effect(target_player, int(current_effect.value) + 2)
+				else:
+					await draw_effect(target_player, int(current_effect.value))
+				
 				toggle_visual_effects(true)
 			"wild":
 				await wild_effect(current_player, card)
-			"challenge":
-				print("EffectManager: Efecto Reto (Challenge) - Pendiente de implementación.")
 			"stack":
 				print("EffectManager: Efecto Acumular (Stack) - Pendiente de implementación.")
 			"none":
@@ -144,6 +171,11 @@ func parse_effect(effect: String) -> Dictionary:
 func set_game_parameters(steps: int, direction: int) -> void:
 	game_manager_direction = direction
 	game_manager_steps = steps
+
+
+func set_game_rules(challenge: bool, stack: bool) -> void:
+	challenge_rule = challenge
+	stack_rule = stack
 
 
 ## Devuelve los parámetros actuales del juego relacionados con los efectos. [br]
@@ -206,6 +238,7 @@ func wild_effect(player: Player, wild_card: Card) -> void:
 	
 	wild_card.set_card_color(color)
 	background.set_background_color(color)
+
 
 
 ## Habilita o deshabilita los efectos visuales. [br]

@@ -29,6 +29,7 @@ enum GameState {
 @export var effect_manager: EffectManager ## Referencia al manejador de efectos [EffectManager].
 @export var uno_button: UnoButton ## Referencia al botón "UNO" [Button].
 @export var wild_menu: WildMenu
+@export var challenge_menu: ChallengeMenu
 
 @export_group("Player Management")
 @export var players_container: PlayersContainer ## Contenedor de los jugadores [PlayersContainer].
@@ -38,7 +39,9 @@ enum GameState {
 @export var steps: int = 1 ## Cantidad de pasos a mover en el turno (1 o más).
 @export var direction: int = 1 ## Dirección del turno (1 para sentido horario, -1 para sentido antihorario).
 @export var current_state: GameState = GameState.IDLE ## Variable que almacena el estado actual del juego.
-@export var draw_till_valid: bool = false ## Indica si el jugador debe robar hasta obtener una carta válida.
+@export var draw_till_valid: bool = true ## Indica si el jugador debe robar hasta obtener una carta válida.
+@export var challenge_wild_draw: bool = true 
+@export var stack_draw_cards: bool = true
 @export var minimum_draw_cards: int = 1 ## Cantidad mínima de cartas a robar cuando un jugador no puede jugar.
 
 # --- Public Variables ---
@@ -90,6 +93,7 @@ func set_controllers() -> void:
 		controller.connect("draw_card", _on_controller_draw_card)
 		controller.connect("two_cards_left", _on_controller_two_cards_left)
 		controller.connect("color_selected", _on_controller_color_selected)
+		controller.connect("challenge_choice", _on_controller_challenge_choice)
 
 
 ## Inicia el juego repartiendo cartas y configurando el estado inicial.
@@ -131,6 +135,7 @@ func deal_cards(wait_time: float) -> void:
 ## Inicia el EffectManager con los parámetros actuales del juego.
 func start_effect_manager() -> void:
 	effect_manager.set_game_parameters(steps, direction)
+	effect_manager.set_game_rules(challenge_wild_draw, stack_draw_cards)
 	effect_manager.start_arrows_indicator()
 
 
@@ -259,7 +264,6 @@ func get_new_parameters() -> void:
 ## Reglas: Coincidir color, coincidir símbolo, o ser carta negra (Wild).
 func is_valid_card(card_to_validate: Card) -> bool:
 	var last_card: Card = discard_pile.top_card
-	print(last_card.values.color)
 	
 	if card_to_validate.get_card_color() == "black":
 		return true
@@ -387,6 +391,10 @@ func _on_controller_color_selected(color: String) -> void:
 	effect_manager.color_received.emit(color)
 
 
+func _on_controller_challenge_choice(choice: bool) -> void:
+	effect_manager.choice_maked.emit(choice)
+
+
 func _on_effect_manager_draw_processed(target_player: Player, amount: int) -> void:
 	draw_a_card(target_player, amount, true, 0.1)
 
@@ -401,3 +409,35 @@ func _on_effect_manager_show_wild_menu() -> void:
 
 func _on_wild_menu_color_selected(color: String) -> void:
 	effect_manager.color_received.emit(color)
+
+
+func _on_effect_manager_process_choice() -> void:
+	if next_player.is_human:
+		challenge_menu.show_self()
+	
+	next_player.process_challenge_choice()
+
+
+func _on_effect_manager_check_current_player_cards() -> void:
+	var last_card_color: String = discard_pile.prev_card.get_card_color()
+	
+	print(last_card_color)
+	
+	for card: Card in current_player.cards_container.current_hand:
+		print("Carta evaluada: ", card.values.color)
+		if card.values.color == last_card_color:
+			await get_tree().create_timer(0.5).timeout
+			
+			current_player.is_turn = false
+			effect_manager.target_draw_player.emit(current_player)
+			print("Jugador elegido:", current_player)
+			return
+	
+	await get_tree().create_timer(0.5).timeout
+	effect_manager.target_draw_player.emit(null)
+	print("Si llega aqui, estamos bien")
+
+
+func _on_challenge_menu_choice_maked(choice: bool) -> void:
+	effect_manager.choice_maked.emit(choice)
+	print("Game Manager: ", choice)

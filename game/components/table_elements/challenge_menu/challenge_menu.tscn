@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://tfoos43qijcy"]
+
+[ext_resource type="Script" uid="uid://dse2lua5ds6up" path="res://game/components/table_elements/challenge_menu/challenge_menu.gd" id="1_84ljo"]
+
+[node name="ChallengeMenu" type="Control" unique_id=1468637440]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_84ljo")
+
+[node name="AcceptButton" type="Button" parent="." unique_id=1647877061]
+layout_mode = 0
+offset_left = 328.0
+offset_top = 400.0
+offset_right = 492.0
+offset_bottom = 464.0
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 22
+text = "Aceptar"
+
+[node name="ChallengeButton" type="Button" parent="." unique_id=53656135]
+layout_mode = 0
+offset_left = 768.0
+offset_top = 400.0
+offset_right = 932.0
+offset_bottom = 464.0
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 22
+text = "Desafiar"
+
+[connection signal="pressed" from="AcceptButton" to="." method="_on_accept_button_pressed"]
+[connection signal="pressed" from="ChallengeButton" to="." method="_on_challenge_button_pressed"]

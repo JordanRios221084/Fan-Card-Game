@@ -10,6 +10,7 @@ signal draw_card(player: Player) ## Solicita que el jugador IA robe una carta.
 signal two_cards_left(player: Player) ## Avisa al [GameManager] que el jugador actual tiene 2 cartas.
 signal draw_finished() ## Señal que indica que el robo de carta ha finalizado.
 signal color_selected(color: String)
+signal challenge_choice(choice: bool)
 
 # --- Exported Variables ---
 @export_group("References")
@@ -35,6 +36,9 @@ func try_to_process_turn() -> void:
 func try_to_select_color() -> void:
 	print("Base Controller: try_to_select_color called.")
 
+func try_to_challenge_choice() -> void:
+	print("Base Controller: try_to_challenge_choice called.")
+
 
 
 
@@ -55,8 +59,13 @@ func card_draw() -> void:
 	draw_card.emit(player)
 	await draw_finished
 
+
 func color_select(color: String) -> void:
 	color_selected.emit(color)
+
+
+func challenge_draw_choice(choice: bool) -> void:
+	challenge_choice.emit(choice)
 
 
 ## Emite la señal para notificar que el jugador tiene dos cartas restantes.

@@ -78,6 +78,9 @@ func get_card_symbol() -> int:
 	return values.symbol
 
 
+func get_card_type() -> String:
+	return values.type
+
 
 
 

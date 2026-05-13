@@ -18,6 +18,7 @@ const  MOVE_TIME_SECONDS: float = 0.4
 
 # --- Variables ---
 var top_card: Card ## Carta superior del montón de descarte. Dicta el símbolo y color actual.
+var prev_card: Card
 var discarded_cards: Array[Card] = [] ## Cartas que han sido descartadas en el montón.
 var discard_position: Vector2 ## Posición local donde caerán las cartas.
 
@@ -44,6 +45,8 @@ func receive_card(new_card: Card, origin: Node) -> void:
 	
 	new_card.current_parent = self
 	top_card = new_card
+	prev_card = discarded_cards[discarded_cards.size() - 2]
+	print(prev_card.values.color, " ", prev_card.values.type)
 	
 	remove_card_from_group(top_card)
 

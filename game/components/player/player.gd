@@ -82,6 +82,8 @@ func process_turn() -> void:
 func process_color_selection() -> void:
 	self_controller.try_to_select_color()
 
+func process_challenge_choice() -> void:
+	self_controller.try_to_challenge_choice()
 
 func change_show_cards() -> void:
 	show_cards = not show_cards

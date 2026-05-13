@@ -65,6 +65,18 @@ func try_to_select_color() -> void:
 	
 	color_select(most_repeated_color)
 
+func try_to_challenge_choice() -> void:
+	var option: Array[bool] = [true, false]
+	var choice: bool = option.pick_random()
+	
+	var random_wait_time: float = randf_range(WAIT_TIME_SECONDS.x, WAIT_TIME_SECONDS.y)
+	random_wait_time = 0.1 # Ajuste temporal para pruebas rápidas
+
+	await get_tree().create_timer(random_wait_time * MULTIPLIER_TIME).timeout
+	
+	challenge_draw_choice(choice)
+
+
 func count_cards() -> Dictionary:
 	var all_cards: Dictionary = {
 		"red" : 0,

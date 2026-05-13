@@ -52,7 +52,7 @@ func recover_card(recovered_card: Card) -> void:
 
 	recovered_card_data = recovered_card.values
 	
-	if recovered_card_data.type == "wild_card" or recovered_card_data.type == "wild_draw":
+	if recovered_card_data.type == "wild_card" or recovered_card_data.type == "wild_draw4":
 		recovered_card_data.color = "black"
 		recovered_card_data.target_color = Color.BLACK
 
