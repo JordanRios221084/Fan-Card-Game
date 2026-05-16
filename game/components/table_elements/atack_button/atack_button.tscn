@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dtlj1brbftey4"]
+
+[ext_resource type="Script" uid="uid://cbwtog1l32ie1" path="res://game/components/table_elements/atack_button/atack_button.gd" id="1_i2j4m"]
+
+[node name="AtackButton" type="Button" unique_id=281039126]
+visible = false
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -97.0
+offset_top = -117.0
+offset_right = -10.0
+offset_bottom = -64.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "!!!!!!!!!"
+script = ExtResource("1_i2j4m")
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

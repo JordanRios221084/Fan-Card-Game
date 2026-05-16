@@ -7,7 +7,6 @@ extends Node2D
 signal play_card(card: Card, player: Player) ## Juega una carta por parte del jugador IA.
 signal check_card(card: Card) ## Verifica si una carta IA es válida para jugar.
 signal draw_card(player: Player) ## Solicita que el jugador IA robe una carta.
-signal two_cards_left(player: Player) ## Avisa al [GameManager] que el jugador actual tiene 2 cartas.
 signal draw_finished() ## Señal que indica que el robo de carta ha finalizado.
 signal color_selected(color: String)
 signal challenge_choice(choice: bool)
@@ -68,11 +67,10 @@ func challenge_draw_choice(choice: bool) -> void:
 	challenge_choice.emit(choice)
 
 
-## Emite la señal para notificar que el jugador tiene dos cartas restantes.
-func notify_two_cards_left() -> void:
-	two_cards_left.emit(player)
-
-
 ## Emite la señal para notificar que el robo de carta ha finalizado.
 func notify_draw_finished() -> void:
 	draw_finished.emit()
+
+
+func yell_uno() -> void:
+	UnoManager.yell_uno(player)

@@ -50,9 +50,6 @@ func _input(event: InputEvent) -> void:
 func try_to_process_turn() -> void:
 	enabled = true
 
-	if player.cards_container.current_hand.size() == 2:
-		notify_two_cards_left()
-
 
 ## Devuelve el nodo 2d que está debajo del mouse
 func mouse_raycast() -> Node2D:

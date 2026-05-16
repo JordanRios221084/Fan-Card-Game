@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://7jaeovpr26l0"]
+[gd_scene format=3 uid="uid://7jaeovpr26l0"]
 
 [ext_resource type="Script" uid="uid://cedthsisrvpmv" path="res://game/components/vfx/ui_effect/ui_effect.gd" id="1_b4csi"]
 [ext_resource type="Shader" uid="uid://yjf3eopb0w12" path="res://assets/shaders/shadows.gdshader" id="2_7wyk8"]
@@ -21,36 +21,43 @@ shader_parameter/shadow_min_length = 1.0
 shader_parameter/shadow_max_length = 5.0
 shader_parameter/screen_center = Vector2(640, 360)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_2kuux"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_hixtk"]
 atlas = ExtResource("4_sxvoo")
 region = Rect2(0, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_i0acw"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_6sm35"]
 atlas = ExtResource("4_sxvoo")
 region = Rect2(32, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_b1lo0"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_k3hu7"]
 atlas = ExtResource("4_sxvoo")
 region = Rect2(64, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ra4lu"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_nskco"]
 atlas = ExtResource("4_sxvoo")
 region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2l7io"]
+atlas = ExtResource("4_sxvoo")
+region = Rect2(128, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_6uqi0"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_2kuux")
+"texture": SubResource("AtlasTexture_hixtk")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_i0acw")
+"texture": SubResource("AtlasTexture_6sm35")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_b1lo0")
+"texture": SubResource("AtlasTexture_k3hu7")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ra4lu")
+"texture": SubResource("AtlasTexture_nskco")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2l7io")
 }],
 "loop": true,
 "name": &"set_icon",
@@ -82,7 +89,7 @@ scale_max = 15.0
 scale_curve = SubResource("CurveTexture_6e7ln")
 alpha_curve = SubResource("CurveTexture_kkdg7")
 
-[node name="UIEffect" type="Node2D" node_paths=PackedStringArray("effect_label", "effect_label_shadow", "effect_icon_sprite", "effect_icon_shadow_sprite", "burst_effect")]
+[node name="UIEffect" type="Node2D" unique_id=1594195517 node_paths=PackedStringArray("effect_label", "effect_label_shadow", "effect_icon_sprite", "effect_icon_shadow_sprite", "burst_effect")]
 script = ExtResource("1_b4csi")
 effect_label = NodePath("Value")
 effect_label_shadow = NodePath("ShadowValue")
@@ -90,7 +97,7 @@ effect_icon_sprite = NodePath("Icon")
 effect_icon_shadow_sprite = NodePath("IconShadow")
 burst_effect = NodePath("BurstParticles")
 
-[node name="ShadowValue" type="Label" parent="."]
+[node name="ShadowValue" type="Label" parent="." unique_id=490200938]
 material = SubResource("ShaderMaterial_2kuux")
 anchors_preset = 9
 anchor_bottom = 1.0
@@ -106,7 +113,7 @@ text = "99"
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="Value" type="Label" parent="."]
+[node name="Value" type="Label" parent="." unique_id=800322210]
 anchors_preset = 9
 anchor_bottom = 1.0
 offset_top = -9.0
@@ -121,18 +128,18 @@ text = "99"
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="IconShadow" type="AnimatedSprite2D" parent="."]
+[node name="IconShadow" type="AnimatedSprite2D" parent="." unique_id=1665075444]
 material = SubResource("ShaderMaterial_i0acw")
 position = Vector2(-9, 0)
 sprite_frames = SubResource("SpriteFrames_6uqi0")
 animation = &"set_icon"
 
-[node name="Icon" type="AnimatedSprite2D" parent="."]
+[node name="Icon" type="AnimatedSprite2D" parent="." unique_id=1437937526]
 position = Vector2(-9, 0)
 sprite_frames = SubResource("SpriteFrames_6uqi0")
 animation = &"set_icon"
 
-[node name="BurstParticles" type="GPUParticles2D" parent="."]
+[node name="BurstParticles" type="GPUParticles2D" parent="." unique_id=1309433103]
 scale = Vector2(3, 3)
 emitting = false
 amount = 128

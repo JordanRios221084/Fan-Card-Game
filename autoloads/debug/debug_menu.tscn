@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cjrbmek3h8kbq"]
+[gd_scene format=3 uid="uid://cjrbmek3h8kbq"]
 
 [ext_resource type="Script" uid="uid://vu1itg6vvblf" path="res://autoloads/debug/debug_menu.gd" id="1_4mcsi"]
 
@@ -17,7 +17,7 @@ border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oll34"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[node name="DebugMenu" type="CanvasLayer" node_paths=PackedStringArray("menu", "fps_label", "current_player_label", "next_player_label", "direction_label", "console", "input_text", "text_log")]
+[node name="DebugMenu" type="CanvasLayer" unique_id=1717463660 node_paths=PackedStringArray("menu", "fps_label", "current_player_label", "next_player_label", "direction_label", "console", "input_text", "text_log")]
 script = ExtResource("1_4mcsi")
 menu = NodePath("Menu")
 fps_label = NodePath("Menu/VBoxContainer/FPSLabel")
@@ -28,7 +28,7 @@ console = NodePath("Console")
 input_text = NodePath("Console/VBoxContainer/Input")
 text_log = NodePath("Console/VBoxContainer/Log")
 
-[node name="Menu" type="Control" parent="."]
+[node name="Menu" type="Control" parent="." unique_id=711682421]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,7 +37,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Menu"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Menu" unique_id=1289929808]
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 1
 anchors_preset = 2
@@ -49,23 +49,23 @@ offset_right = 209.0
 offset_bottom = -20.0
 grow_vertical = 0
 
-[node name="FPSLabel" type="Label" parent="Menu/VBoxContainer"]
+[node name="FPSLabel" type="Label" parent="Menu/VBoxContainer" unique_id=2014085515]
 layout_mode = 2
 text = "FPS: 999"
 
-[node name="CurrentPLabel" type="Label" parent="Menu/VBoxContainer"]
+[node name="CurrentPLabel" type="Label" parent="Menu/VBoxContainer" unique_id=824880595]
 layout_mode = 2
 text = "Jugador Actual: -----"
 
-[node name="NextPLabel" type="Label" parent="Menu/VBoxContainer"]
+[node name="NextPLabel" type="Label" parent="Menu/VBoxContainer" unique_id=1592259332]
 layout_mode = 2
 text = "Siguiente Jugador: -----"
 
-[node name="DirectionLabel" type="Label" parent="Menu/VBoxContainer"]
+[node name="DirectionLabel" type="Label" parent="Menu/VBoxContainer" unique_id=1205364298]
 layout_mode = 2
 text = "Dirección: 1"
 
-[node name="Console" type="Control" parent="."]
+[node name="Console" type="Control" parent="." unique_id=885710561]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -73,7 +73,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Console"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Console" unique_id=1260551213]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -81,13 +81,13 @@ grow_horizontal = 2
 mouse_filter = 0
 theme_override_constants/separation = 0
 
-[node name="Log" type="RichTextLabel" parent="Console/VBoxContainer"]
+[node name="Log" type="RichTextLabel" parent="Console/VBoxContainer" unique_id=2094242634]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_colors/default_color = Color(0.5882353, 0.5882353, 0.5882353, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_4mcsi")
 
-[node name="Input" type="LineEdit" parent="Console/VBoxContainer"]
+[node name="Input" type="LineEdit" parent="Console/VBoxContainer" unique_id=2106896795]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_o111b")

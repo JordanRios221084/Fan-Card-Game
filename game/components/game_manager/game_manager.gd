@@ -9,7 +9,7 @@ extends Node
 signal player_turn_finished ## Señal emitida cuando el turno del jugador actual ha terminado.
 
 # --- Constants ---
-const STARTING_CARDS: int = 7 ## Cantidad de cartas iniciales que recibe cada jugador.
+const STARTING_CARDS: int = 2 ## Cantidad de cartas iniciales que recibe cada jugador.
 
 # --- Enums ---
 ## Define los posibles estados del juego.
@@ -28,6 +28,7 @@ enum GameState {
 @export var discard_pile: DiscardPile ## Referencia al montón de descarte [DiscardPile].
 @export var effect_manager: EffectManager ## Referencia al manejador de efectos [EffectManager].
 @export var uno_button: UnoButton ## Referencia al botón "UNO" [Button].
+@export var atack_button: AtackButton
 @export var wild_menu: WildMenu
 @export var challenge_menu: ChallengeMenu
 
@@ -41,7 +42,7 @@ enum GameState {
 @export var current_state: GameState = GameState.IDLE ## Variable que almacena el estado actual del juego.
 @export var draw_till_valid: bool = true ## Indica si el jugador debe robar hasta obtener una carta válida.
 @export var challenge_wild_draw: bool = true 
-@export var stack_draw_cards: bool = false
+@export var stack_draw_cards: bool = true
 @export var minimum_draw_cards: int = 1 ## Cantidad mínima de cartas a robar cuando un jugador no puede jugar.
 
 # --- Public Variables ---
@@ -59,6 +60,9 @@ func _ready() -> void:
 	get_players_references()
 	set_controllers()
 	start_game()
+	
+	UnoManager.connect("vulnerability_state_changed", _on_uno_manager_vulnerability_state_changed)
+	UnoManager.connect("punished_player", _on_uno_manager_punished_player)
 
 
 
@@ -86,13 +90,16 @@ func get_players_references() -> void:
 ## Configura las señales y referencias de los controladores de IA y jugadores humanos.
 func set_controllers() -> void:
 	for player: Player in all_players:
+		if player.is_human:
+			uno_button.human_player = player
+			atack_button.human_player = player
+		
 		var controller: Controller = player.self_controller
 		controller.game_manager = self
 
 		controller.connect("check_card", _on_controller_check_card)
 		controller.connect("play_card", _on_controller_play_card)
 		controller.connect("draw_card", _on_controller_draw_card)
-		controller.connect("two_cards_left", _on_controller_two_cards_left)
 		controller.connect("color_selected", _on_controller_color_selected)
 		controller.connect("challenge_choice", _on_controller_challenge_choice)
 
@@ -173,9 +180,14 @@ func change_state(new_state: GameState) -> void:
 		GameState.PLAYING_CARDS:
 			print("---------- JUGADOR JUGANDO ----------")
 			await player_playing_cards() # Procesa el turno del jugador y espera a que termine.
+			if current_player.cards_container.current_hand.size() < 1:
+				change_state(GameState.GAME_ENDED)
+				return
+				
 			change_state(GameState.APPLY_EFFECTS)
 			
 		GameState.GAME_ENDED:
+			effect_manager.winner_effect(current_player)
 			print("---------- JUEGO TERMINADO ----------")
 
 
@@ -214,6 +226,9 @@ func change_current_player_turn() -> void:
 
 	# Desactivamos el turno del jugador anterior
 	prev_current_player.is_turn = false
+	
+	
+	UnoManager.check_post_play_state(prev_current_player, prev_current_player.cards_container.current_hand.size())
 
 	# Asignamos nuevo jugador actual
 	current_player = all_players[new_current_player_index]
@@ -225,7 +240,7 @@ func change_current_player_turn() -> void:
 	# Calculamos el "siguiente" jugador
 	var next_player_index: int = (new_current_player_index + (steps * direction) + total_players) % total_players
 	next_player = all_players[next_player_index]
-
+	
 	DebugMenu.update_players_labels(current_player.name, next_player.name)
 	DebugMenu.update_direction_label(direction)
 
@@ -233,17 +248,30 @@ func change_current_player_turn() -> void:
 ## Procesa el turno del jugador actual, permitiéndole jugar cartas o robar.
 func player_playing_cards() -> void:
 	set_cards_deck_state(true)
-
-	current_player.process_turn()
+	
+	var can_yell_uno: bool = has_playable_card(current_player)
+	
+	if current_player.is_human and can_yell_uno:
+		uno_button.show_button(can_yell_uno)
+	
+	current_player.process_turn(can_yell_uno)
 	
 	await player_turn_finished
 	
 	set_cards_deck_state(false)
+	
+	await get_tree().create_timer(0.1).timeout
 
-	var transition_time_seconds: float = 0.1
-	await get_tree().create_timer(transition_time_seconds).timeout
 
-
+func has_playable_card(player: Player) -> bool:
+	if player.cards_container.current_hand.size() != 2:
+		return false
+	
+	for card: Card in player.cards_container.current_hand:
+		if is_valid_card(card):
+			return true
+	
+	return false
 
 
 
@@ -315,11 +343,16 @@ func draw_a_card(target_player: Player, amount: int, forced: bool = false, draw_
 			var new_card: Card = await get_new_card(target_player, draw_speed)
 			if is_valid_card(new_card):
 				stop_drawing = true
+				if current_player.is_human and current_player.cards_container.current_hand.size() == 2:
+					uno_button.show_button(true)
+	
 	# Si no es hasta encontrar una válida, robamos una sola carta
 	else:
 		var new_card: Card = await get_new_card(target_player, draw_speed/2)
 		if not is_valid_card(new_card):
 			player_turn_finished.emit()
+		elif current_player.is_human and current_player.cards_container.current_hand.size() == 2:
+			uno_button.show_button(true)
 	
 	# Emitimos la señal de robo finalizado
 	target_player.self_controller.notify_draw_finished()
@@ -389,10 +422,6 @@ func _on_controller_play_card(card: Card, player: Player) -> void:
 func _on_controller_draw_card(player: Player) -> void:
 	deck.disable_deck() # Deshabilitar el mazo para evitar múltiples robos rápidos
 	draw_a_card(player, minimum_draw_cards)
-
-
-func _on_controller_two_cards_left(player: Player) -> void:
-	pass
 
 
 func _on_controller_color_selected(color: String) -> void:
@@ -467,3 +496,12 @@ func _on_effect_manager_check_next_player_cards(card: Card) -> void:
 
 func _on_effect_manager_current_stack_state(active: bool) -> void:
 	is_stack_active = active
+
+
+func _on_uno_manager_vulnerability_state_changed(state: bool) -> void:
+	if state:
+		for player: Player in all_players:
+			player.process_uno_challenge()
+
+func _on_uno_manager_punished_player(target: Player) -> void:
+	draw_a_card(target, 2, true)

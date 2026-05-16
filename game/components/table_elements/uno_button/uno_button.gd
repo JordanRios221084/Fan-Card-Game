@@ -2,15 +2,12 @@ class_name UnoButton
 extends Button
 ## Componente que representa el botón "UNO" en el juego.
 
+var human_player: Player = null
 
-# --- Signals ---
-## Emite la señal ¡UNO! cuando el botón es presionado.
-signal uno_called
-
+func show_button(state: bool) -> void:
+	self.visible = state
 
 ## --- Signals Callbacks ---
 func _on_pressed() -> void:
-	uno_called.emit()
-	
-	disabled = true
-	visible = false
+	UnoManager.yell_uno(human_player)
+	show_button(false)

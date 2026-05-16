@@ -18,8 +18,6 @@ const _WAIT_TIME_SECONDS: float = 0.25
 @export var is_human: bool = false
 ## Muestra las cartas para el modo DEBUG
 @export var show_cards: bool = false
-## Indica si el jugador ha declarado "UNO".
-@export var has_called_uno: bool = false
 
 @export_group("Components")
 ## Contenedor visual de las cartas
@@ -76,14 +74,32 @@ func play_a_card(card_to_play: Card) -> void:
 
 ## Procesa el turno del jugador llamando a su controlador asociado. [br]
 ## Utiliza la función [Controller.try_to_process_turn] del controlador.
-func process_turn() -> void:
+func process_turn(can_yell: bool) -> void:
 	self_controller.try_to_process_turn()
+	
+	if not can_yell:
+		return
+	
+	if self_controller is AutoController:
+		var rand_time: float = randf_range(0.25, 5.0)
+		
+		await get_tree().create_timer(rand_time).timeout
+		
+		self_controller.yell_uno()
 
 func process_color_selection() -> void:
 	self_controller.try_to_select_color()
 
 func process_challenge_choice() -> void:
 	self_controller.try_to_challenge_choice()
+
+func process_uno_challenge() -> void:
+	if self_controller is AutoController:
+		var rand_time: float = randf_range(0.1, 3.0)
+		
+		await get_tree().create_timer(rand_time).timeout
+		
+		UnoManager.challenge_uno(self)
 
 func change_show_cards() -> void:
 	show_cards = not show_cards

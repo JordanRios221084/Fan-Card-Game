@@ -27,9 +27,6 @@ func add_valid_card(card: Card) -> void:
 # -------------------- Procesamiento automatico de la IA --------------------
 
 func try_to_process_turn() -> void:
-	if player.cards_container.current_hand.size() == 2:
-		notify_two_cards_left() # Emite una señal si el jugador tiene 2 cartas
-	
 	var random_wait_time: float = randf_range(WAIT_TIME_SECONDS.x, WAIT_TIME_SECONDS.y)
 	random_wait_time = 0.1 # Ajuste temporal para pruebas rápidas
 

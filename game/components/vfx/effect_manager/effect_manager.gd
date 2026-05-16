@@ -46,6 +46,8 @@ var stack_rule: bool
 # -------------------- Engine Functions --------------------
 func _ready() -> void:
 	screen_center = get_viewport_rect().size / 2
+	UnoManager.connect("uno_yelled", _on_uno_manager_uno_yelled)
+	UnoManager.connect("punished_player", _on_uno_manager_punished_player)
 
 
 func _process(delta: float) -> void:
@@ -130,21 +132,22 @@ func process_effect(card: Card, target_player: Player, current_player: Player) -
 						if new_target_player:
 							await draw_effect(new_target_player as Player, int(current_effect.value) + stacked_draw)
 							stacked_draw = 0
+							stack_state_report()
 							break
 						else:
 							await draw_effect(target_player, int(current_effect.value) + 2 + stacked_draw)
 							stacked_draw = 0
+							stack_state_report()
 					else:
 						await draw_effect(target_player, int(current_effect.value) + stacked_draw)
 						stacked_draw = 0
+						stack_state_report()
 				else:
 					stacked_draw += int(current_effect.value)
 					stack_state_report()
 					break
-					
-				stack_state_report()
 				
-				await get_tree().create_timer(0.1)
+				await get_tree().create_timer(0.1).timeout
 				
 				toggle_visual_effects(true)
 			"wild":
@@ -297,6 +300,12 @@ func create_visual_effect(effect_icon: String, start_pos: Vector2, final_node: N
 		"reverse":
 			effect_icon_id = 2
 			ui_effect.set_effect(effect_icon_id)
+		"uno":
+			effect_icon_id = 3
+			ui_effect.set_effect(effect_icon_id)
+		"atack":
+			effect_icon_id = 4
+			ui_effect.set_effect(effect_icon_id)
 		_:
 			push_warning("EffectManager: Icono de efecto desconocido: ", effect_icon)
 
@@ -329,3 +338,16 @@ func create_visual_effect(effect_icon: String, start_pos: Vector2, final_node: N
 	await effect_tween.finished
 
 	ui_effect.queue_free()
+
+
+func winner_effect(winner: Player) -> void:
+	foreground.show_winner(winner)
+
+
+
+func _on_uno_manager_uno_yelled(player: Player) -> void:
+	create_visual_effect("uno", player.position, player)
+
+
+func _on_uno_manager_punished_player(victim: Player) -> void:
+	create_visual_effect("atack", screen_center, victim, true)

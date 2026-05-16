@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://1o0g7l64256q"]
+[gd_scene format=3 uid="uid://1o0g7l64256q"]
 
-[ext_resource type="Script" uid="uid://dynojwrb2mqqi" path="res://game/components/effects/foreground/script/foreground.gd" id="2_jrr54"]
+[ext_resource type="Script" uid="uid://dynojwrb2mqqi" path="res://game/components/vfx/foreground/foreground.gd" id="2_jrr54"]
 [ext_resource type="Shader" uid="uid://dksjvr31sx47u" path="res://assets/shaders/shock.gdshader" id="2_qw644"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jrr54"]
@@ -12,11 +12,27 @@ shader_parameter/aberration = 0.425
 shader_parameter/width = 0.04
 shader_parameter/feather = 0.135
 
-[node name="Foreground" type="ColorRect"]
+[node name="Foreground" type="ColorRect" unique_id=1464121309 node_paths=PackedStringArray("winner_label")]
 material = SubResource("ShaderMaterial_jrr54")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("2_jrr54")
+winner_label = NodePath("WinnerLabel")
+
+[node name="WinnerLabel" type="Label" parent="." unique_id=1062886411]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.49803922)
+theme_override_font_sizes/font_size = 48
+text = "¡¡¡ --- ha ganado !!!"
+horizontal_alignment = 1
+vertical_alignment = 1
